@@ -1,9 +1,13 @@
+# Uncomment this for Mac M1 where homebrew will be installed
+# to a different location
+--global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
+AppKit==0.2.8
 google-api-python-client==2.11.0
 Kivy==2.0.0
 Kivy-examples==2.0.0
 Kivy-Garden==0.1.4
-pocketsphinx==0.1.15
+#pocketsphinx==0.1.15
 PyAudio==0.2.11
 # Appears to require XCode on Mac
-# PyAutoGUI==0.9.52
-SpeechRecognition==3.8.1
+PyAutoGUI==0.9.52
+SpeechRecognition==3.6.1
