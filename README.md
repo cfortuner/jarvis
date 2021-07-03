@@ -14,6 +14,8 @@ Potential use cases
 
 ## Setup
 
+(Tested on MacOS Big Sur 11.4)
+
 1. Install Pyenv and Python 3.6 on MacOSX (newer python versions not supported by some deps)
 
 ```bash
@@ -42,7 +44,6 @@ source .venv/bin/activate
 ```bash
 # Microphone support
 brew install portaudio
-export ARCHFLAGS="-arch x86_64"
 
 # Offline NLP library
 # https://pypi.org/project/pocketsphinx/
@@ -53,6 +54,7 @@ brew install swig
 4. Install python dependencies
 
 ```bash
+# export ARCHFLAGS="-arch x86_64"  # for pyaudio on older versions of MacOS (not required on Big Sur)
 pip install -r requirements.txt
 ```
 
@@ -61,4 +63,7 @@ pip install -r requirements.txt
 ```bash
 # Say something
 python speech_recognition_examples.py
+
+# A window with "Hello world" should open
+python kivy_example.py
 ```
