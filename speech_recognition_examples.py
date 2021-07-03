@@ -1,3 +1,8 @@
+"""Example speech-to-text using SpeechRecognition with Sphinx/Google backends.
+
+After executing the script, stay quiet for a bit so the microphone can establish a baseline of ambient noise.
+"""
+
 import speech_recognition as sr
 
 # obtain audio from the microphone

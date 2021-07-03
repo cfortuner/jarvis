@@ -66,4 +66,25 @@ python speech_recognition_examples.py
 
 # A window with "Hello world" should open
 python kivy_example.py
+
+# Run the Kivy GUI
+python speech_app.py
 ```
+
+## Distributing the app
+
+Some options for packaging the app into a native executable:
+
+* https://github.com/pyinstaller/pyinstaller
+* https://pyoxidizer.readthedocs.io/en/stable/pyoxidizer_comparisons.html
+* https://py2app.readthedocs.io/en/latest/ (Mac-only)
+
+## Links
+
+For creating menu bars on MacOS
+* https://github.com/jaredks/rumps
+* https://stackoverflow.com/questions/26815360/how-to-create-menu-item-in-osx-menubar-using-pyinstaller-packaged-kivy-python-ap
+
+Similar projects
+* https://github.com/ulwlu/kivy-speech-recognition/blob/master/main.py
+* https://github.com/jmercouris/speech_recognition
