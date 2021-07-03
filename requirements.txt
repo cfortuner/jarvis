@@ -1,1 +1,5 @@
+google-api-python-client==2.11.0
+pocketsphinx==0.1.15
+PyAudio==0.2.11
 PyAutoGUI==0.9.52
+SpeechRecognition==3.8.1
