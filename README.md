@@ -49,6 +49,8 @@ brew install portaudio
 # https://pypi.org/project/pocketsphinx/
 # https://github.com/Uberi/speech_recognition/blob/master/reference/pocketsphinx.rst
 brew install swig
+
+brew install cairo
 ```
 
 4. Install python dependencies

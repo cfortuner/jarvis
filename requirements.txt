@@ -1,6 +1,7 @@
 # Uncomment this for Mac M1 where homebrew will be installed
 # to a different location
---global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
+#--global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
+--no-use-pep517
 AppKit==0.2.8
 google-api-python-client==2.11.0
 Kivy==2.0.0
