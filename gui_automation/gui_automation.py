@@ -37,6 +37,10 @@ class GUIAutomation(object):
         """
         pyautogui.hotkey(keys)
 
+    def get_screensize(self) -> list:
+        """Return the screen size in pixels (width, height)"""
+        return pyautogui.size()
+
     # Standard OS interaction functions that should work on
     # all OS and Desktop environments
     def screenshot(self) -> None:

@@ -1,6 +1,7 @@
-from commands.base import CommandBase
 from typing import List
+
 from actions import ActionBase, SwitchAction
+
 
 class CommandParser(object):
     def parse(cmd: str) -> List[ActionBase]:
