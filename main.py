@@ -1,9 +1,4 @@
-from .command_listener import CommandListener
-from .command_parser import CommandParser
+from speech_app import SpeechApp
 
 if __name__ == '__main__':
-    parser = CommandParser()
-    cmd = CommandListener.listen()
-    actions = parser.parse(cmd)
-    for a in actions:
-        a.run()
+    SpeechApp().run()
