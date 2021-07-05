@@ -93,13 +93,13 @@ pip install -r requirements.txt
 
 ```bash
 # Say something
-python speech_recognition_examples.py
+python scratch/speech_recognition_examples.py
 
 # A window with "Hello world" should open
-python kivy_example.py
+python scratch/kivy_example.py
 
-# Run the Kivy GUI
-python speech_app.py
+# Run the main app
+python main.py
 ```
 
 ## Distributing the app
