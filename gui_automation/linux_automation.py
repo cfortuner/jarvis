@@ -1,3 +1,5 @@
+import logging
+import os
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
@@ -8,6 +10,17 @@ from gui_automation import GUIAutomation
 
 
 class LinuxAutomation(GUIAutomation):
+    COMMON_APP_NAME_MAPPINGS = {
+        "browser": "xdg-open https://www.google.com",
+        "chrome": "google-chrome",
+        "explorer": "nautilus",
+        "finder": "nautilus",
+        "file explorer": "nautilus",
+        "terminal": "x-terminal-emulator",
+        "command line": "x-terminal-emulator",
+        "command prompt": "x-terminal-emulator",
+    }
+
     def __exit__(self):
         # TODO(hari): Make sure this gets called
         Wnck.shutdown()
@@ -64,4 +77,7 @@ class LinuxAutomation(GUIAutomation):
         raise Exception(f"Failed to find an app with name {app_name}")
 
     def open_application(self, app_name: str):
-        raise NotImplementedError("Needs to be overriden by the derived class")
+        if app_name in self.COMMON_APP_NAME_MAPPINGS:
+            app_name = self.COMMON_APP_NAME_MAPPINGS[app_name]
+        logging.info(app_name)
+        return os.system(app_name)

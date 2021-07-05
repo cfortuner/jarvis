@@ -71,5 +71,7 @@ class GUIAutomation(object):
         raise NotImplementedError("Needs to be overriden by the derived class")
 
     def open_application(self, app_name: str):
-        """Launch an application with the name specified by app_name"""
+        """Launch an application with the name specified by app_name while
+        also doing some mapping between common application names. For ex.,
+        browser should mean default browser application."""
         raise NotImplementedError("Needs to be overriden by the derived class")

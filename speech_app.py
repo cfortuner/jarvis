@@ -32,6 +32,8 @@ from command_parser import CommandParser
 
 
 class SpeechApp(App):
+    GREETING_TEXT = "What can I do for you?"
+
     def build(self):
         # This seems to first create regular sized window
         # and then update it to the specified size. It's
@@ -43,13 +45,12 @@ class SpeechApp(App):
         self.ui_automation = create_automation_instance()
 
         screensize = self.ui_automation.get_screensize()
-        print(screensize[0])
         Window.left = screensize[0] - window_width - 15
         Window.top = 40
         # Window.clearcolor = (1, 1, 1, 0.5)
 
         label = Label(
-            text="Speak thy command!",
+            text=self.GREETING_TEXT,
             size_hint=(1.0, .5),
             color=(1, 1, 1, 1),
             font_size="14sp",
@@ -85,11 +86,18 @@ class SpeechApp(App):
         button.disabled = True
         text = self.clistener.listen()
 
-        label.text = f"You said:\n\n'{text}'\n\nClick to record again."
-        button.disabled = False
+        label.text = text
 
-        # parser = CommandParser()
-        # actions = parser.parse(text)
-        # for a in actions:
-        #     a.run()
+        try:
+            parser = CommandParser()
+            actions = parser.parse(text)
+            for a in actions:
+                logging.info(f"Running {a.name}")
+                a.run(self.ui_automation)
+
+            label.text = self.GREETING_TEXT
+        except Exception as e:
+            label.text = f"Uh oh! Failed to act on this: {str(e)}"
+
+        button.disabled = False
         

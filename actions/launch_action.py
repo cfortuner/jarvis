@@ -9,5 +9,7 @@ class LaunchAction(ActionBase):
         self.app_name = app_name
     
     def run(self, gui: GUIAutomation):
-        # TODO(hari): Find if this is a valid app name before launching
-        os.system(self.app_name)
+        self.app_name = self.app_name.strip().lower()
+        ret_code = gui.open_application(self.app_name)
+        if ret_code != 0:
+            raise Exception(f"Failed to launch the application: {ret_code}")
