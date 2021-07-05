@@ -10,6 +10,7 @@ Kivy-Garden==0.1.4
 PyAudio==0.2.11
 # Appears to require XCode on Mac
 PyAutoGUI==0.9.52
+psutil==5.8.0
 SpeechRecognition==3.6.1
 
 # Uncomment these for Ubuntu

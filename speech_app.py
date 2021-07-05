@@ -87,6 +87,7 @@ class SpeechApp(App):
         text = self.clistener.listen()
 
         label.text = text
+        logging.info(f"Received {text}")
 
         try:
             parser = CommandParser()

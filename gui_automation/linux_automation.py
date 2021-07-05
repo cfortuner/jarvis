@@ -1,10 +1,10 @@
 import logging
 import os
+import psutil
 import gi
-gi.require_version('Gtk', '3.0')
 gi.require_version('Wnck', '3.0')
 
-from gi.repository import Gtk, Wnck, GdkX11, Gdk
+from gi.repository import Wnck, GdkX11, Gdk
 
 from gui_automation import GUIAutomation
 
@@ -30,15 +30,30 @@ class LinuxAutomation(GUIAutomation):
         screen.force_update()
         return screen.get_windows()
 
+    def _get_window_name(self, win):
+        return psutil.Process(win.get_pid()).name()
+
+    def _get_window_with_name(self, win_name):
+        for w in self._get_running_apps():
+            if self._get_window_name(w) == win_name:
+                return w
+        
+        return None
+
     def get_list_of_windows(self) -> list:
-        return map(lambda w: w.get_name(), self._get_running_apps())
+        return list(map(self._get_window_name, 
+                        self._get_running_apps()))
 
     def get_active_window(self) -> str:
         screen = Wnck.Screen.get_default()
         screen.force_update()
-        return screen.get_active_window().get_name()
+        return self._get_window_name(screen.get_active_window())
 
     def switch_to_window(self, app_name: str):
+        w = self._get_window_with_name(app_name)
+        if w is None:
+            raise Exception(f"Failed to find an app with name {app_name}")
+
         # X11 requires that the correct time be set
         # for any events for them to act properly so
         # reading the current time from the server
@@ -46,35 +61,28 @@ class LinuxAutomation(GUIAutomation):
             GdkX11.X11Window.lookup_for_display(
                 Gdk.Display.get_default(), 
                 GdkX11.x11_get_default_root_xwindow()))
-        windows = self._get_running_apps()
-        for w in windows:
-            if w.get_name() == app_name:
-                w.activate(now)
-        
-        raise Exception(f"Failed to find an app with name {app_name}")
+        w.activate(now)
 
     def get_window_bounds(self, app_name) -> list:
-        windows = self._get_running_apps()
-        for w in windows:
-            if w.get_name() == app_name:
-                return list(w.get_geometry())
+        w = self._get_window_with_name(app_name)
+        if w is None:
+            raise Exception(f"Failed to find an app with name {app_name}")
 
-        raise Exception(f"Failed to find an app with name {app_name}")
+        return list(w.get_geometry())
 
     def set_window_bounds(self, app_name, bounds: list) -> None:
-        windows = self._get_running_apps()
-        for w in windows:
-            if w.get_name() == app_name:
-                w.set_geometry(
-                    Wnck.WindowGravity.CURRENT,
-                    # Resize mask specifies flags for which dimension of the
-                    # geometry needs to be updated. Configuring here for all 
-                    # dimensions to be updated.
-                    # https://lazka.github.io/pgi-docs/Wnck-3.0/flags.html#Wnck.WindowMoveResizeMask
-                    15,
-                    bounds[0], bounds[1], bounds[2], bounds[3])
+        w = self._get_window_with_name(app_name)
+        if w is None:
+            raise Exception(f"Failed to find an app with name {app_name}")
 
-        raise Exception(f"Failed to find an app with name {app_name}")
+        w.set_geometry(
+            Wnck.WindowGravity.CURRENT,
+            # Resize mask specifies flags for which dimension of the
+            # geometry needs to be updated. Configuring here for all 
+            # dimensions to be updated.
+            # https://lazka.github.io/pgi-docs/Wnck-3.0/flags.html#Wnck.WindowMoveResizeMask
+            15,
+            bounds[0], bounds[1], bounds[2], bounds[3])
 
     def open_application(self, app_name: str):
         if app_name in self.COMMON_APP_NAME_MAPPINGS:
