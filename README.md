@@ -14,6 +14,7 @@ Potential use cases
 
 ## Setup
 
+### Mac Setup
 (Tested on MacOS Big Sur 11.4)
 
 1. Install Pyenv and Python 3.6 on MacOSX (newer python versions not supported by some deps)
@@ -31,15 +32,7 @@ pyenv init
 Python 3.6.14
 ```
 
-2. Create Virtualenv (Python 3.6)
-
-```bash
-pip install virtualenv
-virtualenv .venv
-source .venv/bin/activate
-```
-
-3. Install prerequisites for SpeechRecognition https://pypi.org/project/SpeechRecognition/
+2. Install prerequisites for SpeechRecognition https://pypi.org/project/SpeechRecognition/
 
 ```bash
 # Microphone support
@@ -53,14 +46,50 @@ brew install swig
 brew install cairo
 ```
 
-4. Install python dependencies
+### Ubuntu Setup
+
+(Tested on Ubuntu 20.04)
+
+1. Install Python Virtual Environment
+
+```
+sudo apt install python3-venv
+```
+
+2. Install library dependencies
+
+```
+sudo apt install python3.8-dev
+
+# Kivy depends on this
+sudo apt install python3-tk
+sudo apt install libcairo2-dev
+
+# SpeechRecognition package depends on these
+sudo apt install libportaudio2 portaudio19-dev
+
+# PyGObject depends on this
+sudo apt install libgirepository1.0-dev
+```
+
+### Common Python Setup
+
+1. Create Virtualenv (Python 3.6)
+
+```bash
+pip install virtualenv
+virtualenv .venv
+source .venv/bin/activate
+```
+
+2. Install python dependencies
 
 ```bash
 # export ARCHFLAGS="-arch x86_64"  # for pyaudio on older versions of MacOS (not required on Big Sur)
 pip install -r requirements.txt
 ```
 
-5. Verify things are working
+3. Verify things are working
 
 ```bash
 # Say something

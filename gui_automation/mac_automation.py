@@ -48,11 +48,11 @@ class MacAutomation(GUIAutomation):
         # to use the int instead of the symbolic names
         app_ra.activateWithOptions_(3)
 
-    def get_window_bounds(self) -> list:
-        pass
+    def get_window_bounds(self, app_name) -> list:
+        raise NotImplementedError()
 
-    def set_window_bounds(self, bounds) -> None:
-        pass
+    def set_window_bounds(self, app_name, bounds) -> None:
+        raise NotImplementedError()
 
 if __name__ == '__main__':
     mac = MacAutomation()

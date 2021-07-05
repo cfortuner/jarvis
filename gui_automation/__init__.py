@@ -9,5 +9,8 @@ def create_automation_instance():
     if 'darwin' in sys.platform.lower():
         from .mac_automation import MacAutomation
         return MacAutomation()
+    elif 'linux' in sys.platform.lower():
+        from .linux_automation import LinuxAutomation
+        return LinuxAutomation()
     else:
         raise NotImplementedError(f"{sys.platform} is not currently supported")
