@@ -15,9 +15,9 @@ Potential use cases
 ## Setup
 
 ### Mac Setup
-(Tested on MacOS Big Sur 11.4, M1 Chip)
+(Tested on MacOS Big Sur 11.4, M1 Chip, Intel Chip)
 
-1. Install Pyenv and Python 3.8.10 on M1
+1. Install Pyenv and Python 3.8.10
 
 ```bash
 brew install pyenv
@@ -45,17 +45,10 @@ brew install swig
 
 # For AppKit
 brew install cairo gobject-introspection
-```
 
-3. Install [Kivy](https://kivy.org) (after creating Python virtualenv)
-
-```bash
-# The M1 architecture requires we install Kivy from source
-# https://kivy.org/doc/stable/gettingstarted/installation.html#from-source
-# https://kivy.org/doc/stable/installation/installation-osx.html#install-source-osx
+# For Kivy
+# https://kivy.org/doc/stable/installation/installation-osx.html#install-source-os
 brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
-git clone git://github.com/kivy/kivy.git kivy_repo && cd kivy_repo
-python -m pip install -e ".[base]"  && cd ..
 ```
 
 ### Ubuntu Setup
@@ -101,7 +94,16 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Verify things are working
+3. Install [Kivy](https://kivy.org) (Mac Only)
+
+```bash
+# The M1 architecture requires we install Kivy from source
+# https://kivy.org/doc/stable/gettingstarted/installation.html#from-source
+git clone git://github.com/kivy/kivy.git kivy_repo && cd kivy_repo
+python -m pip install -e ".[base]"  && cd ..
+```
+
+4. Verify things are working
 
 ```bash
 # Say something

@@ -4,12 +4,11 @@
 # All platforms
 google-api-python-client==2.11.0
 # pocketsphinx==0.1.15
-psutil==5.8.0
 PyAudio==0.2.11
 PyAutoGUI==0.9.52  # Requires XCode on Mac
 SpeechRecognition==3.6.1
 
-# For MacOS (M1)
+# For MacOS
 # AppKit==0.2.8; sys_platform == "darwin"  # Doesn't install correctly on M1
 iterm2; sys_platform == "darwin"  # HACK: Installs AppKit correctly
 PEP517  # Equivalent to --no-use-pep517 flag, needed for PyAutoGUI
