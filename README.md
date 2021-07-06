@@ -70,6 +70,9 @@ sudo apt install libportaudio2 portaudio19-dev
 
 # PyGObject depends on this
 sudo apt install libgirepository1.0-dev
+
+# Keybinding requires this
+sudo apt install libkeybinder-3.0-0 gir1.2-keybinder-3.0
 ```
 
 ### Common Python Setup

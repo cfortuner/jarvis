@@ -31,6 +31,8 @@ from command_listener import CommandListener
 from command_parser import CommandParser
 
 
+ShortCutKeys = ['ctrl', 'alt', 'j']
+
 class SpeechApp(App):
     GREETING_TEXT = "What can I do for you?"
 
@@ -76,6 +78,10 @@ class SpeechApp(App):
         vlayout.add_widget(talk_btn)
         vlayout.add_widget(Label(size_hint=(0.42, 1.0)))
         layout.add_widget(vlayout)
+
+        # TODO(hari): Doesn't seem to work for some reason
+        # self.ui_automation.register_hotkey(ShortCutKeys, 
+        #     lambda k, u: self.record(label, talk_btn))
         
         return layout
     

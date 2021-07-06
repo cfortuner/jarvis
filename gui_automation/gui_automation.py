@@ -75,3 +75,8 @@ class GUIAutomation(object):
         also doing some mapping between common application names. For ex.,
         browser should mean default browser application."""
         raise NotImplementedError("Needs to be overriden by the derived class")
+
+    def register_hotkey(self, keys, callback):
+        """Register a global hotkey that triggers the callback whenever
+        it is pressed"""
+        raise NotImplementedError("Needs to be overriden by the derived class")

@@ -3,8 +3,9 @@ import os
 import psutil
 import gi
 gi.require_version('Wnck', '3.0')
+gi.require_version('Keybinder', '3.0')
 
-from gi.repository import Wnck, GdkX11, Gdk
+from gi.repository import Wnck, GdkX11, Gdk, Keybinder
 
 from gui_automation import GUIAutomation
 
@@ -20,6 +21,11 @@ class LinuxAutomation(GUIAutomation):
         "command line": "x-terminal-emulator",
         "command prompt": "x-terminal-emulator",
     }
+
+    def __init__(self):
+        super().__init__()
+
+        Keybinder.init()
 
     def __exit__(self):
         # TODO(hari): Make sure this gets called
@@ -89,3 +95,19 @@ class LinuxAutomation(GUIAutomation):
             app_name = self.COMMON_APP_NAME_MAPPINGS[app_name]
         logging.info(app_name)
         return os.system(app_name)
+
+    def register_hotkey(self, keys, callback):
+        def add_tags(key):
+            if key == 'ctrl':
+                return '<Ctrl>'
+            elif key == 'alt':
+                return '<Alt>'
+            elif key == 'shift':
+                return '<Shift>'
+            
+            return key
+
+        keys = [add_tags(k.lower()) for k in keys]
+        shortcut_key = ''.join(keys)
+        logging.info(shortcut_key)
+        Keybinder.bind(shortcut_key, callback)
