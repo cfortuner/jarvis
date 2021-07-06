@@ -15,35 +15,47 @@ Potential use cases
 ## Setup
 
 ### Mac Setup
-(Tested on MacOS Big Sur 11.4)
+(Tested on MacOS Big Sur 11.4, M1 Chip)
 
-1. Install Pyenv and Python 3.6 on MacOSX (newer python versions not supported by some deps)
+1. Install Pyenv and Python 3.8.10 on M1
 
 ```bash
 brew install pyenv
-pyenv install 3.6.14
-pyenv global 3.6.14
+pyenv install 3.8.10
+pyenv global 3.8.10
 
 # Run this and follow instructions for how to update your PATH, ~/.profile, ~/.zprofile, and ~/.zshrc. Then do a full logout and log back in.
 pyenv init
 
 # Verify pyenv is working
 >> python -V 
-Python 3.6.14
+Python 3.8.10
 ```
 
-2. Install prerequisites for SpeechRecognition https://pypi.org/project/SpeechRecognition/
+2. Install homebrew prerequisites
 
 ```bash
 # Microphone support
 brew install portaudio
 
-# Offline NLP library
+# Sphinx NLP library (Optional, also requires python 3.6)
 # https://pypi.org/project/pocketsphinx/
 # https://github.com/Uberi/speech_recognition/blob/master/reference/pocketsphinx.rst
 brew install swig
 
-brew install cairo
+# For AppKit
+brew install cairo gobject-introspection
+```
+
+3. Install [Kivy](https://kivy.org) (after creating Python virtualenv)
+
+```bash
+# The M1 architecture requires we install Kivy from source
+# https://kivy.org/doc/stable/gettingstarted/installation.html#from-source
+# https://kivy.org/doc/stable/installation/installation-osx.html#install-source-osx
+brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
+git clone git://github.com/kivy/kivy.git kivy_repo && cd kivy_repo
+python -m pip install -e ".[base]"  && cd ..
 ```
 
 ### Ubuntu Setup
@@ -70,18 +82,15 @@ sudo apt install libportaudio2 portaudio19-dev
 
 # PyGObject depends on this
 sudo apt install libgirepository1.0-dev
-
-# Keybinding requires this
-sudo apt install libkeybinder-3.0-0 gir1.2-keybinder-3.0
 ```
 
 ### Common Python Setup
 
-1. Create Virtualenv (Python 3.6)
+1. Create Virtualenv (Python 3.8)
 
 ```bash
-pip install virtualenv
-virtualenv .venv
+pip3 install virtualenv
+virtualenv .venv --python=python3
 source .venv/bin/activate
 ```
 
@@ -101,7 +110,7 @@ python scratch/speech_recognition_examples.py
 # A window with "Hello world" should open
 python scratch/kivy_example.py
 
-# Run the main app
+# Run the main app (then click Record and "Switch to Chrome")
 python main.py
 ```
 
@@ -115,6 +124,9 @@ Some options for packaging the app into a native executable:
 
 ## Links
 
+Documentation
+* [AppKit](https://developer.apple.com/documentation/appkit)
+
 For creating menu bars on MacOS
 * https://github.com/jaredks/rumps
 * https://stackoverflow.com/questions/26815360/how-to-create-menu-item-in-osx-menubar-using-pyinstaller-packaged-kivy-python-ap
@@ -122,3 +134,15 @@ For creating menu bars on MacOS
 Similar projects
 * https://github.com/ulwlu/kivy-speech-recognition/blob/master/main.py
 * https://github.com/jmercouris/speech_recognition
+
+
+## Roadmap
+
+Features / Enhancements
+
+* Keyboard shortcut to open App and click record
+
+Bugs / Known Issues
+
+* Speech recognition gets stuck during Record if background noise fluctuates after calibration
+

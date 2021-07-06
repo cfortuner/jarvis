@@ -1,17 +1,21 @@
-# Uncomment this for Mac M1 where homebrew will be installed
-# to a different location
-#--global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
-AppKit==0.2.8; sys_platform == "darwin"
+# Uncomment this for Mac M1, as homebrew is installed in a different location
+# --global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
+
+# All platforms
 google-api-python-client==2.11.0
-Kivy==2.0.0
-Kivy-examples==2.0.0
-Kivy-Garden==0.1.4
-#pocketsphinx==0.1.15
-PyAudio==0.2.11
-# Appears to require XCode on Mac
-PyAutoGUI==0.9.52
+# pocketsphinx==0.1.15
 psutil==5.8.0
+PyAudio==0.2.11
+PyAutoGUI==0.9.52  # Requires XCode on Mac
 SpeechRecognition==3.6.1
 
-# Uncomment these for Ubuntu
+# For MacOS (M1)
+# AppKit==0.2.8; sys_platform == "darwin"  # Doesn't install correctly on M1
+iterm2; sys_platform == "darwin"  # HACK: Installs AppKit correctly
+PEP517  # Equivalent to --no-use-pep517 flag, needed for PyAutoGUI
+
+# For Linux
 pygobject==3.40.1; sys_platform == "linux"
+Kivy==2.0.0; sys_platform == "linux"
+Kivy-examples==2.0.0; sys_platform == "linux"
+Kivy-Garden==0.1.4; sys_platform == "linux"
