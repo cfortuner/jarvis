@@ -143,8 +143,12 @@ Similar projects
 Features / Enhancements
 
 * Keyboard shortcut to open App and click record
+* "Listening" animation after clicking record
+* Dedicated console on GUI for debug logs (currently logs are truncated)
+* Improve responsiveness of speech recognition
 
 Bugs / Known Issues
 
 * Speech recognition gets stuck during Record if background noise fluctuates after calibration
+* Logs are truncated at the sides on MacOS
 
