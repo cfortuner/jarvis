@@ -208,6 +208,7 @@ def test_streaming_speech_recognition():
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=RATE,
         language_code=language_code,
+        model="command_and_search"  # Recommended for short audio commands
     )
 
     streaming_config = speech.StreamingRecognitionConfig(

@@ -1,3 +1,5 @@
+# TODO: Move this to a shared nlp module
+
 def compute_levenshtein_distance(s1, s2):
     if len(s1) > len(s2):
         s1, s2 = s2, s1

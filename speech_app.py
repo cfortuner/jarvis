@@ -27,10 +27,20 @@ from kivy.uix.label import Label
 
 
 from gui_automation import create_automation_instance
-from command_listener import CommandListener
+from command_listener.basic_listener import BasicListener
+from command_listener.google_listener import GoogleListener
 from command_parser import CommandParser
 
-
+# Used for early-exit during speech recognition
+SUPPORTED_COMMANDS = [
+    "switch to chrome",
+    "switch to code",
+    "switch to terminal",
+    "open chrome",
+    "new tab",
+    "close window",
+    "scroll down",
+]
 ShortCutKeys = ['ctrl', 'alt', 'j']
 
 class SpeechApp(App):
@@ -43,7 +53,8 @@ class SpeechApp(App):
         # at the top of the file.
         # Window.borderless = True
         # Window.size = (100, 50)
-        self.clistener = CommandListener()
+        # self.clistener = BasicListener()
+        self.clistener = GoogleListener()
         self.ui_automation = create_automation_instance()
 
         screensize = self.ui_automation.get_screensize()
@@ -93,13 +104,13 @@ class SpeechApp(App):
         text = self.clistener.listen()
 
         label.text = text
-        logging.info(f"Received {text}")
+        logging.info(f"You said: '{text}'")
 
         try:
             parser = CommandParser()
             actions = parser.parse(text)
             for a in actions:
-                logging.info(f"Running {a.name}")
+                logging.info(f"Running: {a.name}")
                 a.run(self.ui_automation)
 
             label.text = self.GREETING_TEXT

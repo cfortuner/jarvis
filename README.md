@@ -55,9 +55,12 @@ brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
 
 Instructions [here](https://www.selenium.dev/documentation/en/selenium_installation). On MacOS you also have to grant permissions to web driver. Download the same version as your version of Chrome.
 
-4. Install Google Cloud SDK
+4. Set up Google Cloud Project
 
-https://cloud.google.com/sdk/docs/install
+First, create a GCP project or use the Jarvis one (jarvis-1626279785926). If you create one, you'll need to set up
+a billing account and enable the Cloud Speech APIs.
+
+Next, install the SDK https://cloud.google.com/sdk/docs/install and configure it.
 
 ```bash
 gcloud init
