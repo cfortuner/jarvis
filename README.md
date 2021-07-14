@@ -51,6 +51,10 @@ brew install cairo gobject-introspection
 brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
 ```
 
+3. Install Chrome Web driver (for browser automation)
+
+Instructions [here](https://www.selenium.dev/documentation/en/selenium_installation). On MacOS you also have to grant permissions to web driver. Download the same version as your version of Chrome.
+
 ### Ubuntu Setup
 
 (Tested on Ubuntu 20.04)
@@ -111,6 +115,9 @@ python scratch/speech_recognition_examples.py
 
 # A window with "Hello world" should open
 python scratch/kivy_example.py
+
+# Verify Selenium is installed correctly
+python scratch/selenium_example.py
 
 # Run the main app (then click Record and "Switch to Chrome")
 python main.py

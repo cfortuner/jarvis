@@ -6,6 +6,7 @@ google-api-python-client==2.11.0
 # pocketsphinx==0.1.15
 PyAudio==0.2.11
 PyAutoGUI==0.9.52  # Requires XCode on Mac
+selenium==4.0.0.b4
 SpeechRecognition==3.6.1
 
 # For MacOS
