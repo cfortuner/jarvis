@@ -55,6 +55,24 @@ brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
 
 Instructions [here](https://www.selenium.dev/documentation/en/selenium_installation). On MacOS you also have to grant permissions to web driver. Download the same version as your version of Chrome.
 
+4. Install Google Cloud SDK
+
+https://cloud.google.com/sdk/docs/install
+
+```bash
+gcloud init
+gcloud config list
+
+# Should see something like
+[core]
+account = bfortuner@gmail.com
+disable_usage_reporting = True
+project = jarvis-1626279785926
+
+# Login to get credentials
+gcloud auth application-default login  
+```
+
 ### Ubuntu Setup
 
 (Tested on Ubuntu 20.04)
@@ -112,6 +130,9 @@ python -m pip install -e ".[base]"  && cd ..
 ```bash
 # Say something
 python scratch/speech_recognition_examples.py
+
+# Verify GCP auth is working
+python scratch/google_speech_recognition_example.py
 
 # A window with "Hello world" should open
 python scratch/kivy_example.py
