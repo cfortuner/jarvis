@@ -55,6 +55,27 @@ brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
 
 Instructions [here](https://www.selenium.dev/documentation/en/selenium_installation). On MacOS you also have to grant permissions to web driver. Download the same version as your version of Chrome.
 
+4. Set up Google Cloud Project
+
+First, create a GCP project or use the Jarvis one (jarvis-1626279785926). If you create one, you'll need to set up
+a billing account and enable the Cloud Speech APIs.
+
+Next, install the SDK https://cloud.google.com/sdk/docs/install and configure it.
+
+```bash
+gcloud init
+gcloud config list
+
+# Should see something like
+[core]
+account = bfortuner@gmail.com
+disable_usage_reporting = True
+project = jarvis-1626279785926
+
+# Login to get credentials
+gcloud auth application-default login  
+```
+
 ### Ubuntu Setup
 
 (Tested on Ubuntu 20.04)
@@ -116,6 +137,9 @@ python -m pip install -e ".[base]"  && cd ..
 # Say something
 python scratch/speech_recognition_examples.py
 
+# Verify GCP auth is working
+python scratch/google_speech_recognition_example.py
+
 # A window with "Hello world" should open
 python scratch/kivy_example.py
 
@@ -159,6 +183,6 @@ Features / Enhancements
 
 Bugs / Known Issues
 
-* Speech recognition gets stuck during Record if background noise fluctuates after calibration
+* [Mac] "Switch to X" gets stuck if program is minimized
 * Logs are truncated at the sides on MacOS
 

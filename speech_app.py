@@ -25,14 +25,25 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 from gui_automation import create_automation_instance
-from command_listener import CommandListener
+from command_listener.basic_listener import BasicListener
+from command_listener.google_listener import GoogleListener
 from command_parser import CommandParser
 
-
+# Used for early-exit during speech recognition
+SUPPORTED_COMMANDS = [
+    "switch to chrome",
+    "switch to code",
+    "switch to terminal",
+    "open chrome",
+    "new tab",
+    "close window",
+    "scroll down",
+]
 ShortCutKeys = ['ctrl', 'alt', 'j']
 
 class SpeechApp(App):
     GREETING_TEXT = "What can I do for you?"
+    LISTENING_TEXT = "Continuous listening mode. Say 'exit' to close"
 
     def build(self):
         # This seems to first create regular sized window
@@ -41,8 +52,8 @@ class SpeechApp(App):
         # at the top of the file.
         # Window.borderless = True
         # Window.size = (100, 50)
-        logging.info("Running build")
-        self.clistener = CommandListener()
+        # self.clistener = BasicListener()
+        self.clistener = GoogleListener()
         self.ui_automation = create_automation_instance()
 
         logging.info("Getting screen size")
@@ -73,27 +84,36 @@ class SpeechApp(App):
             # pos_hint={"x": .5, "y": .5},
             font_size="50sp",
         )
+        stream_btn = Button(
+            text="Stream",
+            on_press=functools.partial(self.stream, label),
+            size_hint=(0.2, 1.0),
+            # pos_hint={"x": .5, "y": .5},
+            font_size="50sp",
+        )
 
-        layout = BoxLayout(padding=2, orientation='vertical')
-        layout.size = Window.size
-        layout.pos = (0, 0)
+        main_layout = BoxLayout(padding=2, orientation='vertical')
+        main_layout.size = Window.size
+        main_layout.pos = (0, 0)
         top_layout = BoxLayout(padding=2, orientation='horizontal')
         top_layout.add_widget(label)
         top_layout.add_widget(close_btn)
-        layout.add_widget(top_layout)
+        main_layout.add_widget(top_layout)
 
         bottom_layout = BoxLayout(padding=2, orientation='horizontal')
         # adding labels as spacers
-        bottom_layout.add_widget(Label(size_hint=(0.42, 1.0)))
+        bottom_layout.add_widget(Label(size_hint=(0.40, 1.0)))
         bottom_layout.add_widget(talk_btn)
-        bottom_layout.add_widget(Label(size_hint=(0.42, 1.0)))
-        layout.add_widget(bottom_layout)
+        bottom_layout.add_widget(Label(size_hint=(0.05, 1.0)))
+        bottom_layout.add_widget(stream_btn)
+        bottom_layout.add_widget(Label(size_hint=(0.40, 1.0)))
+        main_layout.add_widget(bottom_layout)
 
         # TODO(hari): Doesn't seem to work for some reason
         # self.ui_automation.register_hotkey(ShortCutKeys, 
         #     lambda k, u: self.record(label, talk_btn))
         
-        return layout
+        return main_layout
     
     def record(self, label, button):
         msg = "Say Something! Listening..."
@@ -103,13 +123,13 @@ class SpeechApp(App):
         text = self.clistener.listen()
 
         label.text = text
-        logging.info(f"Received {text}")
+        logging.info(f"You said: '{text}'")
 
         try:
             parser = CommandParser()
             actions = parser.parse(text)
             for a in actions:
-                logging.info(f"Running {a.name}")
+                logging.info(f"Running: {a.name}")
                 a.run(self.ui_automation)
 
             label.text = self.GREETING_TEXT
@@ -125,4 +145,33 @@ class SpeechApp(App):
 
     def show_window(self):
         Window.restore()
+    
+    def stream(self, label, button):
+        logging.info(self.LISTENING_TEXT)
+        
+        button.disabled = True
+
+        while True:
+            text = self.clistener.listen()
+
+            # Stop Word
+            if text == "exit":
+                logging.info("Exiting continuous record mode.")
+                break
+
+            label.text = text
+            logging.info(f"You said: '{text}'")
+
+            try:
+                parser = CommandParser()
+                actions = parser.parse(text)
+                for a in actions:
+                    logging.info(f"Running: {a.name}")
+                    a.run(self.ui_automation)
+
+                label.text = self.LISTENING_TEXT
+            except Exception as e:
+                label.text = f"Uh oh! Failed to act on this: {str(e)}"
+
+        button.disabled = False
         
