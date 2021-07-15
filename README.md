@@ -1,5 +1,7 @@
 # jarvis
 
+* [Architecture Overview](https://docs.google.com/document/d/13zdsfZo1CowELebOghJDcNnIFnKkGBB2g_AN2ByaiQU)
+* [Google Drive](https://drive.google.com/drive/folders/1rnHkYZJzJOSadJtp-F4n4ItPE8-IsAUX)
 
 Potential use cases
 - quick switch to application or a tab
