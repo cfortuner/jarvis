@@ -79,6 +79,9 @@ sudo apt install libportaudio2 portaudio19-dev
 
 # PyGObject depends on this
 sudo apt install libgirepository1.0-dev
+
+# Taskbar icon support requires this
+sudo apt install gir1.2-appindicator3-0.1
 ```
 
 ### Common Python Setup
