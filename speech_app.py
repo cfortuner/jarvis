@@ -45,6 +45,7 @@ ShortCutKeys = ['ctrl', 'alt', 'j']
 
 class SpeechApp(App):
     GREETING_TEXT = "What can I do for you?"
+    LISTENING_TEXT = "Continuous listening mode. Say 'exit' to close"
 
     def build(self):
         # This seems to first create regular sized window
@@ -77,6 +78,13 @@ class SpeechApp(App):
             # pos_hint={"x": .5, "y": .5},
             font_size="50sp",
         )
+        stream_btn = Button(
+            text="Stream",
+            on_press=functools.partial(self.stream, label),
+            size_hint=(0.2, 1.0),
+            # pos_hint={"x": .5, "y": .5},
+            font_size="50sp",
+        )
 
         layout = BoxLayout(padding=2, orientation='vertical')
         layout.size = Window.size
@@ -87,6 +95,8 @@ class SpeechApp(App):
         # adding labels as spacers
         vlayout.add_widget(Label(size_hint=(0.42, 1.0)))
         vlayout.add_widget(talk_btn)
+        vlayout.add_widget(Label(size_hint=(0.42, 1.0)))
+        vlayout.add_widget(stream_btn)
         vlayout.add_widget(Label(size_hint=(0.42, 1.0)))
         layout.add_widget(vlayout)
 
@@ -116,6 +126,35 @@ class SpeechApp(App):
             label.text = self.GREETING_TEXT
         except Exception as e:
             label.text = f"Uh oh! Failed to act on this: {str(e)}"
+
+        button.disabled = False
+    
+    def stream(self, label, button):
+        logging.info(self.LISTENING_TEXT)
+        
+        button.disabled = True
+
+        while True:
+            text = self.clistener.listen()
+
+            # Stop Word
+            if text == "exit":
+                logging.info("Exiting continuous record mode.")
+                break
+
+            label.text = text
+            logging.info(f"You said: '{text}'")
+
+            try:
+                parser = CommandParser()
+                actions = parser.parse(text)
+                for a in actions:
+                    logging.info(f"Running: {a.name}")
+                    a.run(self.ui_automation)
+
+                label.text = self.LISTENING_TEXT
+            except Exception as e:
+                label.text = f"Uh oh! Failed to act on this: {str(e)}"
 
         button.disabled = False
         

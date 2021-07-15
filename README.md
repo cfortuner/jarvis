@@ -180,6 +180,6 @@ Features / Enhancements
 
 Bugs / Known Issues
 
-* Speech recognition gets stuck during Record if background noise fluctuates after calibration
+* [Mac] "Switch to X" gets stuck if program is minimized
 * Logs are truncated at the sides on MacOS
 
