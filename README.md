@@ -181,10 +181,10 @@ Features / Enhancements
 * Keyboard shortcut to open App and click record
 * "Listening" animation after clicking record
 * Dedicated console on GUI for debug logs (currently logs are truncated)
-* Improve responsiveness of speech recognition
 
 Bugs / Known Issues
 
-* [Mac] "Switch to X" gets stuck if program is minimized
-* Logs are truncated at the sides on MacOS
-
+* If you forget to call "exit" in stream mode and let the microphone run for awhile before your next command, google will continue to record audio and try to process an extremely large transcript which causes the program to timeout / drag. We need a way to detect silence in stream mode, and clear the audio buffer. We can use a timeout parameter in the Microphone or GoogleTranscriber to clear the buffer if no commands are heard for N seconds
+* [Mac] The TaskBar loads slowly and gets stuck sometimes
+* [Mac] "Switch to X" gets stuck if program is minimized ()
+* [Mac] GUI layout isn't formatted properly. Appears to be differences between Monitors or Operating Systems we need to work out. Ideally the GUI can appear the same across all monitors/OS. 
