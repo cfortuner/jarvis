@@ -5,9 +5,10 @@ from typing import List
 
 from google.cloud import speech
 
-from .command_listener import CommandListener
-from .microphone import MicrophoneStream
-from . import text_parser
+from jarvis.devices.microphone import MicrophoneStream
+from jarvis.nlp import nlp_utils
+
+from .audio_transcriber import AudioTranscriber
 
 # Audio recording parameters
 RATE = 16000
@@ -32,8 +33,12 @@ def _get_speech_contexts(supported_commands):
     return contexts
 
 
-class GoogleListener(CommandListener):
-    """Parse audio commands using Google Cloud Speech API."""
+class GoogleTranscriber(AudioTranscriber):
+    """Parse audio from microphone using Google Cloud Speech API.
+
+    This class transcribes microphone audio to text. In the future, we
+    should also support pre-recorded audio files for integration tests.
+    """
     def __init__(self, supported_commands: List[str] = None):
         """Instantiate the Listener.
 
@@ -75,7 +80,7 @@ class GoogleListener(CommandListener):
 
 
 def _is_supported_command(text, supported_commands):
-    return text_parser.normalize_text(text) in supported_commands
+    return nlp_utils.normalize_text(text) in supported_commands
 
 
 def _handle_transcription_stream(responses, supported_commands):

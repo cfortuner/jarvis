@@ -1,5 +1,7 @@
 import functools
 import logging
+import sys
+import traceback
 
 import kivy
 kivy.require('2.0.0')
@@ -24,10 +26,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-from gui_automation import create_automation_instance
-from command_listener.basic_listener import BasicListener
-from command_listener.google_listener import GoogleListener
-from command_parser import CommandParser
+from jarvis.actions import ActionResolver
+from jarvis.automation.gui import create_gui_automation
+from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
+
 
 # Used for early-exit during speech recognition
 SUPPORTED_COMMANDS = [
@@ -41,7 +43,8 @@ SUPPORTED_COMMANDS = [
 ]
 ShortCutKeys = ['ctrl', 'alt', 'j']
 
-class SpeechApp(App):
+
+class DesktopApp(App):
     GREETING_TEXT = "What can I do for you?"
     LISTENING_TEXT = "Continuous listening mode. Say 'exit' to close"
 
@@ -52,12 +55,13 @@ class SpeechApp(App):
         # at the top of the file.
         # Window.borderless = True
         # Window.size = (100, 50)
-        # self.clistener = BasicListener()
-        self.clistener = GoogleListener()
-        self.ui_automation = create_automation_instance()
+        # self.clistener = BasicTranscriber()
+        self.resolver = ActionResolver()
+        self.clistener = GoogleTranscriber()
+        self.gui_automation = create_gui_automation()
 
         logging.info("Getting screen size")
-        screensize = self.ui_automation.get_screensize()
+        screensize = self.gui_automation.get_screensize()
         Window.left = screensize[0] - window_width - 15
         Window.top = 40
         # Window.clearcolor = (1, 1, 1, 0.5)
@@ -110,7 +114,7 @@ class SpeechApp(App):
         main_layout.add_widget(bottom_layout)
 
         # TODO(hari): Doesn't seem to work for some reason
-        # self.ui_automation.register_hotkey(ShortCutKeys, 
+        # self.gui_automation.register_hotkey(ShortCutKeys, 
         #     lambda k, u: self.record(label, talk_btn))
         
         return main_layout
@@ -126,15 +130,21 @@ class SpeechApp(App):
         logging.info(f"You said: '{text}'")
 
         try:
-            parser = CommandParser()
-            actions = parser.parse(text)
+            actions = self.resolver.parse(
+                cmd=text,
+                gui=self.gui_automation,
+                browser=None
+            )
             for a in actions:
                 logging.info(f"Running: {a.name}")
-                a.run(self.ui_automation)
+                a.run()
 
             label.text = self.GREETING_TEXT
         except Exception as e:
-            label.text = f"Uh oh! Failed to act on this: {str(e)}"
+            msg = f"Uh oh! Failed to act on this: {str(e)}"
+            label.text = msg
+            traceback.print_exc(file=sys.stdout)
+            logging.error(msg)
 
         button.disabled = False
 
@@ -163,15 +173,21 @@ class SpeechApp(App):
             logging.info(f"You said: '{text}'")
 
             try:
-                parser = CommandParser()
-                actions = parser.parse(text)
+                actions = self.resolver.parse(
+                    cmd=text,
+                    gui=self.gui_automation,
+                    browser=None
+                )
                 for a in actions:
                     logging.info(f"Running: {a.name}")
-                    a.run(self.ui_automation)
+                    a.run()
 
                 label.text = self.LISTENING_TEXT
             except Exception as e:
-                label.text = f"Uh oh! Failed to act on this: {str(e)}"
+                msg = f"Uh oh! Failed to act on this: {str(e)}"
+                label.text = msg
+                traceback.print_exc(file=sys.stdout)
+                logging.error(msg)
 
         button.disabled = False
         

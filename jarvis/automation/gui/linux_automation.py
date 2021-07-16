@@ -7,7 +7,7 @@ gi.require_version('Keybinder', '3.0')
 
 from gi.repository import Wnck, GdkX11, Gdk, Keybinder
 
-from gui_automation import GUIAutomation
+from .gui_automation import GUIAutomation
 
 
 class LinuxAutomation(GUIAutomation):

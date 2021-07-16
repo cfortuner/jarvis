@@ -2,10 +2,15 @@ import logging
 
 import speech_recognition as sr
 
-from .command_listener import CommandListener
+from .audio_transcriber import AudioTranscriber
 
 
-class BasicListener(CommandListener):
+class BasicTranscriber(AudioTranscriber):
+    """Parse audio from microphone using Speech Recognition library.
+
+    This class transcribes microphone audio to text. In the future, we
+    should also support pre-recorded audio files for integration tests.
+    """
     def __init__(self):
         self.recognizer = sr.Recognizer()
 

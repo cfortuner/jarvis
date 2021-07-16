@@ -1,8 +1,6 @@
-from gui_automation import GUIAutomation
-
 
 class ActionBase:
-    def run(gui: GUIAutomation):
+    def run() -> None:
         raise NotImplementedError("Needs to be implemented by the derived class")
 
     @property

@@ -1,7 +1,7 @@
 import pyautogui
 
 
-class GUIAutomation(object):
+class GUIAutomation():
     """Base class for all functionality related to
     automating GUI interactions across different platforms"""
     

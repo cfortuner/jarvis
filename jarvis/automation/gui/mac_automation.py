@@ -3,7 +3,7 @@ import AppKit
 from ApplicationServices import *
 from CoreFoundation import *
 
-from gui_automation import GUIAutomation
+from .gui_automation import GUIAutomation
 
 
 class MacAutomation(GUIAutomation):
