@@ -14,7 +14,23 @@ Potential use cases
 - set reminders
 - notify
 
-## Setup
+## Roadmap
+
+Features / Enhancements
+
+* Keyboard shortcut to open App and click record
+* "Listening" animation after clicking record
+* Dedicated console on GUI for debug logs (currently logs are truncated)
+* [Record from history](https://caster.readthedocs.io/en/latest/readthedocs/Caster_Commands/Record_Macros/) (save a sequence of voice commands as a macro) - 
+
+Bugs / Known Issues
+
+* If you forget to call "exit" in stream mode and let the microphone run for awhile before your next command, google will continue to record audio and try to process an extremely large transcript which causes the program to timeout / drag. We need a way to detect silence in stream mode, and clear the audio buffer. We can use a timeout parameter in the Microphone or GoogleTranscriber to clear the buffer if no commands are heard for N seconds
+* [Mac] The TaskBar loads slowly and gets stuck sometimes
+* [Mac] "Switch to X" gets stuck if program is minimized ()
+* [Mac] GUI layout isn't formatted properly. Appears to be differences between Monitors or Operating Systems we need to work out. Ideally the GUI can appear the same across all monitors/OS. 
+
+## Developer Setup
 
 ### Mac Setup
 (Tested on MacOS Big Sur 11.4, M1 Chip, Intel Chip)
@@ -107,7 +123,7 @@ sudo apt install libgirepository1.0-dev
 sudo apt install gir1.2-appindicator3-0.1
 ```
 
-### Common Python Setup
+### Python Setup
 
 1. Create Virtualenv (Python 3.8)
 
@@ -149,7 +165,7 @@ python scratch/kivy_example.py
 python scratch/selenium_example.py
 
 # Run the main app (then click Record and "Switch to Chrome")
-python jarvis/main.py
+python main.py
 ```
 
 ## Distributing the app
@@ -169,22 +185,25 @@ For creating menu bars on MacOS
 * https://github.com/jaredks/rumps
 * https://stackoverflow.com/questions/26815360/how-to-create-menu-item-in-osx-menubar-using-pyinstaller-packaged-kivy-python-ap
 
-Similar projects
+Voice Programming
+* https://github.com/jim-schwoebel/voicebook (Textbook with Python example code! Useful utilities.)
+* https://github.com/dictation-toolbox/dragonfly
+* https://github.com/dictation-toolbox/Caster
+* https://github.com/jim-schwoebel/voicebook/blob/master/chapter_1_fundamentals/readme.md (a lot of useful utilities for working with audio and speech stuff)
+* https://github.com/lyncisdev/voco
+* https://github.com/VoiceCode/voicecode ([website](https://www.voicecode.io))
+* https://www.nuance.com/dragon/business-solutions/dragon-professional-individual.html
+* https://github.com/dictation-toolbox/Vocola2/tree/master/src/vocola2/samples (Application-specific commands)
+
+Speech Recognition
+* https://github.com/kaldi-asr/kaldi (Dragonfly defaults to this over Sphinx..)
+* https://github.com/CHERTS/mspeech (and synthesis)
+* https://github.com/dictation-toolbox/dragonfly
 * https://github.com/ulwlu/kivy-speech-recognition/blob/master/main.py
 * https://github.com/jmercouris/speech_recognition
 
+Audio ML
+* https://github.com/jim-schwoebel/allie/tree/master/augmentation/audio_augmentation 
 
-## Roadmap
-
-Features / Enhancements
-
-* Keyboard shortcut to open App and click record
-* "Listening" animation after clicking record
-* Dedicated console on GUI for debug logs (currently logs are truncated)
-
-Bugs / Known Issues
-
-* If you forget to call "exit" in stream mode and let the microphone run for awhile before your next command, google will continue to record audio and try to process an extremely large transcript which causes the program to timeout / drag. We need a way to detect silence in stream mode, and clear the audio buffer. We can use a timeout parameter in the Microphone or GoogleTranscriber to clear the buffer if no commands are heard for N seconds
-* [Mac] The TaskBar loads slowly and gets stuck sometimes
-* [Mac] "Switch to X" gets stuck if program is minimized ()
-* [Mac] GUI layout isn't formatted properly. Appears to be differences between Monitors or Operating Systems we need to work out. Ideally the GUI can appear the same across all monitors/OS. 
+Datasets
+* https://www.neurolex.ai/ (Audio, voice, speaking)

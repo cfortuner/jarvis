@@ -25,3 +25,6 @@ automation/
             ExampleApp/
             ...
 ```
+
+Example of website specific commands (We can build on Caster)
+https://caster.readthedocs.io/en/latest/readthedocs/Caster_Commands/Application_Commands_Quick_Reference/#visual-studio-code
