@@ -67,13 +67,25 @@ brew install cairo gobject-introspection
 # For Kivy
 # https://kivy.org/doc/stable/installation/installation-osx.html#install-source-os
 brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer
+
+brew install openssl
 ```
 
-3. Install Chrome Web driver (for browser automation)
+3. Update environment variables to properly configure clang
+
+Either add these to ~/.profile or manually run them in the shell before running `pip install -r requirements`
+
+```
+export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
+export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
+export CPLUS_INCLUDE_PATH="${CPLUS_INCLUDE_PATH:+${CPLUS_INCLUDE_PATH}:}/opt/homebrew/opt/openssl/include"
+```
+
+4. Install Chrome Web driver (for browser automation)
 
 Instructions [here](https://www.selenium.dev/documentation/en/selenium_installation). On MacOS you also have to grant permissions to web driver. Download the same version as your version of Chrome.
 
-4. Set up Google Cloud Project
+5. Set up Google Cloud Project
 
 First, create a GCP project or use the Jarvis one (jarvis-1626279785926). If you create one, you'll need to set up
 a billing account and enable the Cloud Speech APIs.

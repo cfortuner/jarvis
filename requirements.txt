@@ -1,12 +1,18 @@
 # Uncomment this for Mac M1, as homebrew is installed in a different location
 # --global-option='build_ext'  --global-option='-I/opt/homebrew/include' --global-option='-L/opt/homebrew/lib'
 
+# Upgrading pip and installing wheel avoids compiling 
+# certain packages
+pip==21.1.3
+wheel
+
 # All platforms
 google-api-python-client==2.11.0
 google-cloud-speech==2.5.0
 # pocketsphinx==0.1.15
 PyAudio==0.2.11
 PyAutoGUI==0.9.52  # Requires XCode on Mac
+pygame==2.0.1 # Required for Kivy
 pystray==0.17.3
 selenium==4.0.0.b4
 SpeechRecognition==3.6.1

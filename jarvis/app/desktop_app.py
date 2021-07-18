@@ -55,9 +55,9 @@ class DesktopApp(App):
         # at the top of the file.
         # Window.borderless = True
         # Window.size = (100, 50)
-        # self.clistener = BasicTranscriber()
+        self.basic_clistener = BasicTranscriber()
         self.resolver = ActionResolver()
-        self.clistener = GoogleTranscriber()
+        self.streaming_clistener = GoogleTranscriber()
         self.gui_automation = create_gui_automation()
 
         logging.info("Getting screen size")
@@ -124,7 +124,7 @@ class DesktopApp(App):
         logging.info(msg)
         
         button.disabled = True
-        text = self.clistener.listen()
+        text = self.basic_clistener.listen()
 
         label.text = text
         logging.info(f"You said: '{text}'")
@@ -162,7 +162,7 @@ class DesktopApp(App):
         button.disabled = True
 
         while True:
-            text = self.clistener.listen()
+            text = self.streaming_clistener.listen()
 
             # Stop Word
             if text == "exit":
