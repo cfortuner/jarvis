@@ -5,6 +5,10 @@ https://cloud.google.com/speech-to-text/docs/streaming-recognize#speech-streamin
 https://github.com/googleapis/python-speech/blob/master/samples/microphone/transcribe_streaming_infinite.py
 https://github.com/googleapis/python-speech/blob/master/samples/microphone/transcribe_streaming_mic.py
 https://github.com/Uberi/speech_recognition/blob/master/examples/threaded_workers.py
+https://github.com/daanzu/kaldi-active-grammar/blob/master/examples/audio.py (new)
+
+This has an example of "activity detection" which would handle silence and chaining commands.
+https://github.com/daanzu/dragonfly/blob/kaldi/dragonfly/engines/backend_kaldi/audio.py (example with Kaldi)
 """
 
 import pyaudio

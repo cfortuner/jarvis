@@ -2,6 +2,8 @@
 .vscode/
 kivy_repo/
 .DS_Store
+kaldi_model/
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

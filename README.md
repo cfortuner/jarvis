@@ -188,6 +188,7 @@ For creating menu bars on MacOS
 Voice Programming
 * https://github.com/jim-schwoebel/voicebook (Textbook with Python example code! Useful utilities.)
 * https://github.com/dictation-toolbox/dragonfly
+    * https://github.com/daanzu/dragonfly/blob/kaldi/dragonfly/engines/backend_kaldi/engine.py (example with Kaldi)
 * https://github.com/dictation-toolbox/Caster
 * https://github.com/jim-schwoebel/voicebook/blob/master/chapter_1_fundamentals/readme.md (a lot of useful utilities for working with audio and speech stuff)
 * https://github.com/lyncisdev/voco
@@ -196,11 +197,17 @@ Voice Programming
 * https://github.com/dictation-toolbox/Vocola2/tree/master/src/vocola2/samples (Application-specific commands)
 
 Speech Recognition
+* https://github.com/alphacep/vosk-api (offline library for fast speech recognition)
 * https://github.com/kaldi-asr/kaldi (Dragonfly defaults to this over Sphinx..)
+* https://github.com/daanzu/kaldi-active-grammar/blob/master/docs/models.md (Kaldi model comparison)
 * https://github.com/CHERTS/mspeech (and synthesis)
 * https://github.com/dictation-toolbox/dragonfly
 * https://github.com/ulwlu/kivy-speech-recognition/blob/master/main.py
 * https://github.com/jmercouris/speech_recognition
+
+Microphone/audio recording example
+* https://github.com/daanzu/kaldi-active-grammar/blob/master/examples/audio.py
+* https://github.com/daanzu/kaldi-active-grammar/blob/master/examples/full_example.py
 
 Audio ML
 * https://github.com/jim-schwoebel/allie/tree/master/augmentation/audio_augmentation 
