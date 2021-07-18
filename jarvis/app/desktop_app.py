@@ -1,6 +1,7 @@
 import functools
 import logging
 import sys
+import time
 import traceback
 
 import kivy
@@ -27,20 +28,12 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 from jarvis.actions import ActionResolver
+from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
 from jarvis.automation.gui import create_gui_automation
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
 
 # Used for early-exit during speech recognition
-SUPPORTED_COMMANDS = [
-    "switch to chrome",
-    "switch to code",
-    "switch to terminal",
-    "open chrome",
-    "new tab",
-    "close window",
-    "scroll down",
-]
 ShortCutKeys = ['ctrl', 'alt', 'j']
 
 
@@ -161,33 +154,36 @@ class DesktopApp(App):
         
         button.disabled = True
 
+        start_time = time.time()
         while True:
             text = self.streaming_clistener.listen()
-
-            # Stop Word
-            if text == "exit":
+            if text is None:
+                if time.time() - start_time > SILENCE_TIMEOUT_SEC:
+                    logging.info("Max silence time reached. Turning off microphone..")
+                    break
+            elif text == "exit":
                 logging.info("Exiting continuous record mode.")
                 break
+            else:
+                try:
+                    actions = self.resolver.parse(
+                        cmd=text,
+                        gui=self.gui_automation,
+                        browser=None
+                    )
+                    for a in actions:
+                        logging.info(f"Running: {a.name}")
+                        a.run()
 
-            label.text = text
-            logging.info(f"You said: '{text}'")
+                    label.text = self.LISTENING_TEXT
+                except Exception as e:
+                    msg = f"Uh oh! Failed to act on this: {str(e)}"
+                    label.text = msg
+                    traceback.print_exc(file=sys.stdout)
+                    logging.error(msg)
+                finally:
+                    start_time = time.time()
 
-            try:
-                actions = self.resolver.parse(
-                    cmd=text,
-                    gui=self.gui_automation,
-                    browser=None
-                )
-                for a in actions:
-                    logging.info(f"Running: {a.name}")
-                    a.run()
-
-                label.text = self.LISTENING_TEXT
-            except Exception as e:
-                msg = f"Uh oh! Failed to act on this: {str(e)}"
-                label.text = msg
-                traceback.print_exc(file=sys.stdout)
-                logging.error(msg)
-
+        print("Complete")
         button.disabled = False
         

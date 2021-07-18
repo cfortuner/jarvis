@@ -9,10 +9,12 @@ python cli.py speech2action --transcriber google --no-execute
 """
 
 import logging
+import time
 
 import click
 
 from jarvis.actions import ActionResolver
+from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
 from jarvis.automation.gui import create_gui_automation
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
@@ -25,14 +27,13 @@ def _get_transcriber(name):
     if name == "basic":
         return BasicTranscriber()  # Also Google, but via SpeechRecognition
     elif name == "google":
-        return GoogleTranscriber()  # Performant, streaming listener
+        return GoogleTranscriber(SUPPORTED_COMMANDS)  # Performant, streaming listener
     raise Exception("Transcriber {name} not supported!")
 
 
 def _parse_and_execute_action(
     text, resolver, gui_automation, browser_automation=None, no_execute=False
 ):
-
     actions = resolver.parse(
         cmd=text,
         gui=gui_automation,
@@ -52,6 +53,7 @@ def cli(debug):
     if debug:
         click.echo(f"Debug mode is on!")
 
+
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
 @click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
@@ -60,11 +62,19 @@ def speech2text(transcriber, stream):
     click.echo(f"Using '{transcriber}' transcriber")
     listener = _get_transcriber(transcriber)
     click.echo(f"Listening... Say something!")
+    start_time = time.time()
     while True:
         text = listener.listen()
-        click.echo(f"You said: '{text}'")
-        if text == "exit" or not stream:
-            break
+        if text is None:
+            if time.time() - start_time > SILENCE_TIMEOUT_SEC:
+                logging.info("Max silence time reached. Turning off microphone..")
+                break
+        else:
+            click.echo(f"You said: '{text}'")
+            if text == "exit" or not stream:
+                break
+            start_time = time.time()
+
 
 @cli.command()
 @click.option('--text', help='Text to convert into an Action', default=None)
@@ -84,30 +94,38 @@ def text2action(text, no_execute):
         no_execute=no_execute
     )
 
+
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
 @click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
 def speech2action(transcriber, no_execute, stream):
     """Convert speech to action."""
+    click.echo(f"Initializing..")
     resolver = ActionResolver()
     gui_automation = create_gui_automation()
     listener = _get_transcriber(transcriber)
 
     click.echo(f"Listening... Say something!")
+    start_time = time.time()
     while True:
         text = listener.listen()
-        if text == "exit":
+        if text is None:
+            if time.time() - start_time > SILENCE_TIMEOUT_SEC:
+                logging.info("Max silence time reached. Turning off microphone..")
+                break
+        elif text == "exit":
             break
-        _parse_and_execute_action(
-            text=text,
-            resolver=resolver,
-            gui_automation=gui_automation,
-            no_execute=no_execute
-        )
-        if not stream:
-            break
-
+        else:
+            _parse_and_execute_action(
+                text=text,
+                resolver=resolver,
+                gui_automation=gui_automation,
+                no_execute=no_execute
+            )
+            if not stream:
+                break
+            start_time = time.time()
 
 if __name__ == '__main__':
     cli()

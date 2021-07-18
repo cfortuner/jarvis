@@ -207,6 +207,8 @@ Voice Programming
 * https://github.com/VoiceCode/voicecode ([website](https://www.voicecode.io))
 * https://www.nuance.com/dragon/business-solutions/dragon-professional-individual.html
 * https://github.com/dictation-toolbox/Vocola2/tree/master/src/vocola2/samples (Application-specific commands)
+* https://dragonfluid.readthedocs.io/en/latest/README.html (chaining multiple commands)
+* 
 
 Speech Recognition
 * https://github.com/alphacep/vosk-api (offline library for fast speech recognition)

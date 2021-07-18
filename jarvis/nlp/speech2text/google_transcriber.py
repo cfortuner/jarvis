@@ -100,11 +100,20 @@ def _handle_transcription_stream(responses, supported_commands):
 
     TODO: The SpeechApp GUI might need access to this stream so it can display what
     it's seeing to the user.
+
+    NOTE: Maximum wait period will be 15 seconds for an utterance, if single_utterance=True.
     """
+    import time
     num_chars_printed = 0
+    transcript = None
     for response in responses:
         if not response.results:
-            continue
+            if response.speech_event_type.name == "END_OF_SINGLE_UTTERANCE":
+                if transcript is None:
+                    logging.info("No utterance detected in ~N seconds.")
+                return transcript
+            else:
+                continue
 
         # The `results` list is consecutive. For streaming, we only care about
         # the first result being considered, since once it's `is_final`, it
@@ -146,5 +155,4 @@ def _handle_transcription_stream(responses, supported_commands):
 
             return transcript
 
-    # TODO: Do we raise or return a code?
-    raise Exception("No speech detected")
+    return None
