@@ -3,7 +3,7 @@
 Examples
 --------
 python cli.py --help
-python cli.py speech2text --transcriber google
+python cli.py speech2text --transcriber google --stream
 python cli.py text2action --text "switch to chrome" --no-execute
 python cli.py speech2action --transcriber google --no-execute
 """
@@ -32,6 +32,7 @@ def _get_transcriber(name):
 def _parse_and_execute_action(
     text, resolver, gui_automation, browser_automation=None, no_execute=False
 ):
+
     actions = resolver.parse(
         cmd=text,
         gui=gui_automation,
@@ -53,13 +54,17 @@ def cli(debug):
 
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
-def speech2text(transcriber):
+@click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
+def speech2text(transcriber, stream):
     """Convert text to speech."""
     click.echo(f"Using '{transcriber}' transcriber")
     listener = _get_transcriber(transcriber)
     click.echo(f"Listening... Say something!")
-    text = listener.listen()
-    click.echo(f"You said: '{text}'")
+    while True:
+        text = listener.listen()
+        click.echo(f"You said: '{text}'")
+        if text == "exit" or not stream:
+            break
 
 @cli.command()
 @click.option('--text', help='Text to convert into an Action', default=None)
@@ -82,21 +87,26 @@ def text2action(text, no_execute):
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-def speech2action(transcriber, no_execute):
+@click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
+def speech2action(transcriber, no_execute, stream):
     """Convert speech to action."""
     resolver = ActionResolver()
     gui_automation = create_gui_automation()
     listener = _get_transcriber(transcriber)
 
     click.echo(f"Listening... Say something!")
-    text = listener.listen()
-
-    _parse_and_execute_action(
-        text=text,
-        resolver=resolver,
-        gui_automation=gui_automation,
-        no_execute=no_execute
-    )
+    while True:
+        text = listener.listen()
+        if text == "exit":
+            break
+        _parse_and_execute_action(
+            text=text,
+            resolver=resolver,
+            gui_automation=gui_automation,
+            no_execute=no_execute
+        )
+        if not stream:
+            break
 
 
 if __name__ == '__main__':
