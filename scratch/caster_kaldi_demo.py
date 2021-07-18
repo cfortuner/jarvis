@@ -1,3 +1,9 @@
+"""
+pip install 'dragonfly2[kaldi]'
+Download a model to a `kaldi_model` directory in repo root
+https://github.com/daanzu/kaldi-active-grammar/releases
+"""
+
 from __future__ import print_function
 import logging, os
 
