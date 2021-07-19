@@ -8,45 +8,45 @@ import logging
 from jarvis.actions import ActionBase
 from jarvis.nlp import nlp_utils
 
-from .gui_automation import GUIAutomation
+from .desktop_automation import DesktopAutomation
 
 
-class GUIAction(ActionBase):
-    """Base class for all GUI actions.
+class DesktopAction(ActionBase):
+    """Base class for all Desktop actions.
     
-    We expect the GUIAutomation instance to already be instantiated
+    We expect the DesktopAutomation instance to already be instantiated
     and be passed around to all the actions.
     """
-    def __init__(self, gui: GUIAutomation):
+    def __init__(self, desktop: DesktopAutomation):
         super().__init__()
-        self.gui = gui
+        self.desktop = desktop
 
 
-class LaunchAction(GUIAction):
+class LaunchAction(DesktopAction):
     """Launch an application (not running yet)."""
-    def __init__(self, gui: GUIAutomation, app_name: str):
-        super().__init__(gui)
+    def __init__(self, desktop: DesktopAutomation, app_name: str):
+        super().__init__(desktop)
         self.app_name = app_name
     
     def run(self):
-        ret_code = self.gui.open_application(self.app_name)
+        ret_code = self.desktop.open_application(self.app_name)
         if ret_code != 0:
             raise Exception(f"Failed to launch the application: {ret_code}")
 
 
-class ScreenshotAction(GUIAction):
+class ScreenshotAction(DesktopAction):
     """Task a screenshot."""
-    def __init__(self, gui: GUIAutomation, copy_name: str):
-        super().__init__(gui)
+    def __init__(self, desktop: DesktopAutomation, copy_name: str):
+        super().__init__(desktop)
         self.copy_name = copy_name
 
     def run(self):
         # TODO(hari): Copy the screenshot to clipboard with specific
         # name attached to it
-        self.gui.screenshot()
+        self.desktop.screenshot()
 
 
-class SwitchAction(GUIAction):
+class SwitchAction(DesktopAction):
     """Switch to application window (one that's already running).
 
     TODO: Move command parsing utilities to a shared nlp module.
@@ -55,14 +55,14 @@ class SwitchAction(GUIAction):
     """
     DISTANCE_THRESHOLD = 2
 
-    def __init__(self, gui: GUIAutomation, app_name: str):
-        super().__init__(gui)
+    def __init__(self, desktop: DesktopAutomation, app_name: str):
+        super().__init__(desktop)
         self.app_name = app_name
     
     def run(self):
         logging.info(f"Attemping to switch to: {self.app_name}")
         app = None
-        windows = self.gui.get_list_of_windows()
+        windows = self.desktop.get_list_of_windows()
         # TODO: Move this normalization logic somewhere else
         windows_clean = [w.lower() for w in windows]
         logging.info(f"Available Windows: {windows}")
@@ -95,4 +95,4 @@ class SwitchAction(GUIAction):
             logging.info(msg)
             raise Exception(msg)
 
-        self.gui.switch_to_window(app)
+        self.desktop.switch_to_window(app)

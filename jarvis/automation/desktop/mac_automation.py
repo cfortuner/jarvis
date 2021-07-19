@@ -5,10 +5,10 @@ import AppKit
 from ApplicationServices import *
 from CoreFoundation import *
 
-from .gui_automation import GUIAutomation
+from .desktop_automation import DesktopAutomation
 
 
-class MacAutomation(GUIAutomation):
+class MacAutomation(DesktopAutomation):
     def _get_running_apps(self) -> list:
         """Returns all the running apps with an open window"""
         ws = AppKit.NSWorkspace.sharedWorkspace()

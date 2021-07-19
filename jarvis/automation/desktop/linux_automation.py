@@ -7,10 +7,10 @@ gi.require_version('Keybinder', '3.0')
 
 from gi.repository import Wnck, GdkX11, Gdk, Keybinder
 
-from .gui_automation import GUIAutomation
+from .desktop_automation import DesktopAutomation
 
 
-class LinuxAutomation(GUIAutomation):
+class LinuxAutomation(DesktopAutomation):
     COMMON_APP_NAME_MAPPINGS = {
         "browser": "xdg-open https://www.google.com",
         "chrome": "google-chrome",

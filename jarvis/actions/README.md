@@ -23,6 +23,6 @@ Classes in `action_resolver`:
   * available_windows
   * current_episode
   * episode_history
-  * gui_automation_instance
+  * desktop_automation_instance
   * browser_automation_instance
   

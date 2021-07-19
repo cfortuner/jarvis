@@ -1,9 +1,9 @@
 import pyautogui
 
 
-class GUIAutomation():
+class DesktopAutomation():
     """Base class for all functionality related to
-    automating GUI interactions across different platforms"""
+    automating Desktop interactions across different platforms"""
     
     # Standard device automation functions that should
     # work on all OS and Desktop environments

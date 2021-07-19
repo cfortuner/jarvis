@@ -1,10 +1,10 @@
-from jarvis.automation.gui.gui_automation import GUIAutomation
+from jarvis.automation.desktop.desktop_automation import DesktopAutomation
 import logging
 from typing import List
 
 from jarvis.actions import ActionBase
 from jarvis.automation.browser import browser_actions, BrowserAutomation
-from jarvis.automation.gui import gui_actions, GUIAutomation
+from jarvis.automation.desktop import desktop_actions, DesktopAutomation
 from jarvis.nlp import nlp_utils
 
 
@@ -15,7 +15,7 @@ class ActionResolver:
     previous command), and the library of supported actions. These inputs are combined to
     determine which Action to perform.
     """
-    def parse(self, cmd: str, gui: GUIAutomation, browser: BrowserAutomation) -> List[ActionBase]:
+    def parse(self, cmd: str, desktop: DesktopAutomation, browser: BrowserAutomation) -> List[ActionBase]:
         """Converts user command string in list of Actions.
         
         In the future this can also take the application state, command history, and inputs
@@ -28,10 +28,10 @@ class ActionResolver:
         output_actions = []
         if cmd.startswith('switch to'):
             app_name = ' '.join(cmd.split(' ')[2:])
-            output_actions.append(gui_actions.SwitchAction(gui, app_name))
+            output_actions.append(desktop_actions.SwitchAction(desktop, app_name))
         elif cmd.startswith('launch ') or cmd.startswith('open '):
             app_name = ' '.join(cmd.split(' ')[1:])
-            output_actions.append(gui_actions.LaunchAction(gui, app_name))
+            output_actions.append(desktop_actions.LaunchAction(desktop, app_name))
         else:
             logging.info("No command matched with that!")
             raise NotImplementedError("No command matched with that!")

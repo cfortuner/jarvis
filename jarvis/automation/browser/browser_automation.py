@@ -1,10 +1,10 @@
-from automation.gui import GUIAutomation
+from automation.desktop import DesktopAutomation
 
 class BrowserAutomation():
     """Base class for all browser automation implementations."""
 
-    def __init__(self, gui: GUIAutomation):
-        self.gui = gui
+    def __init__(self, desktop: DesktopAutomation):
+        self.desktop = desktop
 
     def get_list_of_tabs(self) -> list:
         raise NotImplementedError("Needs to be overriden by the derived class")
@@ -15,8 +15,8 @@ class BrowserAutomation():
 def ChromiumBrowserAutomation(BrowserAutomation):
     """Browser automation for all Chromium derived browsers"""
 
-    def __init__(self, gui: GUIAutomation, browser_name: str):
-        super(gui)
+    def __init__(self, desktop: DesktopAutomation, browser_name: str):
+        super(desktop)
 
         self.name = browser_name
 
@@ -43,13 +43,13 @@ def ChromiumBrowserAutomation(BrowserAutomation):
         This makes use of the fact that Chromium browsers have a menu entry 
         in the Tab menu for all tabs open in that particular window.
         """
-        windows = self.gui.get_list_of_windows()
+        windows = self.desktop.get_list_of_windows()
         tabs = []
         tab_menu_name = 'Tab'
         tab_name_begin_str = 'move tab to new window'
         for w in windows:
             if self.name in w:
-                menuitems = self.gui.get_all_menuitems_for_window(w)
+                menuitems = self.desktop.get_all_menuitems_for_window(w)
                 if tab_menu_name in menuitems:
                     idx = 0
                     for item in menuitems[tab_menu_name]:

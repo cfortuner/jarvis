@@ -1,11 +1,11 @@
 """TODO: develop a global registration mechanism for Actions."""
 
-from .gui_automation import GUIAutomation
+from .desktop_automation import DesktopAutomation
 
 import sys
 
 
-def create_gui_automation() -> GUIAutomation:
+def create_desktop_automation() -> DesktopAutomation:
     """Creates an instance of automation corresponding to the
     OS on which the current app is running on"""
     if 'darwin' in sys.platform.lower():

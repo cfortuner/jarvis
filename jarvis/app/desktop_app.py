@@ -29,7 +29,7 @@ from kivy.uix.label import Label
 
 from jarvis.actions import ActionResolver
 from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
-from jarvis.automation.gui import create_gui_automation
+from jarvis.automation.desktop import create_desktop_automation
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
 
@@ -51,10 +51,10 @@ class DesktopApp(App):
         self.basic_clistener = BasicTranscriber()
         self.resolver = ActionResolver()
         self.streaming_clistener = GoogleTranscriber()
-        self.gui_automation = create_gui_automation()
+        self.desktop_automation = create_desktop_automation()
 
         logging.info("Getting screen size")
-        screensize = self.gui_automation.get_screensize()
+        screensize = self.desktop_automation.get_screensize()
         Window.left = screensize[0] - window_width - 15
         Window.top = 40
         # Window.clearcolor = (1, 1, 1, 0.5)
@@ -107,7 +107,7 @@ class DesktopApp(App):
         main_layout.add_widget(bottom_layout)
 
         # TODO(hari): Doesn't seem to work for some reason
-        # self.gui_automation.register_hotkey(ShortCutKeys, 
+        # self.desktop_automation.register_hotkey(ShortCutKeys, 
         #     lambda k, u: self.record(label, talk_btn))
         
         return main_layout
@@ -125,7 +125,7 @@ class DesktopApp(App):
         try:
             actions = self.resolver.parse(
                 cmd=text,
-                gui=self.gui_automation,
+                desktop=self.desktop_automation,
                 browser=None
             )
             for a in actions:
@@ -168,7 +168,7 @@ class DesktopApp(App):
                 try:
                     actions = self.resolver.parse(
                         cmd=text,
-                        gui=self.gui_automation,
+                        desktop=self.desktop_automation,
                         browser=None
                     )
                     for a in actions:

@@ -15,7 +15,7 @@ import click
 
 from jarvis.actions import ActionResolver
 from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
-from jarvis.automation.gui import create_gui_automation
+from jarvis.automation.desktop import create_desktop_automation
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
 logging.basicConfig(level=logging.INFO)
@@ -32,11 +32,11 @@ def _get_transcriber(name):
 
 
 def _parse_and_execute_action(
-    text, resolver, gui_automation, browser_automation=None, no_execute=False
+    text, resolver, desktop_automation, browser_automation=None, no_execute=False
 ):
     actions = resolver.parse(
         cmd=text,
-        gui=gui_automation,
+        desktop=desktop_automation,
         browser=browser_automation
     )
     for a in actions:
@@ -85,12 +85,12 @@ def text2action(text, no_execute):
         text = click.prompt('Enter text')
 
     resolver = ActionResolver()
-    gui_automation = create_gui_automation()
+    desktop_automation = create_desktop_automation()
 
     _parse_and_execute_action(
         text=text,
         resolver=resolver,
-        gui_automation=gui_automation,
+        desktop_automation=desktop_automation,
         no_execute=no_execute
     )
 
@@ -103,7 +103,7 @@ def speech2action(transcriber, no_execute, stream):
     """Convert speech to action."""
     click.echo(f"Initializing..")
     resolver = ActionResolver()
-    gui_automation = create_gui_automation()
+    desktop_automation = create_desktop_automation()
     listener = _get_transcriber(transcriber)
 
     click.echo(f"Listening... Say something!")
@@ -120,7 +120,7 @@ def speech2action(transcriber, no_execute, stream):
             _parse_and_execute_action(
                 text=text,
                 resolver=resolver,
-                gui_automation=gui_automation,
+                desktop_automation=desktop_automation,
                 no_execute=no_execute
             )
             if not stream:
