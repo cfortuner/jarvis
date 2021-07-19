@@ -5,44 +5,12 @@ class DesktopAutomation():
     """Base class for all functionality related to
     automating Desktop interactions across different platforms"""
     
-    # Standard device automation functions that should
-    # work on all OS and Desktop environments
-    def mouse_current_position(self) -> list:
-        """Return the `x` and `y` coords of the mouse"""
-        return pyautogui.position()
-
-    def mouse_move_to(self, x, y) -> None:
-        """Move mouse to specified `x` and `y` coordinates"""
-        pyautogui.moveTo(x, y)
-
-    def mouse_click(self, num_clicks=1, button='left'):
-        """Click the specified button for the specified number of times.
-        
-        Valid options for button include `left`, `right` and `middle`."""
-        pyautogui.click(clicks=num_clicks, button=button)
-
-    def mouse_scroll(self, amount_to_scroll):
-        """Scroll mouse for the specified amount"""
-        pyautogui.mouse_scroll(amount_to_scroll)
-
-    def keyboard_type(self, text):
-        """Type the text in the active window"""
-        pyautogui.typewrite(text)
-
-    def keyboard_shortcut(self, keys: list):
-        """Simulate pressing specified keyboard shortcut (all pressed together)
-        on the currently active window.
-
-        `keys` are specified as a list of keys including modifiers like ctrl, alt, etc.,
-        """
-        pyautogui.hotkey(keys)
-
+    # Standard OS interaction functions that should work on
+    # all OS and Desktop environments
     def get_screensize(self) -> list:
         """Return the screen size in pixels (width, height)"""
         return pyautogui.size()
 
-    # Standard OS interaction functions that should work on
-    # all OS and Desktop environments
     def screenshot(self) -> None:
         """Take a screenshot of the entire desktop environment"""
         # TODO(hari): Save this to standard location
