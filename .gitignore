@@ -1,6 +1,7 @@
 # Project specific
 .vscode/
 kivy_repo/
+pyatom_repo/
 .DS_Store
 kaldi_model/
 *.zip

@@ -163,13 +163,13 @@ python -m pip install -e ".[base]"  && cd ..
 
 4. Install [atomac](https://github.com/pyatom/pyatom) (Mac Only)
 
-Atomac seems to have a dependency because of which we can't install directly 
+Atomac seems to have a dependency because of which we can't install directly
 using `pip install` so we need to get the source code.
 
 ```bash
-git clone https://github.com/pyatom/pyatom.git && cd pyatom
+git clone https://github.com/pyatom/pyatom.git pyatom_repo && cd pyatom_repo
 python -m pip install future
-python -m pip install && cd ..
+python -m pip install . && cd ..
 ```
 
 5. Verify things are working

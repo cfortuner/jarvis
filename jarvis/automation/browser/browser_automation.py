@@ -1,4 +1,5 @@
-from automation.desktop import DesktopAutomation
+from jarvis.automation.desktop import DesktopAutomation
+
 
 class BrowserAutomation():
     """Base class for all browser automation implementations."""
