@@ -161,7 +161,18 @@ git clone git://github.com/kivy/kivy.git kivy_repo && cd kivy_repo
 python -m pip install -e ".[base]"  && cd ..
 ```
 
-4. Verify things are working
+4. Install [atomac](https://github.com/pyatom/pyatom) (Mac Only)
+
+Atomac seems to have a dependency because of which we can't install directly 
+using `pip install` so we need to get the source code.
+
+```bash
+git clone https://github.com/pyatom/pyatom.git && cd pyatom
+python -m pip install future
+python -m pip install && cd ..
+```
+
+5. Verify things are working
 
 ```bash
 # Say something

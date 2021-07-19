@@ -58,6 +58,24 @@ class GUIAutomation():
         """Return the name of currently active window"""
         raise NotImplementedError("Needs to be overriden by the derived class")
 
+    def get_all_menuitems_for_window(self, app_name) -> dict:
+        """Return all menu items as a dict with the key being the name of the menu
+        
+        An example would be:
+
+        {
+            "File" : [
+                MenuItem("New"),
+                MenuItem("Save")
+            ],
+            "Edit" : [
+                MenuItem("Undo"),
+                MenuItem("Redo")
+            ]
+        }
+        """
+        raise NotImplementedError("Needs to be overriden by the derived class")
+
     def switch_to_window(self, app_name: str):
         """Switch to the window of the specific app"""
         raise NotImplementedError("Needs to be overriden by the derived class")

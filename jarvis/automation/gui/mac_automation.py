@@ -1,3 +1,5 @@
+import atomac
+
 import AppKit
 
 from ApplicationServices import *
@@ -23,6 +25,22 @@ class MacAutomation(GUIAutomation):
         #         out_apps.append(app)
         return out_apps
 
+    def _get_all_menu_items(self, ax_item):
+        """Using mac accessibility elements, we fetch all the leaf nodes
+        of a menu bar"""
+        output = []
+        try:
+            if len(ax_item.AXChildren) > 0:
+                for item in ax_item.AXChildren:
+                    output.extend(self._get_all_menu_items(item))
+            else:
+                    output.append(ax_item)
+        except:
+            # some menu items may have special things like "text edit items"
+            # let's ignore such cases
+            pass 
+        return output
+
     def get_list_of_windows(self) -> list:
         apps = self._get_running_apps()
         return [a.localizedName() for a in apps]
@@ -30,6 +48,24 @@ class MacAutomation(GUIAutomation):
     def get_active_window(self) -> str:
         app = AppKit.NSWorkspace.sharedWorkspace().frontmostApplication()
         return app
+
+    def get_all_menuitems_for_window(self, app_name) -> dict:
+        ra = AppKit.NSRunningApplication
+        apps = self._get_running_apps()
+        chosen_apps = [a for a in apps if a.localizedName() == app_name]
+        if len(chosen_apps) == 0:
+            raise Exception("Application is not found")
+
+        # pyatom(aka atomac) gets the app details by using mac accessibility api.
+        # Anything prefixed with ax implies an accessibility element.
+        ax_app = atomac.getAppRefByPid(chosen_apps[0].processIdentifier())
+        menuitems = {}
+        for menuitem in ax_app.menuItem().AXChildren:
+            try:
+                menuitems[menuitem.AXTitle] = self._get_all_menu_items(menuitem)
+            except:
+                pass
+        return menuitems
 
     def switch_to_window(self, app_name):
         ra = AppKit.NSRunningApplication
