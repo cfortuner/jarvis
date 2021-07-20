@@ -117,7 +117,8 @@ class DesktopApp(App):
         logging.info(msg)
         
         button.disabled = True
-        text = self.basic_clistener.listen()
+        transcript = self.basic_clistener.listen()[0]
+        text = transcript.text
 
         label.text = text
         logging.info(f"You said: '{text}'")
@@ -150,40 +151,39 @@ class DesktopApp(App):
         Window.restore()
     
     def stream(self, label, button):
-        logging.info(self.LISTENING_TEXT)
-        
+        logging.info(self.LISTENING_TEXT)        
         button.disabled = True
 
-        start_time = time.time()
-        while True:
-            text = self.streaming_clistener.listen()
-            if text is None:
-                if time.time() - start_time > SILENCE_TIMEOUT_SEC:
-                    logging.info("Max silence time reached. Turning off microphone..")
-                    break
-            elif text == "exit":
-                logging.info("Exiting continuous record mode.")
-                break
-            else:
-                try:
-                    actions = self.resolver.parse(
-                        cmd=text,
-                        desktop=self.desktop_automation,
-                        browser=None
-                    )
-                    for a in actions:
-                        logging.info(f"Running: {a.name}")
-                        a.run()
-
-                    label.text = self.LISTENING_TEXT
-                except Exception as e:
-                    msg = f"Uh oh! Failed to act on this: {str(e)}"
-                    label.text = msg
-                    traceback.print_exc(file=sys.stdout)
-                    logging.error(msg)
-                finally:
-                    start_time = time.time()
-
-        print("Complete")
+        should_exit = False
+        while not should_exit:
+            for transcript in self.streaming_clistener.listen():
+                if transcript.is_final:
+                    if transcript.deadline_exceeded:
+                        logging.info(f"Silence detected. Exiting...")
+                        should_exit = True
+                        break
+                    
+                    assert transcript.text is not None, "We shouldn't have an empty transcript thats final unless its silence"
+                    
+                    if transcript.text == "exit":
+                        should_exit = True
+                        break
+                    
+                    try:
+                        actions = self.resolver.parse(
+                            cmd=transcript.text,
+                            desktop=self.desktop_automation,
+                            browser=None
+                        )
+                        for a in actions:
+                            logging.info(f"Running: {a.name}")
+                            a.run()
+                    except Exception as e:
+                        msg = f"Uh oh! Failed to act on this: {str(e)}"
+                        label.text = msg
+                        traceback.print_exc(file=sys.stdout)
+                        logging.error(msg)
+        
+        logging.info("Exiting streaming mode.")
         button.disabled = False
         

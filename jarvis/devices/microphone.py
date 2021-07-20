@@ -10,15 +10,24 @@ https://github.com/daanzu/kaldi-active-grammar/blob/master/examples/audio.py (ne
 This has an example of "activity detection" which would handle silence and chaining commands.
 https://github.com/daanzu/dragonfly/blob/kaldi/dragonfly/engines/backend_kaldi/audio.py (example with Kaldi)
 """
-
-import pyaudio
+import logging
 import queue
 
+import pyaudio
+
+
+logger = logging.getLogger(__name__)
 
 class MicrophoneStream():
     """Opens a recording stream as a generator yielding the audio chunks."""
 
     def __init__(self, rate, chunk):
+        """Initialize the MicrophoneStream
+
+        Args:
+            rate (int): Sampling rate. Number of frames per second.
+            chunk (int): Buffer length. Number of frames to accumulate before returning audio to caller.
+        """
         self._rate = rate
         self._chunk = chunk
 
@@ -26,7 +35,8 @@ class MicrophoneStream():
         self._buff = queue.Queue()
         self.closed = True
 
-    def __enter__(self):
+    def open_stream(self):
+        logger.info("Turning ON the microphone!")
         self._audio_interface = pyaudio.PyAudio()
         self._audio_stream = self._audio_interface.open(
             format=pyaudio.paInt16,
@@ -41,12 +51,11 @@ class MicrophoneStream():
             # overflow while the calling thread makes network requests, etc.
             stream_callback=self._fill_buffer,
         )
-
         self.closed = False
-
         return self
 
-    def __exit__(self, type, value, traceback):
+    def close_stream(self):
+        logger.info("Turning OFF the microphone!")
         self._audio_stream.stop_stream()
         self._audio_stream.close()
         self.closed = True
@@ -81,3 +90,9 @@ class MicrophoneStream():
                     break
 
             yield b"".join(data)
+
+    def __enter__(self):
+        return self.open_stream()
+
+    def __exit__(self, type, value, traceback):
+        self.close_stream()

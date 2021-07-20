@@ -12,7 +12,8 @@ SUPPORTED_COMMANDS = [
     "new tab",
     "close window",
     "scroll down",
+    "exit",
 ]
 
 # How long to wait before turning of the microphone (seconds)
-SILENCE_TIMEOUT_SEC = 15
+SILENCE_TIMEOUT_SEC = 10

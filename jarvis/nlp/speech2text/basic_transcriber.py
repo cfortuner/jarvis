@@ -1,8 +1,9 @@
 import logging
+from typing import Iterable
 
 import speech_recognition as sr
 
-from .audio_transcriber import AudioTranscriber
+from .audio_transcriber import AudioTranscriber, AudioTranscript
 
 
 class BasicTranscriber(AudioTranscriber):
@@ -18,14 +19,14 @@ class BasicTranscriber(AudioTranscriber):
         with sr.Microphone() as source:
             self.recognizer.adjust_for_ambient_noise(source)
 
-    def listen(self) -> str:
+    def listen(self) -> Iterable[AudioTranscript]:
         try:
             with sr.Microphone() as source:
                 logging.info("Listening...")
                 audio = self.recognizer.listen(source)
                 logging.info("Recognizing...")
                 text = self.recognizer.recognize_google(audio)
-                return text
+                return [AudioTranscript(text, is_final=True)]
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
         except sr.RequestError as e:

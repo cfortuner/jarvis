@@ -4,6 +4,8 @@ Methods here should eventually be moved to specialist modules once common themes
 can be identified across a number of utility methods. But this is a good starting place
 for methods which don't have an obvious home yet.
 """
+import sys
+
 
 def normalize_text(text, method="naive"):
     if method == "naive":
@@ -35,3 +37,14 @@ def compute_levenshtein_distance(s1, s2):
                 distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
         distances = distances_
     return distances[-1]
+
+
+def display_live_transcription(transcript, overwrite_chars):
+    """Print interim results of live transcription to stdout.
+    
+    We include a carriage return at the end of the line, so subsequent lines will overwrite
+    them. If the previous result was longer than this one, we need to print some extra
+    spaces to overwrite the previous result    
+    """
+    sys.stdout.write(transcript + overwrite_chars + "\r")
+    sys.stdout.flush()

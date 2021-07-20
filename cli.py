@@ -14,8 +14,9 @@ import time
 import click
 
 from jarvis.actions import ActionResolver
-from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
 from jarvis.automation.desktop import create_desktop_automation
+from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
+from jarvis.nlp import nlp_utils
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
 logging.basicConfig(level=logging.INFO)
@@ -55,25 +56,26 @@ def cli(debug):
 
 
 @cli.command()
-@click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
-@click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
-def speech2text(transcriber, stream):
+@click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
+@click.option('--no-stream', is_flag=True, help="Exit after first command is transcribed.")
+def speech2text(transcriber, no_stream):
     """Convert text to speech."""
-    click.echo(f"Using '{transcriber}' transcriber")
     listener = _get_transcriber(transcriber)
     click.echo(f"Listening... Say something!")
-    start_time = time.time()
     while True:
-        text = listener.listen()
-        if text is None:
-            if time.time() - start_time > SILENCE_TIMEOUT_SEC:
-                logging.info("Max silence time reached. Turning off microphone..")
-                break
-        else:
-            click.echo(f"You said: '{text}'")
-            if text == "exit" or not stream:
-                break
-            start_time = time.time()
+        transcripts = listener.listen()
+        for transcript in transcripts:
+            if transcript.is_final:
+                if transcript.deadline_exceeded:
+                    click.echo(f"Silence detected. Exiting...")
+                    return
+                click.echo(f"Final transcript: '{transcript.text}'")
+                if no_stream or transcript.text == "exit":
+                    return
+            elif transcript.text is not None:
+                nlp_utils.display_live_transcription(transcript.text, transcript.overwrite_chars)
+            else:
+                click.echo(f"No results yet.")
 
 
 @cli.command()
@@ -96,36 +98,40 @@ def text2action(text, no_execute):
 
 
 @cli.command()
-@click.option('--transcriber', type=click.Choice(['basic', 'google']), default="basic")
+@click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-@click.option('--stream', is_flag=True, default=False, help="Streaming mode for parsing multiple commands.")
-def speech2action(transcriber, no_execute, stream):
+@click.option('--no-stream', is_flag=True, help="Exit after first command is transcribed.")
+def speech2action(transcriber, no_execute, no_stream):
     """Convert speech to action."""
     click.echo(f"Initializing..")
     resolver = ActionResolver()
     desktop_automation = create_desktop_automation()
     listener = _get_transcriber(transcriber)
-
     click.echo(f"Listening... Say something!")
-    start_time = time.time()
     while True:
-        text = listener.listen()
-        if text is None:
-            if time.time() - start_time > SILENCE_TIMEOUT_SEC:
-                logging.info("Max silence time reached. Turning off microphone..")
-                break
-        elif text == "exit":
-            break
-        else:
-            _parse_and_execute_action(
-                text=text,
-                resolver=resolver,
-                desktop_automation=desktop_automation,
-                no_execute=no_execute
-            )
-            if not stream:
-                break
-            start_time = time.time()
+        transcripts = listener.listen()
+        for transcript in transcripts:
+            if transcript.is_final:
+                if transcript.deadline_exceeded:
+                    click.echo(f"Silence detected. Exiting...")
+                    return
+                
+                assert transcript.text is not None, "We shouldn't have an empty transcript thats final unless its silence"
+                click.echo(f"Final transcript: '{transcript.text}'")
+                
+                if transcript.text == "exit":
+                    return
+                
+                _parse_and_execute_action(
+                    text=transcript.text,
+                    resolver=resolver,
+                    desktop_automation=desktop_automation,
+                    no_execute=no_execute
+                )
+
+                if no_stream:
+                    return
+
 
 if __name__ == '__main__':
     cli()

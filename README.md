@@ -21,14 +21,21 @@ Features / Enhancements
 * Keyboard shortcut to open App and click record
 * "Listening" animation after clicking record
 * Dedicated console on GUI for debug logs (currently logs are truncated)
-* [Record from history](https://caster.readthedocs.io/en/latest/readthedocs/Caster_Commands/Record_Macros/) (save a sequence of voice commands as a macro) - 
+* [Record from history](https://caster.readthedocs.io/en/latest/readthedocs/Caster_Commands/Record_Macros/) (save a sequence of voice commands as a macro)
 
 Bugs / Known Issues
 
 * If you forget to call "exit" in stream mode and let the microphone run for awhile before your next command, google will continue to record audio and try to process an extremely large transcript which causes the program to timeout / drag. We need a way to detect silence in stream mode, and clear the audio buffer. We can use a timeout parameter in the Microphone or GoogleTranscriber to clear the buffer if no commands are heard for N seconds
 * [Mac] The TaskBar loads slowly and gets stuck sometimes
 * [Mac] "Switch to X" gets stuck if program is minimized ()
-* [Mac] GUI layout isn't formatted properly. Appears to be differences between Monitors or Operating Systems we need to work out. Ideally the GUI can appear the same across all monitors/OS. 
+* [Mac] GUI layout isn't formatted properly. Appears to be differences between Monitors or Operating Systems we need to work out. Ideally the GUI can appear the same across all monitors/OS.
+
+UI Features/Bugs
+
+* Use real-time sound detection from mic to play animation (don't wait for google)?
+* Show/Hide GUI using the Python API (make keyboard shortcut)
+* Send Show/Hide event to Python when the user opens the window
+* UI should always be on top of all windows (pin the window)?
 
 ## Developer Setup
 
@@ -207,6 +214,12 @@ Documentation
 For creating menu bars on MacOS
 * https://github.com/jaredks/rumps
 * https://stackoverflow.com/questions/26815360/how-to-create-menu-item-in-osx-menubar-using-pyinstaller-packaged-kivy-python-ap
+
+Audio Libraries
+* https://github.com/amsehili/auditok
+* https://github.com/jleb/pyaudio
+* https://github.com/tyiannak/pyAudioAnalysis
+* https://github.com/rhasspy/rhasspy-silence (silence detection)
 
 Voice Programming
 * https://github.com/jim-schwoebel/voicebook (Textbook with Python example code! Useful utilities.)
