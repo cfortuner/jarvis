@@ -50,7 +50,8 @@ class GoogleTranscriber(AudioTranscriber):
         Args:
             supported_commands (List[str], optional): A hard-coded list of text commands. If we detect
                 one of these phrases during transcription, we can exit early and return the phrase, 
-                instead of waiting for Google to detect that the user has stopped speaking.
+                instead of waiting for Google to detect that the user has stopped speaking. This noticeably 
+                speeds up transcription times for known phrases (Brendan).
             single_utterance (bool): indicates whether this request should automatically end after speech
                 is no longer detected. If set, Speech-to-Text will detect pauses, silence, or non-speech audio
                 to determine when to end recognition.

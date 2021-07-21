@@ -195,7 +195,7 @@ python scratch/kivy_example.py
 python scratch/selenium_example.py
 
 # Run the main app (then click Record and "Switch to Chrome")
-python main.py
+python main.py --no-taskbar
 ```
 
 ## Distributing the app

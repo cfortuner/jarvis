@@ -8,6 +8,7 @@ SUPPORTED_COMMANDS = [
     "switch to chrome",
     "switch to code",
     "switch to terminal",
+    "switch to python",
     "open chrome",
     "new tab",
     "close window",

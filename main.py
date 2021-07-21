@@ -39,8 +39,9 @@ if __name__ == '__main__':
 
     # The task bar doesn't work well on Mac yet and slows down iteration speed.
     if args.no_taskbar:
-        speech_app = DesktopApp()
-        speech_app.run()
+        import trio
+        trio.run(DesktopApp().root_task)
+        #DesktopApp().run()
     else:
         # Has to be imported after DesktopApp
         # otherwise it results in segfault
