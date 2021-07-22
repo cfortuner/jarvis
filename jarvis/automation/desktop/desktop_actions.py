@@ -26,6 +26,7 @@ class LaunchAction(DesktopAction):
     """Launch an application (not running yet)."""
     def __init__(self, desktop: DesktopAutomation, app_name: str):
         super().__init__(desktop)
+
         self.app_name = app_name
     
     def run(self):
@@ -33,17 +34,31 @@ class LaunchAction(DesktopAction):
         if ret_code != 0:
             raise Exception(f"Failed to launch the application: {ret_code}")
 
+    @classmethod
+    def phrases(cls):
+        return [
+            "launch {app_name}",
+            "open {app_name}",
+        ]
+
 
 class ScreenshotAction(DesktopAction):
     """Task a screenshot."""
-    def __init__(self, desktop: DesktopAutomation, copy_name: str):
+    def __init__(self, desktop: DesktopAutomation):
         super().__init__(desktop)
-        self.copy_name = copy_name
 
     def run(self):
         # TODO(hari): Copy the screenshot to clipboard with specific
         # name attached to it
         self.desktop.screenshot()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "take a screenshot",
+            "screenshot",
+            "capture screen",
+        ]
 
 
 class SwitchAction(DesktopAction):
@@ -57,6 +72,7 @@ class SwitchAction(DesktopAction):
 
     def __init__(self, desktop: DesktopAutomation, app_name: str):
         super().__init__(desktop)
+
         self.app_name = app_name
     
     def run(self):
@@ -96,3 +112,9 @@ class SwitchAction(DesktopAction):
             raise Exception(msg)
 
         self.desktop.switch_to_window(app)
+
+    @classmethod
+    def phrases(self):
+        return [
+            "switch to {app_name}",
+        ]
