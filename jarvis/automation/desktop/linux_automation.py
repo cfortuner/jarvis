@@ -90,6 +90,20 @@ class LinuxAutomation(DesktopAutomation):
             15,
             bounds[0], bounds[1], bounds[2], bounds[3])
 
+    def maximize_window(self, app_name: str):
+        w = self._get_window_with_name(app_name)
+        if w is None:
+            raise Exception(f"Failed to find an app with name {app_name}")
+
+        w.maximize()
+
+    def minimize_window(self, app_name: str):
+        w = self._get_window_with_name(app_name)
+        if w is None:
+            raise Exception(f"Failed to find an app with name {app_name}")
+
+        w.hide()
+
     def open_application(self, app_name: str):
         if app_name in self.COMMON_APP_NAME_MAPPINGS:
             app_name = self.COMMON_APP_NAME_MAPPINGS[app_name]

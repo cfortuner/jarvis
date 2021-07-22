@@ -48,12 +48,20 @@ class DesktopAutomation():
         """Switch to the window of the specific app"""
         raise NotImplementedError("Needs to be overriden by the derived class")
 
-    def get_window_bounds(self, app_name) -> list:
+    def get_window_bounds(self, app_name: str) -> list:
         """Return the (x, y, width, height) bounds of the window for the app"""
         raise NotImplementedError("Needs to be overriden by the derived class")
 
-    def set_window_bounds(self, app_name, bounds: list) -> None:
+    def set_window_bounds(self, app_name: str, bounds: list) -> None:
         """Set the (x, y, width, height) bounds of the window for the app"""
+        raise NotImplementedError("Needs to be overriden by the derived class")
+
+    def maximize_window(self, app_name: str):
+        """Maximize the main widow of the app"""
+        raise NotImplementedError("Needs to be overriden by the derived class")
+
+    def minimize_window(self, app_name: str):
+        """Minimize the main widow of the app"""
         raise NotImplementedError("Needs to be overriden by the derived class")
 
     def open_application(self, app_name: str):

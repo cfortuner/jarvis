@@ -114,7 +114,78 @@ class SwitchAction(DesktopAction):
         self.desktop.switch_to_window(app)
 
     @classmethod
-    def phrases(self):
+    def phrases(cls):
         return [
             "switch to {app_name}",
+        ]
+
+class MaximizeWindowAction(DesktopAction):
+    """Maximizes the main window of the application"""
+    def __init__(self, desktop: DesktopAutomation, app_name: str):
+        super().__init__(desktop)
+
+        self.app_name = app_name
+    
+    def run(self):
+        self.desktop.maximize_window(self.app_name)
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "maximize {app_name}"
+        ]
+
+class MinimizeWindowAction(DesktopAction):
+    """Minimizes the main window of the application"""
+    def __init__(self, desktop: DesktopAutomation, app_name: str):
+        super().__init__(desktop)
+
+        self.app_name = app_name
+    
+    def run(self):
+        self.desktop.minimize_window(self.app_name)
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "minimize {app_name}"
+        ]
+
+class AttachWindowAction(DesktopAction):
+    """Attach the main window of the application to one of the edges of the
+    desktop - top half, bottom half, left half, right half"""
+
+    EDGE_NAMES = [
+        "top half",
+        "bottom_half",
+        "left half",
+        "right half",
+    ]
+
+    def __init__(self, desktop: DesktopAutomation, app_name: str, edge_name: str):
+        super().__init__(desktop)
+
+        self.app_name = app_name
+        self.edge_name = edge_name
+    
+    def run(self):
+        screen_width, screen_height = self.desktop.get_screensize()
+        # bounds encodes (x, y, width, height)
+        if self.edge_name == 'top half':
+            bounds = (0, 0, screen_width, screen_height/2)
+        elif self.edge_name == 'bottom half':
+            bounds = (0, screen_height/2, screen_width, screen_height/2)
+        elif self.edge_name == 'left half':
+            bounds = (0, 0, screen_width/2, screen_height)
+        elif self.edge_name == 'right half':
+            bounds = (screen_width/2, 0, screen_width/2, screen_height)
+        else:
+            raise Exception(f"Unsupported edge name {self.edge_name}")
+
+        self.desktop.set_window_bounds(self.app_name, bounds)
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "attach {app_name} to {edge_name}"
         ]
