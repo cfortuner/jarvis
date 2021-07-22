@@ -81,13 +81,16 @@ class LinuxAutomation(DesktopAutomation):
         if w is None:
             raise Exception(f"Failed to find an app with name {app_name}")
 
+        bounds = list(map(int, bounds))
+
         w.set_geometry(
-            Wnck.WindowGravity.CURRENT,
+            Wnck.WindowGravity.STATIC,
             # Resize mask specifies flags for which dimension of the
             # geometry needs to be updated. Configuring here for all 
             # dimensions to be updated.
             # https://lazka.github.io/pgi-docs/Wnck-3.0/flags.html#Wnck.WindowMoveResizeMask
-            15,
+            (Wnck.WindowMoveResizeMask.X |Wnck.WindowMoveResizeMask.Y |
+             Wnck.WindowMoveResizeMask.WIDTH |Wnck.WindowMoveResizeMask.HEIGHT),
             bounds[0], bounds[1], bounds[2], bounds[3])
 
     def maximize_window(self, app_name: str):
@@ -102,7 +105,7 @@ class LinuxAutomation(DesktopAutomation):
         if w is None:
             raise Exception(f"Failed to find an app with name {app_name}")
 
-        w.hide()
+        w.minimize()
 
     def open_application(self, app_name: str):
         if app_name in self.COMMON_APP_NAME_MAPPINGS:
