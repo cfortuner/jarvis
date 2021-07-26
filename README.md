@@ -14,7 +14,11 @@ Potential use cases
 - set reminders
 - notify
 
+We *try* to follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
+
 ## Roadmap
+
+See the [Brainstorm](https://docs.google.com/document/d/1xiLHVMMXLBE7JgWXhZ18eERzvKIUjfbp4kCxcofDmzk/edit?usp=sharing) doc for the "crazy ideas."
 
 Features / Enhancements
 
@@ -192,10 +196,19 @@ python scratch/google_speech_recognition_example.py
 python scratch/kivy_example.py
 
 # Verify Selenium is installed correctly
-python scratch/selenium_example.py
+python -m scratch.selenium_example
 
 # Run the main app (then click Record and "Switch to Chrome")
-python main.py --no-taskbar
+python main.py
+```
+
+## Testing
+
+Run unit tests
+
+```bash
+# Optionally prepend SPEED_LIMIT=N_SEC to slow down the automation when debugging
+pytest tests/
 ```
 
 ## Distributing the app

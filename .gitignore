@@ -5,6 +5,8 @@ pyatom_repo/
 .DS_Store
 kaldi_model/
 *.zip
+*.code-workspace
+JarvisProfile/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

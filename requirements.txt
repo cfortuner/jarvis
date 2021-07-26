@@ -8,6 +8,7 @@ wheel
 
 # All platforms
 click==8.0.1  # CLI
+flake8==3.9.2
 google-api-python-client==2.11.0
 google-cloud-speech==2.5.0
 kivymd==0.104.2  # Need to install Kivy first
@@ -29,3 +30,6 @@ pygobject==3.40.1; sys_platform == "linux"
 Kivy==2.0.0; sys_platform == "linux"
 Kivy-examples==2.0.0; sys_platform == "linux"
 Kivy-Garden==0.1.4; sys_platform == "linux"
+
+# Test reqs (move to separate reqs.txt file eventually)
+pytest==6.2.4

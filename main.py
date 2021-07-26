@@ -33,12 +33,12 @@ def on_quit(icon, item):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run jarvis.')
-    parser.add_argument('--no-taskbar', action='store_true', help="Disable task bar feature and launch app directly.")
+    parser.add_argument('--taskbar', action='store_true', help="Enable taskbar feature (buggy).")
 
     args = parser.parse_args()
 
     # The task bar doesn't work well on Mac yet and slows down iteration speed.
-    if args.no_taskbar:
+    if not args.taskbar:
         import trio
         trio.run(DesktopApp().root_task)
         #DesktopApp().run()

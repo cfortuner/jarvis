@@ -1,5 +1,4 @@
 import logging
-import sys
 import time
 from typing import Iterable, List
 
@@ -23,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def _get_speech_contexts(supported_commands):
     """Tell Google about phrases we expect to improve transcription quality.
-    
+
     https://cloud.google.com/speech-to-text/docs/speech-adaptation
     """
     contexts = []
@@ -48,16 +47,16 @@ class GoogleTranscriber(AudioTranscriber):
         """Instantiate the Listener.
 
         Args:
-            supported_commands (List[str], optional): A hard-coded list of text commands. If we detect
-                one of these phrases during transcription, we can exit early and return the phrase, 
-                instead of waiting for Google to detect that the user has stopped speaking. This noticeably 
+            supported_commands: Optional; A hard-coded list of text commands. If we detect
+                one of these phrases during transcription, we can exit early and return the phrase,
+                instead of waiting for Google to detect that the user has stopped speaking. This noticeably
                 speeds up transcription times for known phrases (Brendan).
-            single_utterance (bool): indicates whether this request should automatically end after speech
+            single_utterance: Optional; indicates whether this request should automatically end after speech
                 is no longer detected. If set, Speech-to-Text will detect pauses, silence, or non-speech audio
                 to determine when to end recognition.
         """
         self.supported_commands = supported_commands or []
-        self._client = speech.SpeechClient()        
+        self._client = speech.SpeechClient()
         self._config = speech.StreamingRecognitionConfig(
             config=speech.RecognitionConfig(
                 encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -70,10 +69,11 @@ class GoogleTranscriber(AudioTranscriber):
             single_utterance=single_utterance
         )
 
-    def listen(self) -> str:
+    def listen(self) -> AudioTranscript:
         """Record and transcribe user utterance using Microphone.
+
         Returns:
-            str: Detected utterance
+            AudioTranscript with detected utterance and additional metadata.
         """
         with MicrophoneStream(rate=RATE, chunk=CHUNK) as stream:
             audio_generator = stream.generator()
@@ -100,14 +100,14 @@ def _handle_transcription_stream(
     """Handle streaming transcriptions from Google Cloud Speech API.
 
     Args:
-        responses (Iterable[StreamingRecognizeResponse]): Iterable of Google API responses
-        supported_commands (List[str], optional): A hard-coded list of text commands. If we detect
-            one of these phrases during transcription, we can exit early and return the phrase, 
+        responses: Iterable of Google API responses
+        supported_commands: Optional; A hard-coded list of text commands. If we detect
+            one of these phrases during transcription, we can exit early and return the phrase,
             instead of waiting for Google to detect that the user has stopped speaking.
-        deadline (int, optional): Maximum amount of seconds to wait for user to say something, otherwise
-            exit early due to inactivity. NOTE: Google currently controls part of this equation, since they
-            wait for silence on their end, too. So even with a deadline=0, we would still wait for N seconds
-            for google to detect the silence and send an end of utterance event.
+        deadline: Optional; Maximum amount of seconds to wait for user to say something, otherwise
+            exit early due to inactivity. NOTE: Google currently controls part of this equation,
+            since they wait for silence on their end, too. So even with a deadline=0, we would still
+            wait for N seconds for google to detect the silence and send an end of utterance event.
 
     Returns:
         Iterable[AudioTranscript]: Stream of transcribed audio and metadata
@@ -119,11 +119,14 @@ def _handle_transcription_stream(
     for response in responses:
         if not is_final:
             if not response.results:
-                if response.speech_event_type.name == "END_OF_SINGLE_UTTERANCE" or time.time() - start_time > deadline:
+                if (response.speech_event_type.name == "END_OF_SINGLE_UTTERANCE"
+                    or time.time() - start_time > deadline):
                     if transcript is None:
-                        logger.info(f"No utterance detected for awhile..")
+                        logger.info("No utterance detected for awhile..")
                     is_final = True
-                    yield AudioTranscript(transcript, is_final, deadline_exceeded=transcript is None)
+                    yield AudioTranscript(
+                        transcript, is_final, deadline_exceeded=transcript is None
+                    )
                 else:
                     continue
 
