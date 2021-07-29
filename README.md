@@ -265,3 +265,33 @@ Audio ML
 
 Datasets
 * https://www.neurolex.ai/ (Audio, voice, speaking)
+* https://arxiv.org/abs/1809.08887 (Spider, text2sql database)
+
+Python (background tasks and queues)
+* https://testdriven.io/blog/developing-an-asynchronous-task-queue-in-python/
+* https://docs.celeryproject.org/en/stable/
+* https://python-rq.org/
+* https://huey.readthedocs.io/en/latest/
+
+NLP
+* https://beta.openai.com/examples (GPT3 API)
+
+Code Generation
+* [auto-generate regex from NL examples](https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00339/96479/Sketch-Driven-Regular-Expression-Generation-from)
+* [generate regex from examples](https://dl.acm.org/doi/abs/10.1145/3385412.3385988)
+* [Code generation with external retrieval](https://arxiv.org/abs/2004.09015)
+* [Excel Formula Prediction](http://proceedings.mlr.press/v139/chen21m.html)
+
+NLP-to-Bash
+* https://devhints.io/
+* https://github.com/idank/explainshell
+* https://github.com/tldr-pages/tldr (better man pages with examples!)
+* [NL2Bash Competition](https://eval.ai/web/challenges/challenge-page/674/leaderboard/1831#leaderboardrank-1)
+* [Tellina - NL2Bash](https://github.com/TellinaTool/tellina)
+* [IBM CLI code](https://clai-home.mybluemix.net/)
+* ["Skill Plugin" API for Jarvis](https://github.com/IBM/clai/tree/master/clai/server/plugins)
+
+Desktop Launcher Tools (Mac Spotlight++)
+* [Alfred](https://www.alfredapp.com/) and [plugins](http://www.packal.org/)
+* [Raycast](https://raycast.com/)
+
