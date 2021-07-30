@@ -1,0 +1,76 @@
+Time: 0.68
+[0] Input: Search for keyword brendan in log.text file
+[0] Output: find /var/log/syslog -type f -name "log.text" -exec grep brendan {} \;
+
+Time: 0.55
+[1] Input: Show top 5 processes by CPU usage
+[1] Output: ps aux | awk '{print $4"\t"$11}' | sort -k5n | head -n 5
+
+Time: 0.33
+[2] Input: upload files larger than 1MB with git lfs
+[2] Output: git lfs  --size +1M --name-only
+
+Time: 0.55
+[3] Input: show top 3 largest files in current directory in megabytes
+[3] Output: find . -type f -exec du -h '{}' \; | sort -rh | head -n 3
+
+Time: 0.33
+[4] Input: show current directory size in megabytes
+[4] Output: find . -type d -exec du -hc {} \;
+
+Time: 0.33
+[5] Input: Display differences between file1 and file2 side-by-side.
+[5] Output: diff -y file1 file2
+
+Time: 0.43
+[6] Input: Find *.dat files recursively in the current directory.
+[6] Output: find . -name *.dat -print0 | xargs -0 -n1 echo
+
+Time: 0.33
+[7] Input: count number of lines in readme.md
+[7] Output: cat readme.md | wc -l
+
+Time: 0.44
+[8] Input: Calculate the total size of all *.py files in the directory tree
+[8] Output: find . -name '*.py' -exec du -hc {} + | tail -n1
+
+Time: 0.44
+[9] Input: Copy all directories recursively from source/ to destination/
+[9] Output: find source/ -type d -exec cp -a {} destination/ \;
+
+Time: 0.44
+[10] Input: Create a tarball 'files.tar.gz' containing all regular files under current directory tree
+[10] Output: find . -type f -exec tar -rvf files.tar.gz {} \;
+
+Time: 0.43
+[11] Input: Find all .txt files in current directory except README.md
+[11] Output: find . -name README.md -prune -o -name '*.txt' -print
+
+Time: 0.33
+[12] Input: Find all files in current directory that were modified less than 1 day ago
+[12] Output: find . -mtime -1
+
+Time: 0.33
+[13] Input: checkout git branch bfortuner/jarvis
+[13] Output: cd /path/to/your/project
+
+Time: 0.33
+[14] Input: create new git branch hari/jarvis
+[14] Output: git checkout -b hari/jarvis
+
+Time: 0.44
+[15] Input: remove all *.pyc files recursively in current directory
+[15] Output: find . -name "*.pyc" | xargs rm -rf
+
+Time: 0.45
+[16] Input: remove all __pycache__ directories recursively
+[16] Output: find . -name __pycache__ -type d -print0 | xargs -0 rm -rf
+
+Time: 0.21
+[17] Input: print all environment variables with keyword OPENAI
+[17] Output: env | grep OPENAI
+
+Time: 0.55
+[18] Input: how much disk space do I have left?
+[18] Output: df -h | tail -n 1 | tr -s ' ' | cut -d' ' -f1 | tail -n 1
+

@@ -1,4 +1,5 @@
 # Project specific
+.env.secret
 .vscode/
 kivy_repo/
 pyatom_repo/

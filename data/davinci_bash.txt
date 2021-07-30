@@ -1,0 +1,57 @@
+Time: 0.70
+[0] Input: Search for keyword brendan in log.text file
+[0] Output: grep brendan log.text
+Time: 0.41
+[1] Input: Show top 5 processes by CPU usage
+[1] Output: top -n 5
+Time: 0.43
+[2] Input: upload files larger than 1MB with git lfs
+[2] Output: git lfs push --all
+Time: 0.66
+[3] Input: show top 3 largest files in current directory in megabytes
+[3] Output: du -sm * | sort -nr | head -3
+Time: 0.41
+[4] Input: show current directory size in megabytes
+[4] Output: du -h
+Time: 0.40
+[5] Input: Display differences between file1 and file2 side-by-side.
+[5] Output: git diff file1 file2
+Time: 0.66
+[6] Input: Find *.dat files recursively in the current directory.
+[6] Output: find . -name "*.dat"
+Time: 0.70
+[7] Input: count number of lines in readme.md
+[7] Output: wc -l readme.md
+Time: 0.66
+[8] Input: Calculate the total size of all *.py files in the directory tree
+[8] Output: find . -name "*.py" | xargs wc -l
+Time: 0.40
+[9] Input: Copy all directories recursively from source/ to destination/
+[9] Output: cp -r source/* destination/
+Time: 0.68
+[10] Input: Create a tarball 'files.tar.gz' containing all regular files under current directory tree
+[10] Output: tar -czf files.tar.gz .
+Time: 0.91
+[11] Input: Find all .txt files in current directory except README.md
+[11] Output: find . -name "*.txt" -not -name README.md
+Time: 0.40
+[12] Input: Find all files in current directory that were modified less than 1 day ago
+[12] Output: find . -mtime -1
+Time: 0.66
+[13] Input: checkout git branch bfortuner/jarvis
+[13] Output: git checkout bfortuner/jarvis
+Time: 0.65
+[14] Input: create new git branch hari/jarvis
+[14] Output: git checkout -b hari/jarvis
+Time: 0.92
+[15] Input: remove all *.pyc files recursively in current directory
+[15] Output: find . -name '*.pyc' -exec rm -rf {} \;
+Time: 0.96
+[16] Input: remove all __pycache__ directories recursively
+[16] Output: find . -name '*__pycache__' -exec rm -rf {} \;
+Time: 0.43
+[17] Input: print all environment variables with keyword OPENAI
+[17] Output: env | grep OPENAI
+Time: 0.40
+[18] Input: how much disk space do I have left?
+[18] Output: df -h
