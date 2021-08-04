@@ -4,8 +4,9 @@ Non-GUI realted operating system tasks should live elsewhere.
 """
 
 import logging
+from typing import List
 
-from jarvis.actions import ActionBase
+from jarvis.actions import ActionBase, ActionResult
 from jarvis.nlp import nlp_utils
 
 from .desktop_automation import DesktopAutomation
@@ -13,13 +14,18 @@ from .desktop_automation import DesktopAutomation
 
 class DesktopAction(ActionBase):
     """Base class for all Desktop actions.
-    
+
     We expect the DesktopAutomation instance to already be instantiated
     and be passed around to all the actions.
     """
     def __init__(self, desktop: DesktopAutomation):
         super().__init__()
         self.desktop = desktop
+
+    @classmethod
+    def automations(cls) -> List[str]:
+        # List of automation instances required to initialize
+        return ["desktop"]
 
 
 class LaunchAction(DesktopAction):
@@ -28,11 +34,13 @@ class LaunchAction(DesktopAction):
         super().__init__(desktop)
 
         self.app_name = app_name
-    
+
     def run(self):
         ret_code = self.desktop.open_application(self.app_name)
         if ret_code != 0:
-            raise Exception(f"Failed to launch the application: {ret_code}")
+            msg = f"Failed to launch the application: {ret_code}"
+            return ActionResult(status="failed", error=msg)
+        return ActionResult()
 
     @classmethod
     def phrases(cls):
@@ -96,7 +104,7 @@ class SwitchAction(DesktopAction):
                     break
 
             # Third: Try to do fuzzy matching to find the app
-            if app == None:
+            if app is None:
                 logging.info("Falling back to fuzzy matching.")
                 distances = list(map(
                     lambda w: nlp_utils.compute_levenshtein_distance(w, self.app_name), 
@@ -105,13 +113,15 @@ class SwitchAction(DesktopAction):
                 if min_dist <= self.DISTANCE_THRESHOLD:
                     idx = distances.index(min_dist)
                     app = windows[idx]
-            
-        if app == None:
+
+        if app is None:
             msg = f"Failed to find any app with name {self.app_name}"
             logging.info(msg)
-            raise Exception(msg)
+            return ActionResult(status="failed", error=msg)
 
         self.desktop.switch_to_window(app)
+
+        return ActionResult()
 
     @classmethod
     def phrases(cls):

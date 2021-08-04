@@ -1,6 +1,16 @@
+from dataclasses import dataclass
+from typing import List
+
+
+@dataclass
+class ActionResult:
+    """Stores the status and error of an executed action."""
+    status: str = "succeeded"  # succeeded, failed
+    error: str = None  # exception message
+
 
 class ActionBase:
-    def run(self, **kwargs) -> None:
+    def run(self, **kwargs) -> ActionResult:
         raise NotImplementedError("Needs to be implemented by the derived class")
 
     @property
@@ -13,3 +23,16 @@ class ActionBase:
         # Any variable in the string will be parsed and the value will be fed
         # to the `run` method as input.
         raise NotImplementedError("Needs to be implemented by the derived class")
+
+    @classmethod
+    def app_names(cls) -> List[str]:
+        # List of app names this action can operate on
+        # If empty, the action can operate on all apps or desktops
+        # In combination with active window, this can be used to disambiguate
+        # user commands when the same phrase is supported by multiple actions.
+        return []
+
+    @classmethod
+    def automations(cls) -> List[str]:
+        # List of automation instances required to initialize
+        return []

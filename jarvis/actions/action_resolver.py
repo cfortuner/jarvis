@@ -5,8 +5,9 @@ import logging
 from typing import List, Tuple
 
 from jarvis.actions import ActionBase
-from jarvis.automation.browser import BrowserAutomation
-from jarvis.automation.desktop import DesktopAutomation
+from jarvis.actions.context import Context
+from jarvis.automation.browser import create_browser_automation
+from jarvis.automation.desktop import create_desktop_automation
 from jarvis.nlp import nlp_utils
 
 
@@ -54,6 +55,10 @@ class ActionResolver:
     def __init__(self):
         super()
 
+        self.desktop = create_desktop_automation()
+        self.context = Context(desktop=self.desktop)
+        self._browser = None
+
         # Map between phrase string and the action type
         self._phrase_map = {}
         # Support multiple actions by using conjunctive and.
@@ -62,34 +67,78 @@ class ActionResolver:
         self._phrase_map.update(self._find_action_phrases("jarvis/automation"))
         logging.info(f"Found {len(self._phrase_map)} phrases to match against")
 
-    def parse(self, cmd: str, desktop: DesktopAutomation, browser: BrowserAutomation) -> List[ActionBase]:
+    @property
+    def browser(self):
+        if self._browser is None:
+            self._browser = create_browser_automation()
+        return self._browser
+
+    def parse(self, cmd: str) -> List[ActionBase]:
         """Converts user command string in list of Actions.
-        
-        In the future this can also take the application state, command history, and inputs
-        from other devices like the Camera for gaze estimation.
+
+        NOTE: Right now we only support 1 action per command, but we
+        return a list of matching actions to attempt ordered by the
+        most relevant as determined by context (e.g. active window).
         """
+
         logging.info(f"CommandParser Input:  {cmd}")
         cmd = nlp_utils.normalize_text(cmd)
         logging.info(f"Command after cleaning: {cmd}")
 
-        output_actions = []
-        for phrase_matcher, action_type in self._phrase_map.items():
-            status, params = phrase_matcher.match(cmd)
-            if status:
-                if phrase_matcher.is_conjunctive():
-                    # For conjunctive phrases, param name doesn't
-                    # matter
-                    for _, param_value in params.items():
-                        output_actions.extend(self.parse(param_value, desktop, browser))
-                else:
-                    output_actions.append(action_type(desktop, **params))
+        matching_actions = self._find_matching_actions(cmd)
 
-        if len(output_actions) == 0:
+            # TODO: Support conjunctives
+            # if phrase_matcher.is_conjunctive():
+            #     # For conjunctive phrases, param name doesn't
+            #     # matter
+            #     for _, param_value in params.items():
+            #         output_actions.extend(
+            #             self.parse(param_value, self.desktop, self.browser)
+            #         )
+
+        if len(matching_actions) == 0:
             logging.info("No command matched with that!")
             raise NotImplementedError("No command matched with that!")
-        
-        return output_actions
 
+        # Use Context to disambiguate commands
+        actions = self._sort_actions_by_relevance(matching_actions)
+
+        # Add required automation instances
+        actions = self._add_automation_instances(actions)
+
+        # Initialize the actions
+        action_instances = []
+        for action_cls, action_params in actions:
+            action_instances.append(action_cls(**action_params))
+        return action_instances
+
+    def _sort_actions_by_relevance(self, matching_actions):
+        # If the active window supports the action, push it to the top
+        ordered_actions = []
+        active_window_actions = []
+        for i, (action_type, _) in enumerate(matching_actions):
+            if self.context.active_window in action_type.app_names():
+                active_window_actions.append(matching_actions[i])
+            else:
+                ordered_actions.append(matching_actions[i])
+        return active_window_actions + ordered_actions
+
+    def _add_automation_instances(self, actions):
+        for action_cls, action_params in actions:
+            if "browser" in action_cls.automations():
+                action_params["browser"] = self.browser
+            if "desktop" in action_cls.automations():
+                action_params["desktop"] = self.desktop
+        return actions
+
+    def _find_matching_actions(self, phrase: str):
+        # Returns list of (action type, action params)
+        actions = []
+        for phrase_matcher, action_type in self._phrase_map.items():
+            status, params = phrase_matcher.match(phrase)
+            if status:
+                actions.append((action_type, params))
+        return actions
 
     def _find_action_phrases(self, dir_name: str) -> dict:
         """Loop through sub directories and load all the packages

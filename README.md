@@ -295,3 +295,5 @@ Desktop Launcher Tools (Mac Spotlight++)
 * [Alfred](https://www.alfredapp.com/) and [plugins](http://www.packal.org/)
 * [Raycast](https://raycast.com/)
 
+Headless Browsers
+* https://github.com/dhamaniasad/HeadlessBrowsers

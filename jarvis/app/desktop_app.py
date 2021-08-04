@@ -31,7 +31,6 @@ import trio
 
 from jarvis.actions import ActionResolver
 from jarvis.const import SUPPORTED_COMMANDS
-from jarvis.automation.desktop import create_desktop_automation
 from jarvis.nlp.speech2text import GoogleTranscriber
 
 # Alternative library which claims to be faster than trio/asyncio for Kivy
@@ -188,9 +187,8 @@ class DesktopApp(MDApp):
     nursery = None
 
     def build(self):
-        self.resolver = ActionResolver()
         self.listener = GoogleTranscriber(SUPPORTED_COMMANDS, single_utterance=True)
-        self.desktop_automation = create_desktop_automation()
+        self.resolver = ActionResolver()
 
         self.theme_cls.theme_style="Light"
         screen = Builder.load_string(KV)
@@ -308,15 +306,17 @@ class DesktopApp(MDApp):
                     break
                 elif transcript.is_final:
                     try:
-                        actions = self.resolver.parse(
-                            cmd=transcript.text,
-                            desktop=self.desktop_automation,
-                            browser=None
-                        )
+                        actions = self.resolver.parse(cmd=transcript.text)
+                        # Exit as soon as the first action succeeds
                         for a in actions:
                             await self.log("Running: {} - {}".format(a.name, transcript.text))
-                            a.run()
-                            await self.add_action_to_list(a.name, transcript.text)
+                            result = a.run()
+                            await self.log("Action: {} status: {}, error: {}".format(
+                                a.name, result.status, result.error)
+                            )
+                            if result.status == "succeeded":
+                                await self.add_action_to_list(a.name, transcript.text)
+                                break
                     except Exception as e:
                         msg = "Uh oh! Failed to act on this: {}".format(str(e))
                         traceback.print_exc(file=sys.stdout)

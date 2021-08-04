@@ -4,7 +4,7 @@ import pyautogui
 class DesktopAutomation():
     """Base class for all functionality related to
     automating Desktop interactions across different platforms"""
-    
+
     # Standard OS interaction functions that should work on
     # all OS and Desktop environments
     def get_screensize(self) -> list:
