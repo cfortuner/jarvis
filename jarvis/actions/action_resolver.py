@@ -41,7 +41,7 @@ class PhraseMatcher:
 
 class ActionResolver:
     """The "Brain" which routes commands to actions.
-    
+
     Inputs include the transcribed command, current application state (e.g. open windows,
     previous command), and the library of supported actions. These inputs are combined to
     determine which Action to perform.
@@ -63,14 +63,19 @@ class ActionResolver:
         self._phrase_map = {}
         # Support multiple actions by using conjunctive and.
         # This will not have any action mapped to it.
-        self._phrase_map[PhraseMatcher("{a} and {b}", True)] = None
+
+        # TODO(bfortuner): Support multiple actions
+        # Right now this makes the resolve logic complex and breaks
+        # when a user says the word "and" as part of a link name
+        # self._phrase_map[PhraseMatcher("{a} and {b}", True)] = None
+
         self._phrase_map.update(self._find_action_phrases("jarvis/automation"))
         logging.info(f"Found {len(self._phrase_map)} phrases to match against")
 
     @property
     def browser(self):
         if self._browser is None:
-            self._browser = create_browser_automation()
+            self._browser = create_browser_automation(self.desktop)
         return self._browser
 
     def parse(self, cmd: str) -> List[ActionBase]:

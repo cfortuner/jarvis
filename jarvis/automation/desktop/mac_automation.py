@@ -71,6 +71,11 @@ class MacAutomation(DesktopAutomation):
         # to use the int instead of the symbolic names
         app_ra.activateWithOptions_(3)
 
+    def open_application(self, app_name):
+        # HACK: We don't support this on Mac, so mimic a failure.
+        ret_code = 1
+        return ret_code
+
     def _get_all_menu_items(self, ax_item):
         """Using mac accessibility elements, we fetch all the leaf nodes
         of a menu bar"""

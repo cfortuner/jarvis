@@ -39,6 +39,27 @@ def compute_levenshtein_distance(s1, s2):
     return distances[-1]
 
 
+def match_text(
+    target: str,
+    text: str,
+    fuzzy: bool = True,
+    contains: bool = False,
+    threshold: float = 2
+):
+    target = normalize_text(target)
+    text = normalize_text(text)
+    if text == target:
+        return True
+    if fuzzy:
+        print("Falling back to fuzzy matching")
+        distance = compute_levenshtein_distance(target, text)
+        if distance <= threshold:
+            return True
+    if contains:
+        return text in target
+    return False
+
+
 def display_live_transcription(transcript, overwrite_chars):
     """Print interim results of live transcription to stdout.
     

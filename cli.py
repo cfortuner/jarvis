@@ -4,7 +4,7 @@ Examples
 --------
 python cli.py --help
 python cli.py speech2text --transcriber google --stream
-python cli.py text2action --text "switch to chrome" --no-execute
+python cli.py text2action --no-execute
 python cli.py speech2action --transcriber google --no-execute
 """
 
@@ -28,22 +28,23 @@ def _get_transcriber(name):
     if name == "basic":
         return BasicTranscriber()  # Also Google, but via SpeechRecognition
     elif name == "google":
-        return GoogleTranscriber(SUPPORTED_COMMANDS)  # Performant, streaming listener
+        return GoogleTranscriber(
+            supported_commands=SUPPORTED_COMMANDS,
+            single_utterance=False
+        )  # Performant, streaming listener
     raise Exception("Transcriber {name} not supported!")
 
 
-def _parse_and_execute_action(
-    text, resolver, desktop_automation, browser_automation=None, no_execute=False
-):
-    actions = resolver.parse(
-        cmd=text,
-        desktop=desktop_automation,
-        browser=browser_automation
-    )
+def parse_and_execute_action(text, resolver, no_execute=False):
+    actions = resolver.parse(cmd=text)
+    print("Matching actions: ", actions)
     for a in actions:
-        click.echo(f"Running: {a.name}")
+        print(f"Running: {a.name}")
         if not no_execute:
-            a.run()
+            result = a.run()
+            print("Action result", result)
+            if result.status == "succeeded":
+                break
 
 
 ## CLI commands ##
@@ -79,35 +80,30 @@ def speech2text(transcriber, no_stream):
 
 
 @cli.command()
-@click.option('--text', help='Text to convert into an Action', default=None)
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-def text2action(text, no_execute):
+def text2action(no_execute):
     """Convert text to action."""
-    if text is None:
+    resolver = ActionResolver()
+
+    while True:
         text = click.prompt('Enter text')
 
-    resolver = ActionResolver()
-    desktop_automation = create_desktop_automation()
-
-    _parse_and_execute_action(
-        text=text,
-        resolver=resolver,
-        desktop_automation=desktop_automation,
-        no_execute=no_execute
-    )
+        parse_and_execute_action(
+            text=text,
+            resolver=resolver,
+            no_execute=no_execute
+        )
 
 
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-@click.option('--no-stream', is_flag=True, help="Exit after first command is transcribed.")
-def speech2action(transcriber, no_execute, no_stream):
+def speech2action(transcriber, no_execute):
     """Convert speech to action."""
-    click.echo(f"Initializing..")
+    click.echo("Initializing..")
     resolver = ActionResolver()
-    desktop_automation = create_desktop_automation()
     listener = _get_transcriber(transcriber)
-    click.echo(f"Listening... Say something!")
+    click.echo("Listening... Say something!")
     while True:
         transcripts = listener.listen()
         for transcript in transcripts:
@@ -115,22 +111,18 @@ def speech2action(transcriber, no_execute, no_stream):
                 if transcript.deadline_exceeded:
                     click.echo(f"Silence detected. Exiting...")
                     return
-                
+
                 assert transcript.text is not None, "We shouldn't have an empty transcript thats final unless its silence"
                 click.echo(f"Final transcript: '{transcript.text}'")
-                
+
                 if transcript.text == "exit":
                     return
-                
-                _parse_and_execute_action(
+
+                parse_and_execute_action(
                     text=transcript.text,
                     resolver=resolver,
-                    desktop_automation=desktop_automation,
                     no_execute=no_execute
                 )
-
-                if no_stream:
-                    return
 
 
 if __name__ == '__main__':

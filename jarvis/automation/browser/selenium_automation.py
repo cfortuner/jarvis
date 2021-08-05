@@ -41,6 +41,7 @@ import os
 from pathlib import Path
 import shutil
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -48,6 +49,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from jarvis.automation.auto_utils import speed_limit
 from jarvis.automation.desktop import DesktopAutomation
+from jarvis.nlp import nlp_utils
 
 from .browser_automation import BrowserAutomation
 
@@ -132,6 +134,15 @@ def get_tabs_and_windows(driver):
         print(w, type(w))
 
 
+def normalize_url(url):
+    # HACK: Selenium requires the protocol defined
+    url = nlp_utils.normalize_text(url)
+    prefix = "http://"
+    if prefix not in url:
+        url = prefix + url
+    return url
+
+
 class SeleniumAutomation(BrowserAutomation):
     """Controls the browser using Selenium library."""
     def __init__(self, desktop: DesktopAutomation):
@@ -147,6 +158,10 @@ class SeleniumAutomation(BrowserAutomation):
         return self._driver
 
     @property
+    def is_open(self):
+        return self.driver is not None
+
+    @property
     def last_window(self):
         _, win = self._get_window_by_handle(self.driver.current_window_handle)
         return win
@@ -156,6 +171,11 @@ class SeleniumAutomation(BrowserAutomation):
         _, win = self._get_window_by_handle(self.driver.current_window_handle)
         return win
 
+    def open_url(self, url):
+        """Handle URL cleanup."""
+        url = normalize_url(url)
+        self.driver.get(url)
+
     def open_driver(self, keep_open: bool = None):
         return open_new_driver(keep_open=keep_open)
 
@@ -164,7 +184,7 @@ class SeleniumAutomation(BrowserAutomation):
         if self._driver is not None:
             raise ValueError("Cannot call open() twice before calling close()")
         self._driver = open_new_driver(keep_open=keep_open)
-        self.driver.get(url)
+        self.open_url(url)
         self._register_window(
             handle=self.driver.current_window_handle,
             name=self.driver.title,
@@ -213,10 +233,13 @@ class SeleniumAutomation(BrowserAutomation):
                 return idx, win
         return None, None
 
-    def _get_window_by_name(self, name: str):
+    def _get_window_by_name(self, name: str, fuzzy: bool = True):
         for idx, win in enumerate(self._windows):
-            if win["name"] == name:
+            if nlp_utils.match_text(
+                target=win["name"], text=name, fuzzy=fuzzy, contains=True
+            ):
                 return idx, win
+        print(f"found no matching tab named '{name}' in available tabs: ", self._windows)
         return None, None
 
     def list_tabs(self):
@@ -245,7 +268,7 @@ class SeleniumAutomation(BrowserAutomation):
         """
         self._set_last_window(self.driver.current_window_handle)
         self.driver.switch_to.new_window("tab")
-        self.driver.get(url)
+        self.open_url(url)
         self._register_window(
             handle=self.driver.current_window_handle,
             name=self.driver.title,
@@ -258,7 +281,7 @@ class SeleniumAutomation(BrowserAutomation):
         """Open new browser window."""
         self._set_last_window(self.driver.current_window_handle)
         self.driver.switch_to.new_window("window")
-        self.driver.get(url)
+        self.open_url(url)
         self._register_window(
             handle=self.driver.current_window_handle,
             name=self.driver.title,
@@ -293,10 +316,13 @@ class SeleniumAutomation(BrowserAutomation):
         """Close tab by name, or active tab if no name provided."""
         if name is not None:
             _, win = self._get_window_by_name(name)
+            if win is None:
+                return "failed"
             handle = win["handle"]
         else:
             handle = self.driver.current_window_handle
         self._close_tab_or_window(handle)
+        return "succeeded"
 
     @speed_limit()
     def close_window(self, name: str = None):
@@ -306,10 +332,13 @@ class SeleniumAutomation(BrowserAutomation):
         """
         if name is not None:
             _, win = self._get_window_by_name(name)
+            if win is None:
+                return "failed"
             handle = win["handle"]
         else:
             handle = self.driver.current_window_handle
         self._close_tab_or_window(handle)
+        return "succeeded"
 
     @speed_limit()
     def switch_tab(self, name: str = None, handle: str = None):
@@ -337,9 +366,12 @@ class SeleniumAutomation(BrowserAutomation):
             if name is None:
                 raise Exception("Must provide either `name` or `handle`")
             _, win = self._get_window_by_name(name)
+            if win is None:
+                return "failed"
             handle = win["handle"]
         self._last_window_handle = self.driver.current_window_handle
         self.driver.switch_to.window(handle)
+        return "succeeded"
 
     @speed_limit()
     def switch_window(self, name: str = None, handle: str = None):
@@ -350,14 +382,17 @@ class SeleniumAutomation(BrowserAutomation):
         if handle is None:
             assert name is not None, "Must provide either name or handle"
             _, win = self._get_window_by_name(name)
+            if win is None:
+                return "failed"
             handle = win["handle"]
         self._last_window_handle = self.driver.current_window_handle
         self.driver.switch_to.window(handle)
+        return "succeeded"
 
     @speed_limit()
     def change_url(self, url: str, wait: float = 0):
         """Change url in current window/tab."""
-        self.driver.get(url)
+        self.open_url(url)
         _ = WebDriverWait(self.driver, wait)
 
         _, win = self._get_window_by_handle(self.driver.current_window_handle)
@@ -377,18 +412,48 @@ class SeleniumAutomation(BrowserAutomation):
         self.driver.refresh()
 
     @speed_limit()
-    def click_link_by_text(self, link_text: str):
+    def click_link_by_text(self, link_text: str, fuzzy: bool = False):
         """Click a link on page by name.
 
-        TODO: Handle updating window metadata once new page is opened
+        TODO(bfortuner): Handle updating window metadata once new page is opened
+        TODO(bfortuner): Return all matching elements so we can parse
 
         Args:
-            link_text (str): Human-readable text on the link.
+            link_text: Human-readable text on the link.
+            fuzzy: Optional. If True, perform fuzzy matching.
         """
-        # Also, PARTIAL_LINK_TEXT, or return all the matching elements
-        self.driver.find_element(by=By.LINK_TEXT, value=link_text).click()
-        _, win = self._get_window_by_handle(self.driver.current_window_handle)
-        win["url"]
+        # TODO(bfortuner): Return all matching elements so we can parse
+        strategy = By.PARTIAL_LINK_TEXT if fuzzy else By.LINK_TEXT
+        status = "failed"
+        link_text = nlp_utils.normalize_text(link_text)
+        link_text_variations = [
+            link_text,
+            link_text.title(),
+            link_text.capitalize(),
+            link_text.upper(),
+        ]
+        for text in link_text_variations:
+            element = self._find_element_on_page(strategy, text)
+            if element is not None:
+                element.click()
+                _, win = self._get_window_by_handle(
+                    self.driver.current_window_handle
+                )
+                win["url"]
+                status = "succeeded"
+        return status
+
+    def _find_element_on_page(self, strategy, link_text):
+        # links = self.driver.find_elements_by_xpath(
+        #     f'//a[contains(lower-case(.), {link_text})]'
+        # )
+        # return links
+        element = None
+        try:
+            element = self.driver.find_element(by=strategy, value=link_text)
+        except NoSuchElementException as e:
+            print(e)
+        return element
 
 
 # Experimental

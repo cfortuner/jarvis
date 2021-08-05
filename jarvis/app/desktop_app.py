@@ -187,7 +187,10 @@ class DesktopApp(MDApp):
     nursery = None
 
     def build(self):
-        self.listener = GoogleTranscriber(SUPPORTED_COMMANDS, single_utterance=True)
+        self.listener = GoogleTranscriber(
+            supported_commands=SUPPORTED_COMMANDS,
+            single_utterance=False,
+        )
         self.resolver = ActionResolver()
 
         self.theme_cls.theme_style="Light"

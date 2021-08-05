@@ -32,7 +32,6 @@ class LaunchAction(DesktopAction):
     """Launch an application (not running yet)."""
     def __init__(self, desktop: DesktopAutomation, app_name: str):
         super().__init__(desktop)
-
         self.app_name = app_name
 
     def run(self):
@@ -80,9 +79,8 @@ class SwitchAction(DesktopAction):
 
     def __init__(self, desktop: DesktopAutomation, app_name: str):
         super().__init__(desktop)
-
         self.app_name = app_name
-    
+
     def run(self):
         logging.info(f"Attemping to switch to: {self.app_name}")
         app = None
