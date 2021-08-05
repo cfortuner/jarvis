@@ -31,7 +31,18 @@ def _get_speech_contexts(supported_commands):
     contexts.append(speech.SpeechContext(phrases=supported_commands))
 
     # Add common command prefixes and keywords
-    prefixes = ["launch", "switch to", "open", "Chrome", "Spotify", "code", "terminal"]
+    prefixes = [
+        "click",
+        "go to",
+        "launch",
+        "switch to",
+        "open",
+        "Chrome",
+        "Spotify",
+        "code",
+        "terminal",
+        "new"
+    ]
     contexts.append(speech.SpeechContext(phrases=prefixes))
 
     return contexts
