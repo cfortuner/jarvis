@@ -2,12 +2,14 @@ import json
 import logging
 
 from typing import Callable
-from websocket_server import WebsocketServer, WebSocketHandler
+from websocket_server import WebsocketServer
+
 
 class BridgeMessage:
     def __init__(self, messageType: str, data: any):
         self.type = messageType
         self.data = data
+
 
 class Bridge:
     def __init__(self):

@@ -132,14 +132,14 @@ def speech2text():
                     print(current_transcript_text)
                     try:
                         actions = resolver.parse(cmd=current_transcript_text)
-                        phrases = []
-                        for a in actions:
-                            for phrase in a.phrases():
-                                phrases.append(phrase)
-                        bridge.send_message(
-                            JarvisMessageType.ACTIONS_MODIFIED.value,
-                            phrases
-                        )
+                        # phrases = []
+                        # for a in actions:
+                        #     for phrase in a.phrases():
+                        #         phrases.append(phrase)
+                        # bridge.send_message(
+                        #     JarvisMessageType.ACTIONS_MODIFIED.value,
+                        #     phrases
+                        # )
                         # Exit as soon as the first action succeeds
                         for a in actions:
                             logging.info("Running: {} - {}".format(a.name, current_transcript_text))

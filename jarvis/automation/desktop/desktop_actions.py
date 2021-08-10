@@ -127,6 +127,7 @@ class SwitchAction(DesktopAction):
             "switch to {app_name}",
         ]
 
+
 class MaximizeWindowAction(DesktopAction):
     """Maximizes the main window of the application"""
     def __init__(self, desktop: DesktopAutomation, app_name: str):
@@ -143,6 +144,7 @@ class MaximizeWindowAction(DesktopAction):
             "maximize {app_name}"
         ]
 
+
 class MinimizeWindowAction(DesktopAction):
     """Minimizes the main window of the application"""
     def __init__(self, desktop: DesktopAutomation, app_name: str):
@@ -158,6 +160,7 @@ class MinimizeWindowAction(DesktopAction):
         return [
             "minimize {app_name}"
         ]
+
 
 class AttachWindowAction(DesktopAction):
     """Attach the main window of the application to one of the edges of the

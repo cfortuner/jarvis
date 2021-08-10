@@ -2,9 +2,10 @@ import os
 import re
 
 import logging
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
-from jarvis.actions import ActionBase
+from jarvis.const import COMMUNITY_ACTION_CHAINS
+from jarvis.actions import ActionBase, ActionChain
 from jarvis.actions.context import Context
 from jarvis.automation.browser import create_browser_automation
 from jarvis.automation.desktop import create_desktop_automation
@@ -60,7 +61,7 @@ class ActionResolver:
         self._browser = None
 
         # Map between phrase string and the action type
-        self._phrase_map = {}
+        self._phrase_map: Dict[PhraseMatcher, ActionBase] = {}
         # Support multiple actions by using conjunctive and.
         # This will not have any action mapped to it.
 
@@ -70,6 +71,7 @@ class ActionResolver:
         # self._phrase_map[PhraseMatcher("{a} and {b}", True)] = None
 
         self._phrase_map.update(self._find_action_phrases("jarvis/automation"))
+        self._phrase_map.update(self._find_action_chain_phrases())
         logging.info(f"Found {len(self._phrase_map)} phrases to match against")
 
     @property
@@ -90,6 +92,7 @@ class ActionResolver:
         cmd = nlp_utils.normalize_text(cmd)
         logging.info(f"Command after cleaning: {cmd}")
 
+        # This can contain action chain instances
         matching_actions = self._find_matching_actions(cmd)
 
             # TODO: Support conjunctives
@@ -108,13 +111,20 @@ class ActionResolver:
         # Use Context to disambiguate commands
         actions = self._sort_actions_by_relevance(matching_actions)
 
-        # Add required automation instances
-        actions = self._add_automation_instances(actions)
-
         # Initialize the actions
         action_instances = []
         for action_cls, action_params in actions:
-            action_instances.append(action_cls(**action_params))
+            # TODO: Refactor all of this. There is a much better abstraction
+            # which unifies Action and ActionChain, I just haven't found it yet.
+            if isinstance(action_cls, ActionChain):
+                action_cls.add_automations(self.desktop, self.browser)
+                action_instances.append(action_cls)
+            else:
+                if "browser" in action_cls.automations():
+                    action_params["browser"] = self.browser
+                if "desktop" in action_cls.automations():
+                    action_params["desktop"] = self.desktop
+                action_instances.append(action_cls(**action_params))
         return action_instances
 
     def _sort_actions_by_relevance(self, matching_actions):
@@ -127,14 +137,6 @@ class ActionResolver:
             else:
                 ordered_actions.append(matching_actions[i])
         return active_window_actions + ordered_actions
-
-    def _add_automation_instances(self, actions):
-        for action_cls, action_params in actions:
-            if "browser" in action_cls.automations():
-                action_params["browser"] = self.browser
-            if "desktop" in action_cls.automations():
-                action_params["desktop"] = self.desktop
-        return actions
 
     def _find_matching_actions(self, phrase: str):
         # Returns list of (action type, action params)
@@ -173,5 +175,14 @@ class ActionResolver:
                     except:
                         # Some members of the module aren't classes. Ignore them.
                         pass
-        
+        return phrase_map
+
+    def _find_action_chain_phrases(self):
+        # TODO: Allow users to register custom action chains
+        phrase_map = {}
+        for chain_dict in COMMUNITY_ACTION_CHAINS:
+            chain = ActionChain.from_dict(chain_dict)
+            for phrase in chain.phrases:
+                matcher = PhraseMatcher(phrase)
+                phrase_map[matcher] = chain
         return phrase_map

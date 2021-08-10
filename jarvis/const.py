@@ -24,3 +24,39 @@ SILENCE_TIMEOUT_SEC = 10
 
 # How long to wait between GUI actions (e.g. debugging)
 SPEED_LIMIT = float(os.getenv("SPEED_LIMIT", "0"))
+
+
+COMMUNITY_ACTION_CHAINS = [
+    {
+        "name": "Amazon shopping cart",
+        "phrases": ["amazon shopping cart", "go to amazon shopping cart"],
+        "steps": [
+            {
+                "action_classname": "jarvis.automation.browser.browser_actions.OpenBrowser",
+                "action_params": {}
+            },
+            {
+                "action_classname": "jarvis.automation.browser.browser_actions.ChangeURL",
+                "action_params": {"url": "amazon.com"}
+            },
+            {
+                "action_classname": "jarvis.automation.browser.browser_actions.ClickLink",
+                "action_params": {"link_text": "Cart"}
+            },
+        ]
+    },
+    {
+        "name": "Crazy window switch",
+        "phrases": ["crazy windows"],
+        "steps": [
+            {
+                "action_classname": "jarvis.automation.desktop.desktop_actions.SwitchAction",
+                "action_params": {"app_name": "code"}
+            },
+            {
+                "action_classname": "jarvis.automation.desktop.desktop_actions.SwitchAction",
+                "action_params": {"app_name": "chrome"}
+            },
+        ]
+    }
+]
