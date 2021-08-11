@@ -1,19 +1,20 @@
 from dataclasses import asdict, dataclass
+import json
 import logging
-from typing import List
+from typing import Any, Dict, List
 
 from jarvis.automation.desktop import DesktopAutomation
 from jarvis.automation.browser import BrowserAutomation
 
-from jarvis.actions import ActionResult
+from jarvis.actions.action_base import ActionResult
 from jarvis.actions import action_utils
 
 
 @dataclass
 class ActionChainStep:
     """State of an executed action."""
-    action_classname: str
-    action_params: dict
+    class_path: str
+    params: Dict[str, Any]
 
 
 class ActionChain:
@@ -45,16 +46,16 @@ class ActionChain:
         if self._actions is None:
             self._actions = []
             for step in self.steps:
-                action_cls = action_utils.load_action_class_by_name(
-                    name=step.action_classname
+                action_cls = action_utils.load_class_by_name(
+                    step.class_path
                 )
                 action_utils.add_automation_to_action_params(
                     action_cls=action_cls,
-                    action_params=step.action_params,
+                    action_params=step.params,
                     desktop=self._desktop,
                     browser=self._browser,
                 )
-                action = action_cls(**step.action_params)
+                action = action_cls(**step.params)
                 self._actions.append(action)
         return self._actions
 
@@ -87,3 +88,6 @@ class ActionChain:
             phrases=self.phrases,
             steps=[asdict(step) for step in self.steps]
         )
+
+    def __repr__(self):
+        return json.dumps(self.to_dict(), indent=2)

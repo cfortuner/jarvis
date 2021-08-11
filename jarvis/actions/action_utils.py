@@ -1,7 +1,7 @@
 import importlib
 
 
-def load_action_class_by_name(name: str):
+def load_class_by_name(name: str):
     # name: my_package.my_module.LaunchAction
     tree = name.split(".")
     module = importlib.import_module(".".join(tree[:-1]))
@@ -31,5 +31,5 @@ def action_to_dict(action_cls, action_params):
 
 
 def dict_to_action(dct):
-    dct["class"] = load_action_class_by_name(dct["class"])
+    dct["class"] = load_class_by_name(dct["class"])
     return dct

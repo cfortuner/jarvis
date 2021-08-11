@@ -13,6 +13,7 @@ class BrowserAction(ActionBase):
     and passed around to all the actions.
     """
     def __init__(self, browser: BrowserAutomation):
+        super().__init__()
         self.browser = browser
 
     @classmethod

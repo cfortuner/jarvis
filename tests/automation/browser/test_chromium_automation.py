@@ -24,7 +24,6 @@ def browser():
 def test_get_menu_items_for_all_tabs(browser):
     windows = browser.desktop.get_list_of_windows()
     print(windows)
-    import pdb; pdb.set_trace();
     # tabs = browser._get_menuitems_for_all_tabs()
     # print(tabs)
 

@@ -3,19 +3,17 @@
 Examples
 --------
 python cli.py --help
-python cli.py speech2text --transcriber google --stream
+python cli.py speech2text
 python cli.py text2action --no-execute
-python cli.py speech2action --transcriber google --no-execute
+python cli.py speech2action
 """
 
 import logging
-import time
 
 import click
 
-from jarvis.actions import ActionResolver
-from jarvis.automation.desktop import create_desktop_automation
-from jarvis.const import SILENCE_TIMEOUT_SEC, SUPPORTED_COMMANDS
+from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
+from jarvis.const import SUPPORTED_COMMANDS
 from jarvis.nlp import nlp_utils
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
@@ -44,6 +42,14 @@ def parse_and_execute_action(text, resolver, no_execute=False):
             result = a.run()
             print("Action result", result)
             if result.status == "succeeded":
+                # TODO: Support adding action chains to history
+                if isinstance(a, ActionBase):
+                    executed_action = ExecutedAction.from_action(
+                        action=a,
+                        result=result,
+                        transcript=text,
+                    )
+                    print(executed_action)
                 break
 
 

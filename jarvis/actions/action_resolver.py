@@ -4,8 +4,8 @@ import re
 import logging
 from typing import Dict, List, Tuple
 
-from jarvis.const import COMMUNITY_ACTION_CHAINS
-from jarvis.actions import ActionBase, ActionChain
+from jarvis.const import ACTION_CHAIN_PATH, COMMON_ACTION_CHAINS
+from jarvis.actions import ActionBase, ActionChain, action_registry
 from jarvis.actions.context import Context
 from jarvis.automation.browser import create_browser_automation
 from jarvis.automation.desktop import create_desktop_automation
@@ -70,8 +70,17 @@ class ActionResolver:
         # when a user says the word "and" as part of a link name
         # self._phrase_map[PhraseMatcher("{a} and {b}", True)] = None
 
+        # Loads Actions from Classes
         self._phrase_map.update(self._find_action_phrases("jarvis/automation"))
-        self._phrase_map.update(self._find_action_chain_phrases())
+
+        # Loads community action chains
+        self._phrase_map.update(self._load_action_chain_phrases(
+            COMMON_ACTION_CHAINS)
+        )
+        # Load user's local action chains
+        self._user_action_chains = []
+        self.reload_user_action_chains()
+
         logging.info(f"Found {len(self._phrase_map)} phrases to match against")
 
     @property
@@ -140,6 +149,11 @@ class ActionResolver:
 
     def _find_matching_actions(self, phrase: str):
         # Returns list of (action type, action params)
+        # HACK: We always reload the user action phrases so we can pickup
+        # updates for newly created action chains
+        self._phrase_map.update(self._load_action_chain_phrases(
+            self._user_action_chains)
+        )
         actions = []
         for phrase_matcher, action_type in self._phrase_map.items():
             status, params = phrase_matcher.match(phrase)
@@ -177,12 +191,15 @@ class ActionResolver:
                         pass
         return phrase_map
 
-    def _find_action_chain_phrases(self):
+    def _load_action_chain_phrases(self, chains: List[Dict]):
         # TODO: Allow users to register custom action chains
         phrase_map = {}
-        for chain_dict in COMMUNITY_ACTION_CHAINS:
+        for chain_dict in chains:
             chain = ActionChain.from_dict(chain_dict)
             for phrase in chain.phrases:
                 matcher = PhraseMatcher(phrase)
                 phrase_map[matcher] = chain
         return phrase_map
+
+    def reload_user_action_chains(self, fpath: str = ACTION_CHAIN_PATH):
+        self._user_action_chains = action_registry.load_action_chains_from_file(fpath)

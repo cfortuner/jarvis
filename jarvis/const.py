@@ -26,37 +26,39 @@ SILENCE_TIMEOUT_SEC = 10
 SPEED_LIMIT = float(os.getenv("SPEED_LIMIT", "0"))
 
 
-COMMUNITY_ACTION_CHAINS = [
-    {
-        "name": "Amazon shopping cart",
-        "phrases": ["amazon shopping cart", "go to amazon shopping cart"],
-        "steps": [
-            {
-                "action_classname": "jarvis.automation.browser.browser_actions.OpenBrowser",
-                "action_params": {}
-            },
-            {
-                "action_classname": "jarvis.automation.browser.browser_actions.ChangeURL",
-                "action_params": {"url": "amazon.com"}
-            },
-            {
-                "action_classname": "jarvis.automation.browser.browser_actions.ClickLink",
-                "action_params": {"link_text": "Cart"}
-            },
-        ]
-    },
+COMMON_ACTION_CHAINS = [
+    # {
+    #     "name": "amazon shopping cart",
+    #     "phrases": ["amazon shopping cart", "go to amazon shopping cart"],
+    #     "steps": [
+    #         {
+    #             "class_path": "jarvis.automation.browser.browser_actions.OpenBrowser",
+    #             "params": {}
+    #         },
+    #         {
+    #             "class_path": "jarvis.automation.browser.browser_actions.ChangeURL",
+    #             "params": {"url": "amazon.com"}
+    #         },
+    #         {
+    #             "class_path": "jarvis.automation.browser.browser_actions.ClickLink",
+    #             "params": {"link_text": "Cart"}
+    #         },
+    #     ]
+    # },
     {
         "name": "Crazy window switch",
         "phrases": ["crazy windows"],
         "steps": [
             {
-                "action_classname": "jarvis.automation.desktop.desktop_actions.SwitchAction",
-                "action_params": {"app_name": "code"}
+                "class_path": "jarvis.automation.desktop.desktop_actions.SwitchAction",
+                "params": {"app_name": "code"}
             },
             {
-                "action_classname": "jarvis.automation.desktop.desktop_actions.SwitchAction",
-                "action_params": {"app_name": "chrome"}
+                "class_path": "jarvis.automation.desktop.desktop_actions.SwitchAction",
+                "params": {"app_name": "chrome"}
             },
         ]
     }
 ]
+
+ACTION_CHAIN_PATH = "./action_chains.json"

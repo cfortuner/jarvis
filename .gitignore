@@ -1,4 +1,5 @@
 # Project specific
+action_chains.json
 .env.secret
 .vscode/
 kivy_repo/

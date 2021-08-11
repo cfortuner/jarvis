@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 
 from jarvis.actions.action_chain import ActionChain
@@ -14,16 +12,16 @@ def chain_dict():
         "phrases": ["Amazon shopping cart", "shopping cart"],
         "steps": [
             {
-                "action_classname": "jarvis.automation.browser.browser_actions.OpenBrowser",
-                "action_params": {}
+                "class_path": "jarvis.automation.browser.browser_actions.OpenBrowser",
+                "params": {}
             },
             {
-                "action_classname": "jarvis.automation.browser.browser_actions.ChangeURL",
-                "action_params": {"url": "amazon.com"}
+                "class_path": "jarvis.automation.browser.browser_actions.ChangeURL",
+                "params": {"url": "amazon.com"}
             },
             {
-                "action_classname": "jarvis.automation.desktop.desktop_actions.SwitchAction",
-                "action_params": {"app_name": "Code"}
+                "class_path": "jarvis.automation.desktop.desktop_actions.SwitchAction",
+                "params": {"app_name": "Code"}
             },
         ]
     }

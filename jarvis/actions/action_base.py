@@ -10,12 +10,26 @@ class ActionResult:
 
 
 class ActionBase:
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
+
     def run(self, **kwargs) -> ActionResult:
         raise NotImplementedError("Needs to be implemented by the derived class")
 
     @property
     def name(self):
         return type(self).__name__
+
+    @property
+    def params(self):
+        # HACK: we should call automations directly, but classmethod makes it tricky
+        exclude = ["browser", "desktop"]
+        return {k: v for k, v in self._kwargs.items() if k not in exclude}
+
+    @property
+    def class_path(self):
+        cls = type(self)
+        return ".".join([cls.__module__, cls.__name__])
 
     @classmethod
     def phrases(cls):

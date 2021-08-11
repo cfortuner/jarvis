@@ -1,29 +1,37 @@
 """Entrypoint called by Electron.js frontend app."""
 
-import signal
+from dataclasses import asdict
 import threading
 import sys
-import time
+import traceback
 import logging
 
 from enum import Enum
 
 from jarvis.bridge import Bridge, BridgeMessage
-from jarvis.actions import ActionResolver
-from jarvis.const import SUPPORTED_COMMANDS
+from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
+from jarvis.const import ACTION_CHAIN_PATH, SUPPORTED_COMMANDS
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
+from jarvis.actions import action_registry
+
 
 logging.basicConfig(level=logging.INFO)
+
 
 # Entrypoint for the backend -> electron communication
 class ClientMessage(BridgeMessage):
     def __init__(self, messageType, data):
         super(messageType, data)
+
+
 class ClientMessageType(Enum):
     STOP_LISTENING = 'stopListening'
     START_LISTENING = 'startListening'
     UPDATE_TRANSCRIPT = 'updateTranscript'
     EXECUTE_ACTION = 'executeAction'
+    REGISTER_ACTION_CHAIN = 'registerActionChain'
+
+
 class JarvisMessageType(Enum):
   VOICE_CONTROL = 'voiceControl'
   ACTION_EXECUTED = 'actionExecuted'
@@ -43,6 +51,7 @@ def _get_transcriber(name):
         )  # Performant, streaming listener
     raise Exception("Transcriber {name} not supported!")
 
+
 def speech2text():
     # start speech2Text loop and pass bridge
     # on transcript
@@ -59,30 +68,43 @@ def speech2text():
     listening = True
 
     # Setup subscriptions
-    def on_update_transcript(message: ClientMessage):
-        print(f"Received UpdateTranscript: {message}")
+    def on_update_transcript(msg: ClientMessage):
+        print(f"Received UpdateTranscript: {msg}")
         global current_transcript_text
-        current_transcript_text = message.data
+        current_transcript_text = msg.data
 
-    def on_execute_command(message: ClientMessage):
-        print(f"Received ExecuteCommand: {message}")
+    def on_execute_command(msg: ClientMessage):
+        print(f"Received ExecuteCommand: {msg}")
         # TODO: execute action from client
 
-    def on_start_listening(message):
-        print(f"Received StartListening: {message}")
+    def on_start_listening(msg):
+        print(f"Received StartListening: {msg}")
         global listening
         listening = True
 
-    def on_stop_listening(message):
-        print(f"Received StopListening: {message}")
+    def on_stop_listening(msg):
+        print(f"Received StopListening: {msg}")
         global listening
         listening = False
 
+    def on_register_action_chain(msg):
+        print(f"Received register_action_chain: {msg}")
+        chain = action_registry.register_action_chain(
+            name=msg.data["name"],
+            phrases=msg.data["phrases"],
+            executed_actions=msg.data["executed_actions"],
+            action_chain_path=ACTION_CHAIN_PATH
+        )
+        print(chain)
+        print("Registered chain!")
+        resolver.reload_user_action_chains()
+        # TODO: add user phrases to Google Speech Context object...
 
     bridge.subscribe(ClientMessageType.UPDATE_TRANSCRIPT.value, on_update_transcript)
     bridge.subscribe(ClientMessageType.EXECUTE_ACTION.value, on_execute_command)
     bridge.subscribe(ClientMessageType.START_LISTENING.value, on_start_listening)
     bridge.subscribe(ClientMessageType.STOP_LISTENING.value, on_stop_listening)
+    bridge.subscribe(ClientMessageType.REGISTER_ACTION_CHAIN.value, on_register_action_chain)
 
     # Start listening for client connections in a separate thread
     t = threading.Thread(target = bridge.listen)
@@ -95,7 +117,6 @@ def speech2text():
     def silence():
         bridge.send_message(JarvisMessageType.VOICE_CONTROL.value, False)
     silenceTimer = None
-
 
     bridge.send_message(JarvisMessageType.ACTIONS_MODIFIED.value, SUPPORTED_COMMANDS)
 
@@ -148,6 +169,21 @@ def speech2text():
                                 a.name, result.status, result.error)
                             )
                             if result.status == "succeeded":
+                                # TODO: Support adding action chains to history
+                                if isinstance(a, ActionBase):
+                                    executed_action = ExecutedAction.from_action(
+                                        action=a,
+                                        result=result,
+                                        transcript=current_transcript_text,
+                                    )
+                                    print(asdict(executed_action))
+                                    # TODO(cfortuner): Add the ExecutedAction struct to history
+                                    # NOTE: We do not add ActionChain executions to history. We ignore that for now.
+                                    # bridge.send_message(
+                                    #     JarvisMessageType.ACTION_EXECUTED.value,
+                                    #     asdict(executed_action)
+                                    # )
+                        
                                 bridge.send_message(
                                     JarvisMessageType.ACTION_EXECUTED.value,
                                     a.name
@@ -156,9 +192,9 @@ def speech2text():
 
                     except Exception as e:
                         msg = "Uh oh! Failed to act on this: {}".format(str(e))
-                        # traceback.print_exc(file=sys.stdout)
-                        logging.error(msg)
-                        # break
+                        traceback.print_exc(file=sys.stdout)
+                        print(msg)
+
 
 if __name__ == "__main__":
     try:
