@@ -198,8 +198,15 @@ python scratch/kivy_example.py
 # Verify Selenium is installed correctly
 python -m scratch.selenium_example
 
-# Run the main app (then click Record and "Switch to Chrome")
+# Run the Kivy app (then click Record and "Switch to Chrome")
 python main.py
+
+# OR, run the electron app
+python electron.py
+
+# And in prophet...
+npm install
+npm run start
 ```
 
 ## Testing
