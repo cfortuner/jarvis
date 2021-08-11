@@ -63,6 +63,10 @@ class ChangeURL(BrowserAction):
         super().__init__(browser)
         self.url = url
 
+    @property
+    def params(self):
+        return {"url": self.url}
+
     def run(self):
         print(f"ChangeURL to {self.url}")
         if not self.browser.is_open:
@@ -122,6 +126,10 @@ class ChangeTab(BrowserAction):
     def __init__(self, browser: BrowserAutomation, tab_name: str):
         super().__init__(browser)
         self.tab_name = tab_name
+
+    @property
+    def params(self):
+        return {"tab_name": self.tab_name}
 
     def run(self):
         print(f"ChangeTab to {self.tab_name}")
@@ -196,6 +204,10 @@ class ClickLink(BrowserAction):
     def __init__(self, browser: BrowserAutomation, link_text: str):
         super().__init__(browser)
         self.link_text = link_text
+
+    @property
+    def params(self):
+        return {"link_text": self.link_text}
 
     def run(self):
         # TODO handle error / not found, or multiple found

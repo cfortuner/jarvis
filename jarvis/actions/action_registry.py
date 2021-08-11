@@ -1,3 +1,4 @@
+from jarvis.nlp import nlp_utils
 import json
 import os
 from typing import Dict, List, Union
@@ -35,6 +36,8 @@ def register_action_chain(
     action_chain_path: str,
 ):
     """Convert sequence of executed actions into an ActionChain and save to file."""
+    name = nlp_utils.normalize_text_naive(name)
+    phrases = [nlp_utils.normalize_text_naive(p) for p in phrases]
     chain = create_action_chain(name, phrases, executed_actions)
 
     chains = {"chains": []}

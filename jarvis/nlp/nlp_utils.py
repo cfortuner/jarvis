@@ -4,6 +4,7 @@ Methods here should eventually be moved to specialist modules once common themes
 can be identified across a number of utility methods. But this is a good starting place
 for methods which don't have an obvious home yet.
 """
+import hashlib
 import sys
 
 
@@ -69,3 +70,10 @@ def display_live_transcription(transcript, overwrite_chars):
     """
     sys.stdout.write(transcript + overwrite_chars + "\r")
     sys.stdout.flush()
+
+
+def hash_normalized_text(text, normalize=True):
+    if normalize:
+        text = normalize_text(text)
+    text = text.encode("utf-8")
+    return hashlib.sha256(text).hexdigest()

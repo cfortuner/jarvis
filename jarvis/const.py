@@ -61,4 +61,23 @@ COMMON_ACTION_CHAINS = [
     }
 ]
 
+# Speech Synthesis
+DEFAULT_VOICE_NAME = "en-GB-Wavenet-D"
+USERNAME = "Brendan"
+JARVIS_INTRO_SSML = f"""
+<speak>
+    <break time="200ms"/>
+    Hello {USERNAME}, <break time="400ms"/>
+    How can I help you?
+</speak>
+"""
+JARVIS_PHRASES = [
+    "Right!",
+    "Very well!",
+    "As you wish!",
+    "It shall be done!",
+    "Certainly."
+]
+
+# User macros
 ACTION_CHAIN_PATH = "./action_chains.json"

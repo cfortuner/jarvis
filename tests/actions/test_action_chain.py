@@ -8,8 +8,8 @@ from jarvis.automation.browser import create_browser_automation
 @pytest.fixture
 def chain_dict():
     return {
-        "name": "Amazon shopping cart",
-        "phrases": ["Amazon shopping cart", "shopping cart"],
+        "name": "amazon shopping cart",
+        "phrases": ["amazon shopping cart", "shopping cart"],
         "steps": [
             {
                 "class_path": "jarvis.automation.browser.browser_actions.OpenBrowser",

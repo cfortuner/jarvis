@@ -34,6 +34,10 @@ class LaunchAction(DesktopAction):
         super().__init__(desktop)
         self.app_name = app_name
 
+    @property
+    def params(self):
+        return {"app_name": self.app_name}
+
     def run(self):
         ret_code = self.desktop.open_application(self.app_name)
         if ret_code != 0:
@@ -80,6 +84,10 @@ class SwitchAction(DesktopAction):
     def __init__(self, desktop: DesktopAutomation, app_name: str):
         super().__init__(desktop)
         self.app_name = app_name
+
+    @property
+    def params(self):
+        return {"app_name": self.app_name}
 
     def run(self):
         logging.info(f"Attemping to switch to: {self.app_name}")

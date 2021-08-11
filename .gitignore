@@ -9,6 +9,8 @@ kaldi_model/
 *.zip
 *.code-workspace
 JarvisProfile/
+audio_cache
+action_chains.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

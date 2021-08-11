@@ -28,7 +28,7 @@ class Bridge:
         self.clients.append(client)
 
     def _client_left(self, client, _: WebsocketServer) -> None:
-        logging.info(f"client {client['id']} disconnected")
+        print(f"client {client['id']} disconnected")
 
     def _message_received(self, client, _, jsn) -> None:
         jsn = json.loads(jsn)

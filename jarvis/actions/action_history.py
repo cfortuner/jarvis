@@ -17,6 +17,7 @@ class ExecutedAction:
     def from_action(
         cls, action: ActionBase, result: ActionResult, transcript: str
     ):
+        print("Action params", action.params)
         return cls(
             name=action.name,
             class_path=action.class_path,

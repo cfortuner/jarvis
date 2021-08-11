@@ -202,4 +202,5 @@ class ActionResolver:
         return phrase_map
 
     def reload_user_action_chains(self, fpath: str = ACTION_CHAIN_PATH):
+        print("Reloading user action chains.")
         self._user_action_chains = action_registry.load_action_chains_from_file(fpath)

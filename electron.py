@@ -3,6 +3,7 @@
 from dataclasses import asdict
 import threading
 import sys
+import random
 import traceback
 import logging
 
@@ -10,10 +11,11 @@ from enum import Enum
 
 from jarvis.bridge import Bridge, BridgeMessage
 from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
-from jarvis.const import ACTION_CHAIN_PATH, SUPPORTED_COMMANDS
+from jarvis.const import ACTION_CHAIN_PATH, SUPPORTED_COMMANDS, DEFAULT_VOICE_NAME, JARVIS_INTRO_SSML, JARVIS_PHRASES
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 from jarvis.actions import action_registry
-
+from jarvis.nlp.text2speech import audio_utils
+from jarvis.nlp.text2speech import google_synthesizer
 
 logging.basicConfig(level=logging.INFO)
 
@@ -52,7 +54,17 @@ def _get_transcriber(name):
     raise Exception("Transcriber {name} not supported!")
 
 
-def speech2text():
+def speak_text(text=None, ssml=None, enable=True):
+    if enable:
+        audio_bytes = google_synthesizer.load_or_convert_text_to_speech(
+            text=text, ssml=ssml, voice_name=DEFAULT_VOICE_NAME
+        )
+        audio_utils.play_audio_bytes(audio_bytes)
+
+
+def speech2text(speak_mode):
+    intro_spoken = False
+
     # start speech2Text loop and pass bridge
     # on transcript
     print("Running speech2text")
@@ -65,7 +77,7 @@ def speech2text():
     bridge = Bridge()
 
     global listening
-    listening = True
+    listening = False
 
     # Setup subscriptions
     def on_update_transcript(msg: ClientMessage):
@@ -76,10 +88,16 @@ def speech2text():
     def on_execute_command(msg: ClientMessage):
         print(f"Received ExecuteCommand: {msg}")
         # TODO: execute action from client
+        # phrase = random.choices(JARVIS_PHRASES)
+        # speak(text=phrase)
 
     def on_start_listening(msg):
         print(f"Received StartListening: {msg}")
         global listening
+        nonlocal intro_spoken
+        if not intro_spoken:
+            speak_text(ssml=JARVIS_INTRO_SSML, enable=speak_mode)
+            intro_spoken = True
         listening = True
 
     def on_stop_listening(msg):
@@ -88,7 +106,7 @@ def speech2text():
         listening = False
 
     def on_register_action_chain(msg):
-        print(f"Received register_action_chain: {msg}")
+        print(f"Received register_action_chain: {msg.data}")
         chain = action_registry.register_action_chain(
             name=msg.data["name"],
             phrases=msg.data["phrases"],
@@ -114,9 +132,12 @@ def speech2text():
     # Start listening for commands
     listener = _get_transcriber('google')
 
-    def silence():
+    def reset_microphone_viz():
+        # Reset the Siri Wave if silence is detected
         bridge.send_message(JarvisMessageType.VOICE_CONTROL.value, False)
-    silenceTimer = None
+
+    # Timer which resets the Siri Wave if silence is detected
+    reset_mic_viz_timer = None
 
     bridge.send_message(JarvisMessageType.ACTIONS_MODIFIED.value, SUPPORTED_COMMANDS)
 
@@ -125,19 +146,22 @@ def speech2text():
             # TODO: Move the generator to a background thread and pull from queue
             transcripts = listener.listen()
             for transcript in transcripts:
+                if not listening:
+                    break
                 if transcript.text is not None:
                     current_transcript_text = transcript.text
                     bridge.send_message(JarvisMessageType.VOICE_CONTROL.value, True)
                     bridge.send_message(JarvisMessageType.TRANSCRIPT_MODIFIED.value, current_transcript_text)
 
                     # reset voice control after a few ms
-                    if silenceTimer is not None:
-                        silenceTimer.cancel()
-                    silenceTimer = threading.Timer(.5, silence)
-                    silenceTimer.start()
+                    if reset_mic_viz_timer is not None:
+                        reset_mic_viz_timer.cancel()
+                    reset_mic_viz_timer = threading.Timer(.5, reset_microphone_viz)
+                    reset_mic_viz_timer.start()
 
                     if transcript.text == "exit":
                         print(f"Okay goodbye :)")
+                        speak_text(text="Goodbye", enable=speak_mode)
                         bridge.send_message(JarvisMessageType.TRANSCRIPT_MODIFIED.value, "")
                         bridge.send_message(JarvisMessageType.HIDE.value)
                         listening = False
@@ -153,17 +177,11 @@ def speech2text():
                     print(current_transcript_text)
                     try:
                         actions = resolver.parse(cmd=current_transcript_text)
-                        # phrases = []
-                        # for a in actions:
-                        #     for phrase in a.phrases():
-                        #         phrases.append(phrase)
-                        # bridge.send_message(
-                        #     JarvisMessageType.ACTIONS_MODIFIED.value,
-                        #     phrases
-                        # )
                         # Exit as soon as the first action succeeds
                         for a in actions:
                             logging.info("Running: {} - {}".format(a.name, current_transcript_text))
+                            # speak_text(text=f"Running: {current_transcript_text}")
+                            speak_text(text=random.choices(JARVIS_PHRASES)[0], enable=speak_mode)
                             result = a.run()
                             logging.info("Action: {} status: {}, error: {}".format(
                                 a.name, result.status, result.error)
@@ -177,27 +195,26 @@ def speech2text():
                                         transcript=current_transcript_text,
                                     )
                                     print(asdict(executed_action))
-                                    # TODO(cfortuner): Add the ExecutedAction struct to history
-                                    # NOTE: We do not add ActionChain executions to history. We ignore that for now.
-                                    # bridge.send_message(
-                                    #     JarvisMessageType.ACTION_EXECUTED.value,
-                                    #     asdict(executed_action)
-                                    # )
-                        
-                                bridge.send_message(
-                                    JarvisMessageType.ACTION_EXECUTED.value,
-                                    a.name
-                                )
+                                    bridge.send_message(
+                                        JarvisMessageType.ACTION_EXECUTED.value,
+                                        asdict(executed_action)
+                                    )
                                 break
 
                     except Exception as e:
                         msg = "Uh oh! Failed to act on this: {}".format(str(e))
                         traceback.print_exc(file=sys.stdout)
                         print(msg)
+                        speak_text(text="Sorry I didn't understand that.", enable=speak_mode)
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Run jarvis.')
+    parser.add_argument('--speak', action='store_true', help="Include speech synthesis audio")
+    args = parser.parse_args()
+
     try:
-        speech2text()
+        speech2text(speak_mode=args.speak)
     except Exception as e:
         print(e)
