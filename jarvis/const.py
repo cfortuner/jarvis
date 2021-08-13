@@ -2,6 +2,8 @@
 
 import os
 
+# Parameter names to exclude for serialization
+AUTOMATION_PARAMS = ["browser", "desktop"]
 
 # The Google Speech Recognition quality improves if you "prime" it with known keywords
 # In the future, we can auto-generate a list of supported commands and keywords and pass
@@ -75,9 +77,16 @@ JARVIS_PHRASES = [
     "Right!",
     "Very well!",
     "As you wish!",
+    "Certainly.",
     "It shall be done!",
-    "Certainly."
 ]
 
 # User macros
 ACTION_CHAIN_PATH = "./action_chains.json"
+
+# Some files are platform specific like mac_automation.py.
+# To avoid loading them, we only load files that contain actions
+# which are determined by looking for file with this suffix.
+ACTION_FILE_SUFFIX = "_actions.py"
+
+OPENAI_CACHE_DIR = "openai_cache/"

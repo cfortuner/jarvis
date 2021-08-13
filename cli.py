@@ -9,15 +9,20 @@ python cli.py speech2action
 """
 
 import logging
+import pprint
 
 import click
 
 from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
+from jarvis.actions import action_registry
 from jarvis.const import SUPPORTED_COMMANDS
 from jarvis.nlp import nlp_utils
+from jarvis.nlp.openai import openai_action_resolver
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
 
 logging.basicConfig(level=logging.INFO)
+
+pp = pprint.PrettyPrinter(indent=2)
 
 
 ## Helpers ##
@@ -33,8 +38,11 @@ def _get_transcriber(name):
     raise Exception("Transcriber {name} not supported!")
 
 
-def parse_and_execute_action(text, resolver, no_execute=False):
-    actions = resolver.parse(cmd=text)
+def parse_and_execute_action(text, resolver, no_execute=False, openai=False):
+    if openai:
+        actions = resolver.attempt_model_based_resolve(text)
+    else:
+        actions = resolver.parse(cmd=text)
     print("Matching actions: ", actions)
     for a in actions:
         print(f"Running: {a.name}")
@@ -87,24 +95,29 @@ def speech2text(transcriber, no_stream):
 
 @cli.command()
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-def text2action(no_execute):
+@click.option('--openai', is_flag=True, default=False, help='Use GPT3-based OpenAI action resolver')
+def text2action(no_execute, openai):
     """Convert text to action."""
     resolver = ActionResolver()
 
     while True:
         text = click.prompt('Enter text')
-
-        parse_and_execute_action(
-            text=text,
-            resolver=resolver,
-            no_execute=no_execute
-        )
+        try:
+            parse_and_execute_action(
+                text=text,
+                resolver=resolver,
+                no_execute=no_execute,
+                openai=openai
+            )
+        except Exception as e:
+            print(e)
 
 
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
-def speech2action(transcriber, no_execute):
+@click.option('--openai', is_flag=True, default=False, help='Use GPT3-based OpenAI action resolver')
+def speech2action(transcriber, no_execute, openai):
     """Convert speech to action."""
     click.echo("Initializing..")
     resolver = ActionResolver()
@@ -127,8 +140,23 @@ def speech2action(transcriber, no_execute):
                 parse_and_execute_action(
                     text=transcript.text,
                     resolver=resolver,
-                    no_execute=no_execute
+                    no_execute=no_execute,
+                    openai=openai,
                 )
+
+
+@cli.command()
+@click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
+def openai(no_execute):
+    action_classes = action_registry.load_action_classes_from_modules("jarvis/automation")
+    while True:
+        cmd = click.prompt('Enter command')
+        if no_execute:
+            answer, resp = openai_action_resolver.ask_web_navigation_model(cmd)
+            pp.pprint(answer)
+        else:
+            chain = openai_action_resolver.infer_action_chain(cmd, action_classes)
+            pp.pprint(chain.to_dict())
 
 
 if __name__ == '__main__':

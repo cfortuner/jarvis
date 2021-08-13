@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from jarvis.actions import action_utils
+
 
 @dataclass
 class ActionResult:
@@ -26,7 +28,7 @@ class ActionBase:
     @property
     def class_path(self):
         cls = type(self)
-        return ".".join([cls.__module__, cls.__name__])
+        return action_utils.get_fully_qualified_class_name(cls)
 
     @classmethod
     def phrases(cls):

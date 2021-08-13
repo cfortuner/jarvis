@@ -80,3 +80,8 @@ def test_register_action_chain(tmpdir, actions_dict, chain_dict):
     read_chain = action_registry.load_action_chains_from_file(fpath)[0]
 
     assert read_chain == written_chain.to_dict()
+
+
+def test_load_action_classes_from_modules():
+    modules = action_registry.load_action_classes_from_modules("jarvis/automation")
+    print(modules)

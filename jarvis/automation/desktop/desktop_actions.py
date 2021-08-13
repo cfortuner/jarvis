@@ -7,6 +7,8 @@ import logging
 from typing import List
 
 from jarvis.actions import ActionBase, ActionResult
+from jarvis.devices.mouse import Mouse
+from jarvis.devices.keyboard import Keyboard
 from jarvis.nlp import nlp_utils
 
 from .desktop_automation import DesktopAutomation
@@ -50,6 +52,126 @@ class LaunchAction(DesktopAction):
         return [
             "launch {app_name}",
             "open {app_name}",
+        ]
+
+
+class TypeText(DesktopAction):
+    """Enter text using keyboard."""
+    def __init__(self, desktop: DesktopAutomation, text: str):
+        super().__init__(desktop)
+        self.text = text
+        self.keyboard = Keyboard()
+
+    @property
+    def params(self):
+        return {"text": self.text}
+
+    def run(self):
+        print(f"Typing: {self.text}")
+        self.keyboard.type(self.text)
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "type {text}",
+        ]
+
+
+class ClickMouse(DesktopAction):
+    """Click mouse."""
+    def __init__(self, desktop: DesktopAutomation, button: str):
+        super().__init__(desktop)
+        self.button = button
+        self.mouse = Mouse()
+
+    @property
+    def params(self):
+        return {"button": self.button}
+
+    def run(self):
+        self.mouse.click(button=self.button)
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "{button} click",
+        ]
+
+
+class Scroll(DesktopAction):
+    """Scroll down/up/left/right from current mouse position."""
+    def __init__(self, desktop: DesktopAutomation, direction: str):
+        super().__init__(desktop)
+        self.direction = direction
+        self.mouse = Mouse()
+
+    @property
+    def params(self):
+        return {"direction": self.direction}
+
+    def run(self):
+        self.mouse.scroll(direction=self.direction)
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "scroll {direction}",
+        ]
+
+
+class PressKey(DesktopAction):
+    """Press single key on Keyboard."""
+    def __init__(self, desktop: DesktopAutomation, key: str):
+        super().__init__(desktop)
+        self.key = key
+        self.keyboard = Keyboard()
+
+    @property
+    def params(self):
+        return {"key": self.key}
+
+    def run(self):
+        print(f"Pressing: {self.key} key")
+        self.keyboard.press_key(self.key)
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "press {key}",
+            "press {key} key",
+            "press key {key}",
+        ]
+
+
+class KeyboardShortcut(DesktopAction):
+    """Press single key on Keyboard."""
+    def __init__(self, desktop: DesktopAutomation, shortcut: str):
+        super().__init__(desktop)
+        self.shortcut = shortcut
+        self.keyboard = Keyboard()
+
+    @property
+    def params(self):
+        return {"shortcut": self.shortcut}
+
+    def run(self):
+        shortcut = self.shortcut.split(" ")
+        print(f"Pressing keyboard shortcut: {shortcut} from input {self.shortcut}")
+        self.keyboard.shortcut(self.shortcut)
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "keyboard shortcut {shortcut}",
+            "type shortcut {shortcut}",
+            "press shortcut {shortcut}",
+            "shortcut {shortcut}",
+            "hotkey {shortcut}"
         ]
 
 

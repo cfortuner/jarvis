@@ -225,3 +225,21 @@ class ClickLink(BrowserAction):
             "click {link_text}",
             "click {link_text} button",
         ]
+
+
+class FindSearchBar(BrowserAction):
+    """Go back to last webpage"""
+    def __init__(self, browser: BrowserAutomation):
+        super().__init__(browser)
+
+    def run(self):
+        # TODO: Implement smart find search box and highlight
+        return ActionResult()
+
+    @classmethod
+    def phrases(cls):
+        # Add keywords?
+        return [
+            # "search",
+            # "search for",
+        ]

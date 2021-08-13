@@ -10,7 +10,7 @@ kaldi_model/
 *.code-workspace
 JarvisProfile/
 audio_cache
-action_chains.json
+openai_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

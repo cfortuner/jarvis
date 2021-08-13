@@ -1,0 +1,38 @@
+Q: Go to my amazon cart
+A: OpenURL `amazon.com` -> ClickLink `cart`
+Q: open my github pull requests
+A: OpenURL `http://www.github.com` -> ClickLink `pull requests`
+Q: search google for tents
+A: OpenURL `google.com` -> FindSearchBar -> Type `tents` -> Press `enter`
+Q: search amazon for ski mask
+A: OpenURL `amazon.com` -> FindSearchBar -> Type `ski mask` -> Press `enter`
+Q: open facebook marketplace
+A: OpenURL `www.facebook.com` -> ClickLink `marketplace`
+Q: go to openai homepage
+A: OpenURL `open.ai`
+Q: search twitter for $index mentions
+A: OpenURL `twitter.com` -> FindSearchBar -> Type `$index` -> Press `enter`
+Q: open my youtube profile page
+A: OpenURL `www.youtube.com` -> ClickLink `profile`
+Q: search bestbuy for smart tv
+A: OpenURL `www.bestbuy.com` -> FindSearchBar -> Type `smart tv` -> Press `enter`
+Q: search for roger federer highlights on youtube
+A: OpenURL `www.youtube.com` -> FindSearchBar -> Type `roger federer` -> Press `enter`
+Q: open circleci select staging
+A: OpenURL `circleci.com` -> ClickLink `staging`
+Q: search twitter for latest #elonmusk tweets
+A: OpenURL `twitter.com` -> FindSearchBar -> Type `#elonmusk` -> Press `enter`
+Q: search for backpacks at REI
+A: OpenURL `www.rei.com` -> FindSearchBar -> Type `backpacks` -> Press `enter`
+Q: Login to my amazon account
+A: OpenURL `amazon.com` -> ClickLink `sign in`
+Q: Sign out of my account
+A: ClickLink `sign out`
+Q: Logout
+A: ClickLink `logout`
+Q: open netflix and login
+A: OpenURL `www.netflix.com` -> ClickLink `sign in`
+Q: Login to my new york times account
+A: OpenURL `www.nytimes.com` -> ClickLink `sign in`
+Q: log in to my wall street journal account
+A: OpenURL `www.wsj.com` -> ClickLink `sign in`

@@ -2,6 +2,7 @@
 
 import pyautogui
 
+
 class Mouse():
     def current_position(self) -> list:
         """Return the `x` and `y` coords of the mouse"""
@@ -11,12 +12,32 @@ class Mouse():
         """Move mouse to specified `x` and `y` coordinates"""
         pyautogui.moveTo(x, y)
 
-    def click(self, num_clicks=1, button='left'):
+    def click(self, button='left'):
         """Click the specified button for the specified number of times.
-        
-        Valid options for button include `left`, `right` and `middle`."""
-        pyautogui.click(clicks=num_clicks, button=button)
 
-    def scroll(self, amount_to_scroll):
-        """Scroll mouse for the specified amount"""
-        pyautogui.mouse_scroll(amount_to_scroll)
+        Valid options for button include `left`, `right` and `middle`."""
+        assert button in ("left", "right", "middle", "double", "triple")
+        if button == "double":
+            pyautogui.click(button="left", clicks=2)
+        elif button == "triple":
+            pyautogui.click(button="left", clicks=3)
+        else:
+            pyautogui.click(button=button, clicks=1)
+
+    def scroll(self, direction: str, amount: int = 10):
+        """Scroll mouse for specified amount in direction.
+
+        Args:
+            amount: positive integer indicating magnitude of scroll
+            direction: "up", "down", "left", "right"
+        """
+        if direction == "left":
+            pyautogui.hscroll(-amount)
+        elif direction == "right":
+            pyautogui.hscroll(amount)
+        elif direction == "up":
+            pyautogui.scroll(amount)
+        elif direction == "down":
+            pyautogui.scroll(-amount)
+        else:
+            raise Exception(f"Scroll direction {direction} not supported.")

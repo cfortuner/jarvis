@@ -1,0 +1,29 @@
+# This new syntax confuses the model
+Q: Go to my amazon shopping cart
+A: OpenURL(`http://amazon.com`) -> ClickLink(`shopping cart`)
+Q: open my github pull requests
+A: OpenURL(`http://www.github.com`) -> ClickLink(`pull requests`)
+Q: search google for tents
+A: OpenURL(`google.com`) -> FindSearchBar -> Type(`tents`) -> Press(`enter`)
+Q: search amazon for ski mask
+A: OpenURL(`amazon.com`) -> FindSearchBar -> Type(`ski mask`) -> Press(`enter`)
+Q: open facebook marketplace
+A: OpenURL(`www.facebook.com`) -> ClickLink(`marketplace`)
+Q: go to openai homepage
+A: OpenURL(`open.ai`)
+Q: search twitter for $index mentions
+A: OpenURL(`twitter.com`) -> FindSearchBar -> Type(`$index`) -> Press(`enter`)
+Q: open my youtube profile page
+A: OpenURL(`www.youtube.com`) -> ClickLink(`profile`)
+Q: search bestbuy for smart tv
+A: OpenURL(`www.bestbuy.com`) -> FindSearchBar -> Type(`smart tv`) -> Press(`enter`)
+Q: search for roger federer highlights on youtube
+A: OpenURL(`www.youtube.com`) -> FindSearchBar -> Type(`roger federer`) -> Press(`enter`)
+Q: open circleci select staging
+A: OpenURL(`circleci.com`) -> ClickLink(`staging`)
+Q: search twitter for latest #elonmusk tweets
+A: OpenURL(`twitter.com`) -> FindSearchBar -> Type(`#elonmusk`) -> Press(`enter`)
+Q: search for backpacks at REI
+A: OpenURL(`rei.com`) -> FindSearchBar -> Type(`backpacks`) -> Press(`enter`)
+Q: search wikipedia for jeff bezos
+A: OpenURL(`www.wikipedia.org`) -> FindSearchBar -> Type(`jeff bezos`) -> Press(`enter`)

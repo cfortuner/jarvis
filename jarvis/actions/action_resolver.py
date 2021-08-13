@@ -82,6 +82,7 @@ class ActionResolver:
         self.reload_user_action_chains()
 
         logging.info(f"Found {len(self._phrase_map)} phrases to match against")
+        self._action_classes = action_registry.load_action_classes_from_modules("jarvis/automation")
 
     @property
     def browser(self):
@@ -114,8 +115,11 @@ class ActionResolver:
             #         )
 
         if len(matching_actions) == 0:
-            logging.info("No command matched with that!")
-            raise NotImplementedError("No command matched with that!")
+            if os.getenv("OPENAI_API_KEY") is not None:
+                return self.attempt_model_based_resolve(cmd)
+            else:
+                logging.info("No command matched with that!")
+                raise NotImplementedError("No command matched with that!")
 
         # Use Context to disambiguate commands
         actions = self._sort_actions_by_relevance(matching_actions)
@@ -135,6 +139,14 @@ class ActionResolver:
                     action_params["desktop"] = self.desktop
                 action_instances.append(action_cls(**action_params))
         return action_instances
+
+    def attempt_model_based_resolve(self, cmd: str) -> List[ActionChain]:
+        # NOTE: This requires an Open.ai API key
+        print(f"Attemping model-based resolve for command: '{cmd}'")
+        from jarvis.nlp.openai import openai_action_resolver
+        chain = openai_action_resolver.infer_action_chain(cmd, self._action_classes)
+        chain.add_automations(self.desktop, self.browser)
+        return [chain]
 
     def _sort_actions_by_relevance(self, matching_actions):
         # If the active window supports the action, push it to the top
@@ -202,5 +214,4 @@ class ActionResolver:
         return phrase_map
 
     def reload_user_action_chains(self, fpath: str = ACTION_CHAIN_PATH):
-        print("Reloading user action chains.")
         self._user_action_chains = action_registry.load_action_chains_from_file(fpath)

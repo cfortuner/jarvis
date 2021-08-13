@@ -1,4 +1,5 @@
 import importlib
+import inspect
 
 
 def load_class_by_name(name: str):
@@ -7,6 +8,16 @@ def load_class_by_name(name: str):
     module = importlib.import_module(".".join(tree[:-1]))
     cls = getattr(module, tree[-1])
     return cls
+
+
+def get_class_init_args(cls):
+    sig = inspect.signature(cls.__init__)
+    exclude_params = ["self", "kwarg"]
+    return [k for k in sig.parameters.keys() if k not in exclude_params]
+
+
+def get_fully_qualified_class_name(cls):
+    return ".".join([cls.__module__, cls.__name__])
 
 
 def add_automation_to_action_params(
