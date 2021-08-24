@@ -303,7 +303,7 @@ class SearchWebsiteFor(BrowserAction):
 
 
 class FindOnPage(BrowserAction):
-    """Search using the search bar on website.
+    """Find text on page (CTRL-F).
 
     TODO: This is sensitive to the active window and element. Sometimes
     this doesn't work unless you click the webpage and make sure another
@@ -320,6 +320,7 @@ class FindOnPage(BrowserAction):
     def run(self):
         keyboard = Keyboard()
         try:
+            # TODO: support linux
             keyboard.shortcut(keys=["command", "f"])
             keyboard.type(self.text)
             return ActionResult()
@@ -333,5 +334,7 @@ class FindOnPage(BrowserAction):
         return [
             "find {text}",
             "find on page {text}",
-            "find text {text}"
+            "find text {text}",
+            "ctrl f {text}",
+            "control f {text}",
         ]
