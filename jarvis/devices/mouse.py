@@ -27,6 +27,9 @@ class Mouse():
     def scroll(self, direction: str, amount: int = 10):
         """Scroll mouse for specified amount in direction.
 
+        NOTE: The location of the mouse pointer determines which
+        window is scrolled.
+
         Args:
             amount: positive integer indicating magnitude of scroll
             direction: "up", "down", "left", "right"

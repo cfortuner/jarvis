@@ -23,4 +23,4 @@ class Keyboard():
 
         `keys` are specified as a list of keys including modifiers like ctrl, alt, etc.,
         """
-        pyautogui.hotkey(keys)
+        pyautogui.hotkey(*keys)

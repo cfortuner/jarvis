@@ -1,10 +1,15 @@
 """Actions for navigating web browsers."""
 
+import sys
+import traceback
 from typing import List
 
-from jarvis.actions import ActionBase, ActionResult
-from .browser_automation import BrowserAutomation
 from selenium.webdriver.common.by import By
+
+from jarvis.actions import ActionBase, ActionResult
+from jarvis.devices.keyboard import Keyboard
+
+from .browser_automation import BrowserAutomation
 
 
 class BrowserAction(ActionBase):
@@ -229,11 +234,15 @@ class ClickLink(BrowserAction):
 
 
 class FindSearchBar(BrowserAction):
-    """Go back to last webpage"""
+    """Find and select search bar on website.
+
+    NOTE: This is extremely brittle..
+    """
     def __init__(self, browser: BrowserAutomation):
         super().__init__(browser)
 
     def run(self):
+        # TODO: Handle non-standard naming, fields, forms, and javascript
         for selector in ['input', 'input[type=text]', 'input[type=search]']:
             try:
                 element = self.browser.find_element_on_page(
@@ -242,23 +251,25 @@ class FindSearchBar(BrowserAction):
                 )
                 if element is not None:
                     # Focus search bar
+                    # TODO: Handle buttons, javascript
                     element.click()
                     return ActionResult()
             except Exception as e:
                 print(e)
+                traceback.print_exc(file=sys.stdout)
 
         return ActionResult(status="failed", error="Failed to find search bar")
 
     @classmethod
     def phrases(cls):
-        # Add keywords?
-        return [
-            # "search",
-            # "search for",
-        ]
+        return []
 
-class Search(BrowserAction):
-    """Search on page"""
+
+class SearchWebsiteFor(BrowserAction):
+    """Search using the search bar on website.
+
+    NOTE: This is extremely brittle..
+    """
     def __init__(self, browser: BrowserAutomation, text: str):
         super().__init__(browser)
         self.text = text
@@ -266,7 +277,6 @@ class Search(BrowserAction):
     @property
     def params(self):
         return {"text": self.text}
-
 
     def run(self):
         try:
@@ -280,10 +290,48 @@ class Search(BrowserAction):
                 return ActionResult()
         except Exception as e:
             print(e)
-        return ActionResult(status="failed", error="Failed to SearchActiveInput")
+            traceback.print_exc(file=sys.stdout)
+        return ActionResult(status="failed", error="Failed to search ")
 
     @classmethod
     def phrases(cls):
         return [
-            "search {text}",
+            "search for {text}",
+            "search website for {text}"
+            "search current website for {text}"
+        ]
+
+
+class FindOnPage(BrowserAction):
+    """Search using the search bar on website.
+
+    TODO: This is sensitive to the active window and element. Sometimes
+    this doesn't work unless you click the webpage and make sure another
+    button or app is in-focus. Selenium probably has a feature for this.
+    """
+    def __init__(self, browser: BrowserAutomation, text: str):
+        super().__init__(browser)
+        self.text = text
+
+    @property
+    def params(self):
+        return {"text": self.text}
+
+    def run(self):
+        keyboard = Keyboard()
+        try:
+            keyboard.shortcut(keys=["command", "f"])
+            keyboard.type(self.text)
+            return ActionResult()
+        except Exception as e:
+            print(e)
+            traceback.print_exc(file=sys.stdout)
+        return ActionResult(status="failed", error="Failed to search ")
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "find {text}",
+            "find on page {text}",
+            "find text {text}"
         ]

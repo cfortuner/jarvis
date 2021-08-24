@@ -101,7 +101,12 @@ class ClickMouse(DesktopAction):
 
 
 class Scroll(DesktopAction):
-    """Scroll down/up/left/right from current mouse position."""
+    """Scroll down/up/left/right from current mouse position.
+
+    TODO: Automatically find the active window, perhaps using the keyboard
+    instead of the mouse. Currently the location of the mouse pointer
+    determines which window is scrolled.
+    """
     def __init__(self, desktop: DesktopAutomation, direction: str):
         super().__init__(desktop)
         self.direction = direction

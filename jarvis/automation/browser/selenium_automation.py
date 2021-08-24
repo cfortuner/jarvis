@@ -95,7 +95,8 @@ def get_user_data_dir():
 
     jarvis_path = os.path.join("./", JARVIS_PROFILE)
 
-    shutil.copytree(user_path, jarvis_path, dirs_exist_ok=True)
+    if not os.path.exists(jarvis_path):
+        shutil.copytree(user_path, jarvis_path, dirs_exist_ok=True)
 
     return jarvis_path
 

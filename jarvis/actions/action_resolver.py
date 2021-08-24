@@ -105,17 +105,8 @@ class ActionResolver:
         # This can contain action chain instances
         matching_actions = self._find_matching_actions(cmd)
 
-            # TODO: Support conjunctives
-            # if phrase_matcher.is_conjunctive():
-            #     # For conjunctive phrases, param name doesn't
-            #     # matter
-            #     for _, param_value in params.items():
-            #         output_actions.extend(
-            #             self.parse(param_value, self.desktop, self.browser)
-            #         )
-
         if len(matching_actions) == 0:
-            if os.getenv("OPENAI_API_KEY") is not None:
+            if not os.getenv("NO_OPENAI") and os.getenv("OPENAI_API_KEY"):
                 return self.attempt_model_based_resolve(cmd)
             else:
                 logging.info("No command matched with that!")
