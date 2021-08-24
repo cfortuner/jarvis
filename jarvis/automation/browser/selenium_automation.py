@@ -4,18 +4,18 @@ Install: https://www.selenium.dev/documentation/en/selenium_installation
 Requires installing the web drivers separately (on MacOS you also have to grant permissions to web driver)
 
 Docs: https://selenium-python.readthedocs.io/navigating.html
-TODO: Selenium treats tabs/windows the same. Need way to differentiate. 
+TODO: Selenium treats tabs/windows the same. Need way to differentiate.
 TODO: Simplify last_window storage. Perhaps just always fall back to window[0] if > 0 windows? What happens if parent window is closed?
 TODO: Simplify list_tabs by returning all windows and tabs??
 
-Selenium chrome://version (default selenium mode -- creates new profile path every time) 
+Selenium chrome://version (default selenium mode -- creates new profile path every time)
 -------------------------
 User Agent	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36
 Command Line	/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-hang-monitor --disable-popup-blocking --disable-prompt-on-repost --disable-sync --enable-automation --enable-blink-features=ShadowDOMV0 --enable-logging --log-level=0 --no-first-run --no-service-autorun --password-store=basic --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain --user-data-dir=/var/folders/sh/nmjlw4rs5nq_xlggl3d20_9w0000gq/T/.com.google.Chrome.CkQeMn --flag-switches-begin --flag-switches-end data:,
 Executable Path	/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
 Profile Path	/private/var/folders/sh/nmjlw4rs5nq_xlggl3d20_9w0000gq/T/.com.google.Chrome.CkQeMn/Default
 
-Selenium chrome://version (with userdata) 
+Selenium chrome://version (with userdata)
 -------------------------
 User Agent	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36
 Command Line	/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-hang-monitor --disable-popup-blocking --disable-prompt-on-repost --disable-sync --enable-automation --enable-blink-features=ShadowDOMV0 --enable-logging --log-level=0 --no-first-run --no-service-autorun --password-store=basic --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain --user-data-dir=./JarvisProfile/Default --flag-switches-begin --flag-switches-end --origin-trial-disabled-features=SecurePaymentConfirmation
@@ -40,12 +40,14 @@ import logging
 import os
 from pathlib import Path
 import shutil
+import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from jarvis.automation.auto_utils import speed_limit
 from jarvis.automation.desktop import DesktopAutomation
@@ -121,9 +123,11 @@ def open_new_driver(keep_open: bool = True) -> webdriver.Chrome:
         Chromium Web Driver.
     """
     # I'm not sure how much help this gives us..
-    user_data_dir = None  # get_user_data_dir()
+    user_data_dir = get_user_data_dir()
     chrome_options = get_chrome_options(keep_open, user_data_dir)
-    return webdriver.Chrome(chrome_options=chrome_options)
+    caps = DesiredCapabilities().CHROME
+    caps["pageLoadStrategy"] = "none" # wait only until the first html loads
+    return webdriver.Chrome(desired_capabilities=caps, chrome_options=chrome_options)
 
 
 def get_tabs_and_windows(driver):
@@ -174,7 +178,9 @@ class SeleniumAutomation(BrowserAutomation):
     def open_url(self, url):
         """Handle URL cleanup."""
         url = normalize_url(url)
+        start = time.time()
         self.driver.get(url)
+        print(time.time() - start)
 
     def open_driver(self, keep_open: bool = None):
         return open_new_driver(keep_open=keep_open)
@@ -263,7 +269,7 @@ class SeleniumAutomation(BrowserAutomation):
     def new_tab(self, url: str = DEFAULT_URL):
         """Open new tab in current window.
 
-        There seems to be a complicated history for this function: 
+        There seems to be a complicated history for this function:
         https://stackoverflow.com/questions/28431765/open-web-in-new-tab-selenium-python
         """
         self._set_last_window(self.driver.current_window_handle)
@@ -305,7 +311,7 @@ class SeleniumAutomation(BrowserAutomation):
         """
         self._deregister_window(handle)
         self.driver.close()
-        # Kill the driver if there are no remaining tabs/windows        
+        # Kill the driver if there are no remaining tabs/windows
         if len(self._windows) > 0:
             self.driver.switch_to.window(self._get_last_window()["handle"])
         else:
@@ -433,7 +439,7 @@ class SeleniumAutomation(BrowserAutomation):
             link_text.upper(),
         ]
         for text in link_text_variations:
-            element = self._find_element_on_page(strategy, text)
+            element = self.find_element_on_page(strategy, text)
             if element is not None:
                 element.click()
                 _, win = self._get_window_by_handle(
@@ -443,18 +449,21 @@ class SeleniumAutomation(BrowserAutomation):
                 status = "succeeded"
         return status
 
-    def _find_element_on_page(self, strategy, link_text):
+    def find_element_on_page(self, strategy, link_text):
         # links = self.driver.find_elements_by_xpath(
         #     f'//a[contains(lower-case(.), {link_text})]'
         # )
         # return links
         element = None
         try:
+
             element = self.driver.find_element(by=strategy, value=link_text)
         except NoSuchElementException as e:
             print(e)
         return element
 
+    def get_active_element(self):
+        return self.driver.switch_to.active_element
 
 # Experimental
 

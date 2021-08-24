@@ -4,6 +4,7 @@ from typing import List
 
 from jarvis.actions import ActionBase, ActionResult
 from .browser_automation import BrowserAutomation
+from selenium.webdriver.common.by import By
 
 
 class BrowserAction(ActionBase):
@@ -233,8 +234,20 @@ class FindSearchBar(BrowserAction):
         super().__init__(browser)
 
     def run(self):
-        # TODO: Implement smart find search box and highlight
-        return ActionResult()
+        for selector in ['input', 'input[type=text]', 'input[type=search]']:
+            try:
+                element = self.browser.find_element_on_page(
+                    By.CSS_SELECTOR,
+                    selector
+                )
+                if element is not None:
+                    # Focus search bar
+                    element.click()
+                    return ActionResult()
+            except Exception as e:
+                print(e)
+
+        return ActionResult(status="failed", error="Failed to find search bar")
 
     @classmethod
     def phrases(cls):
@@ -242,4 +255,35 @@ class FindSearchBar(BrowserAction):
         return [
             # "search",
             # "search for",
+        ]
+
+class Search(BrowserAction):
+    """Search on page"""
+    def __init__(self, browser: BrowserAutomation, text: str):
+        super().__init__(browser)
+        self.text = text
+
+    @property
+    def params(self):
+        return {"text": self.text}
+
+
+    def run(self):
+        try:
+            FindSearchBar(self.browser).run()
+            element = self.browser.get_active_element()
+
+            if element is not None:
+                element.clear()
+                element.send_keys(self.text)
+                element.submit()
+                return ActionResult()
+        except Exception as e:
+            print(e)
+        return ActionResult(status="failed", error="Failed to SearchActiveInput")
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "search {text}",
         ]

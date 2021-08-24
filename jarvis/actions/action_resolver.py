@@ -188,7 +188,7 @@ class ActionResolver:
                 module_name = os.path.splitext(file_name)[0]
                 logging.info(module_name)
                 module = __import__(
-                    f"{dir_name.replace(os.sep, '.')}.{module_name}", 
+                    f"{dir_name.replace(os.sep, '.')}.{module_name}",
                     fromlist = ["*"])
                 for _, t_value in module.__dict__.items():
                     try:
