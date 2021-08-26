@@ -17,6 +17,7 @@ jsonlines==2.0.0
 kivymd==0.104.2  # Need to install Kivy first
 # pocketsphinx==0.1.15
 openai==0.10.1
+pvporcupine==1.9.5  # wake word
 PyAudio==0.2.11
 PyAutoGUI==0.9.52  # Requires XCode on Mac
 pydub==0.25.1

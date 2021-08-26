@@ -19,6 +19,7 @@ from jarvis.const import SUPPORTED_COMMANDS
 from jarvis.nlp import nlp_utils
 from jarvis.nlp.openai import openai_action_resolver
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
+from jarvis.nlp.speech2text import wake_word_detector
 
 logging.basicConfig(level=logging.INFO)
 
@@ -73,8 +74,13 @@ def cli(debug):
 @cli.command()
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
 @click.option('--no-stream', is_flag=True, help="Exit after first command is transcribed.")
-def speech2text(transcriber, no_stream):
+@click.option('--wake-word', is_flag=True, help="Wait until wake word is called.")
+def speech2text(transcriber, no_stream, wake_word):
     """Convert text to speech."""
+    if wake_word:
+        click.echo("Waiting for wake word..")
+        wake_word_detector.listen_for_wake_word()
+
     listener = _get_transcriber(transcriber)
     click.echo(f"Listening... Say something!")
     while True:
@@ -117,11 +123,17 @@ def text2action(no_execute, openai):
 @click.option('--transcriber', type=click.Choice(['basic', 'google']), default="google")
 @click.option('--no-execute', is_flag=True, default=False, help='Print Action(s) but do NOT execute them')
 @click.option('--openai', is_flag=True, default=False, help='Use GPT3-based OpenAI action resolver')
-def speech2action(transcriber, no_execute, openai):
+@click.option('--wake-word', is_flag=True, help="Wait until wake word is called.")
+def speech2action(transcriber, no_execute, openai, wake_word):
     """Convert speech to action."""
     click.echo("Initializing..")
     resolver = ActionResolver()
     listener = _get_transcriber(transcriber)
+
+    if wake_word:
+        click.echo("Waiting for wake word..")
+        wake_word_detector.listen_for_wake_word()
+
     click.echo("Listening... Say something!")
     while True:
         transcripts = listener.listen()

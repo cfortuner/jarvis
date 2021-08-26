@@ -11,8 +11,10 @@ from enum import Enum
 
 from jarvis.bridge import Bridge, BridgeMessage
 from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
-from jarvis.const import ACTION_CHAIN_PATH, SUPPORTED_COMMANDS, DEFAULT_VOICE_NAME, JARVIS_INTRO_SSML, JARVIS_PHRASES
+from jarvis import const
+from jarvis.const import ACTION_CHAIN_PATH, SUPPORTED_COMMANDS, DEFAULT_VOICE_NAME, JARVIS_PHRASES
 from jarvis.nlp.speech2text import BasicTranscriber, GoogleTranscriber
+from jarvis.nlp.speech2text import wake_word_detector
 from jarvis.actions import action_registry
 from jarvis.nlp.text2speech import audio_utils
 from jarvis.nlp.text2speech import google_synthesizer
@@ -54,16 +56,15 @@ def _get_transcriber(name):
     raise Exception("Transcriber {name} not supported!")
 
 
-def speak_text(text=None, ssml=None, enable=True):
+def speak_text(text=None, ssml=None, enable=True, voice=DEFAULT_VOICE_NAME):
     if enable:
         audio_bytes = google_synthesizer.load_or_convert_text_to_speech(
-            text=text, ssml=ssml, voice_name=DEFAULT_VOICE_NAME
+            text=text, ssml=ssml, voice_name=voice
         )
         audio_utils.play_audio_bytes(audio_bytes)
 
 
-def speech2text(speak_mode):
-    intro_spoken = False
+def speech2text(speak_mode, wake_word: bool = False):
 
     # start speech2Text loop and pass bridge
     # on transcript
@@ -94,10 +95,11 @@ def speech2text(speak_mode):
     def on_start_listening(msg):
         print(f"Received StartListening: {msg}")
         global listening
-        nonlocal intro_spoken
-        if not intro_spoken:
-            speak_text(ssml=JARVIS_INTRO_SSML, enable=speak_mode)
-            intro_spoken = True
+        # FIXME: if wake_word=True, then you need to say "higgins" to begin listening
+        # regardless of the state of the UI. As the listen_for_wake_word is blocking
+        # and will only exit
+        if not wake_word:
+            speak_text(ssml=const.get_jarvis_wake_ssml(), enable=speak_mode)
         listening = True
 
     def on_stop_listening(msg):
@@ -142,7 +144,15 @@ def speech2text(speak_mode):
     bridge.send_message(JarvisMessageType.ACTIONS_MODIFIED.value, SUPPORTED_COMMANDS)
 
     while True:
-        if listening:
+        if not listening:
+            if wake_word:
+                print("Waiting for wake word..")
+                wake_word_detector.listen_for_wake_word()
+                bridge.send_message(JarvisMessageType.SHOW.value)
+                speak_text(ssml=const.get_jarvis_wake_ssml(), enable=speak_mode)
+                listening = True
+        else:
+            print("We've started listening")
             # TODO: Move the generator to a background thread and pull from queue
             transcripts = listener.listen()
             for transcript in transcripts:
@@ -181,7 +191,7 @@ def speech2text(speak_mode):
                         for a in actions:
                             logging.info("Running: {} - {}".format(a.name, current_transcript_text))
                             # speak_text(text=f"Running: {current_transcript_text}")
-                            speak_text(text=random.choices(JARVIS_PHRASES)[0], enable=speak_mode)
+                            speak_text(text=random.choices(JARVIS_PHRASES)[0], enable=False)
                             result = a.run()
                             logging.info("Action: {} status: {}, error: {}".format(
                                 a.name, result.status, result.error)
@@ -205,16 +215,17 @@ def speech2text(speak_mode):
                         msg = "Uh oh! Failed to act on this: {}".format(str(e))
                         traceback.print_exc(file=sys.stdout)
                         print(msg)
-                        speak_text(text="Sorry I didn't understand that.", enable=speak_mode)
+                        speak_text(text="Sorry I didn't understand that.", enable=True)
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Run jarvis.')
     parser.add_argument('--speak', action='store_true', help="Include speech synthesis audio")
+    parser.add_argument('--wake-word', action='store_true', help="Don't transcribe until wake word called.")
     args = parser.parse_args()
 
     try:
-        speech2text(speak_mode=args.speak)
+        speech2text(speak_mode=args.speak, wake_word=args.wake_word)
     except Exception as e:
         print(e)

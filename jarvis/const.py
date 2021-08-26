@@ -65,6 +65,27 @@ COMMON_ACTION_CHAINS = [
 
 # Speech Synthesis
 DEFAULT_VOICE_NAME = "en-GB-Wavenet-D"
+JARVIS_PHRASES = [
+    "Right!",
+    "Very well!",
+    "As you wish!",
+    "Certainly.",
+    "It shall be done!",
+]
+JARVIS_WAKE_PHRASES = [
+    "Sir",
+    "Sire",
+    "M'lady",
+    "M'lord",
+    "Ready and waiting",
+    # not as good...
+    # "At your service",
+    # "My queen",
+    # "My lord",
+    # "Your Grace",
+    # "Your highness",
+    # "Your excellency",
+]
 USERNAME = "Brendan"
 JARVIS_INTRO_SSML = f"""
 <speak>
@@ -73,13 +94,19 @@ JARVIS_INTRO_SSML = f"""
     How can I help you?
 </speak>
 """
-JARVIS_PHRASES = [
-    "Right!",
-    "Very well!",
-    "As you wish!",
-    "Certainly.",
-    "It shall be done!",
-]
+JARVIS_WAKE_SSML = """
+<speak>
+    <break time="400ms"/>
+    {wake_phrase} <break time="400ms"/>
+</speak>
+"""
+
+
+def get_jarvis_wake_ssml():
+    import random
+    phrase = random.choices(JARVIS_WAKE_PHRASES)
+    return JARVIS_WAKE_SSML.format(wake_phrase=phrase)
+
 
 # User macros
 ACTION_CHAIN_PATH = "./action_chains.json"
@@ -90,3 +117,6 @@ ACTION_CHAIN_PATH = "./action_chains.json"
 ACTION_FILE_SUFFIX = "_actions.py"
 
 OPENAI_CACHE_DIR = "openai_cache/"
+
+WAKE_WORDS = ["jarvis"]
+WAKE_WORD_PATHS = ["higgins__en_mac_2021-09-25-utc_v1_9_0.ppn"]  # "Higgins"
