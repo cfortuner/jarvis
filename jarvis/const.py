@@ -87,6 +87,7 @@ JARVIS_WAKE_PHRASES = [
     # "Your excellency",
 ]
 USERNAME = "Brendan"
+AGENT_NAME = "Higgins"
 JARVIS_INTRO_SSML = f"""
 <speak>
     <break time="200ms"/>

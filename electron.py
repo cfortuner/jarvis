@@ -62,6 +62,10 @@ def speak_text(text=None, ssml=None, enable=True, voice=DEFAULT_VOICE_NAME):
             text=text, ssml=ssml, voice_name=voice
         )
         audio_utils.play_audio_bytes(audio_bytes)
+    else:
+        # For summarization, Q/A, chat
+        if text is not None:
+            print(text)
 
 
 def speech2text(speak_mode, wake_word: bool = False):
@@ -187,6 +191,7 @@ def speech2text(speak_mode, wake_word: bool = False):
                     print(current_transcript_text)
                     try:
                         actions = resolver.parse(cmd=current_transcript_text)
+
                         # Exit as soon as the first action succeeds
                         for a in actions:
                             logging.info("Running: {} - {}".format(a.name, current_transcript_text))
@@ -205,6 +210,10 @@ def speech2text(speak_mode, wake_word: bool = False):
                                         transcript=current_transcript_text,
                                     )
                                     print(asdict(executed_action))
+
+                                    if executed_action.result.data:
+                                        speak_text(text=executed_action.result.data, enable=speak_mode)
+
                                     bridge.send_message(
                                         JarvisMessageType.ACTION_EXECUTED.value,
                                         asdict(executed_action)
@@ -215,7 +224,7 @@ def speech2text(speak_mode, wake_word: bool = False):
                         msg = "Uh oh! Failed to act on this: {}".format(str(e))
                         traceback.print_exc(file=sys.stdout)
                         print(msg)
-                        speak_text(text="Sorry I didn't understand that.", enable=True)
+                        speak_text(text="Sorry I didn't understand that.", enable=speak_mode)
 
 
 if __name__ == "__main__":

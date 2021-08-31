@@ -223,7 +223,7 @@ class SwitchAction(DesktopAction):
         # TODO: Move this normalization logic somewhere else
         windows_clean = [w.lower() for w in windows]
         logging.info(f"Available Windows: {windows}")
-        
+
         # First: Try to find exact match
         if self.app_name in windows_clean:
             idx = windows_clean.index(self.app_name)
@@ -240,7 +240,7 @@ class SwitchAction(DesktopAction):
             if app is None:
                 logging.info("Falling back to fuzzy matching.")
                 distances = list(map(
-                    lambda w: nlp_utils.compute_levenshtein_distance(w, self.app_name), 
+                    lambda w: nlp_utils.compute_levenshtein_distance(w, self.app_name),
                     windows_clean))
                 min_dist = min(distances)
                 if min_dist <= self.DISTANCE_THRESHOLD:
@@ -269,7 +269,7 @@ class MaximizeWindowAction(DesktopAction):
         super().__init__(desktop)
 
         self.app_name = app_name
-    
+
     def run(self):
         self.desktop.maximize_window(self.app_name)
 
@@ -286,7 +286,7 @@ class MinimizeWindowAction(DesktopAction):
         super().__init__(desktop)
 
         self.app_name = app_name
-    
+
     def run(self):
         self.desktop.minimize_window(self.app_name)
 
@@ -313,7 +313,7 @@ class AttachWindowAction(DesktopAction):
 
         self.app_name = app_name
         self.edge_name = edge_name
-    
+
     def run(self):
         screen_width, screen_height = self.desktop.get_screensize()
         # bounds encodes (x, y, width, height)
@@ -334,4 +334,26 @@ class AttachWindowAction(DesktopAction):
     def phrases(cls):
         return [
             "attach {app_name} to {edge_name}"
+        ]
+
+
+class ReadHighlightedText(DesktopAction):
+    """Copy Text in an Application"""
+
+    def __init__(self, desktop: DesktopAutomation):
+        super().__init__(desktop)
+
+    def run(self):
+        try:
+            text = self.desktop.capture_highlighted_text()
+            print(text)
+            return ActionResult(data=text)
+        except Exception as e:
+            print(e)
+        return ActionResult(status="failed")
+
+    @classmethod
+    def phrases(cls):
+        return [
+            "read text"
         ]

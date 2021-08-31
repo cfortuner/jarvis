@@ -2,6 +2,7 @@ import pytest
 
 from jarvis.actions import action_registry
 from jarvis.nlp.openai import openai_action_resolver as OR
+from jarvis.nlp.openai import navigation
 
 from pprint import PrettyPrinter
 
@@ -40,7 +41,7 @@ pp = PrettyPrinter(indent=2)
     ]
 )
 def test_query_web_navigation_model(question, expected):
-    answer, response = OR.ask_web_navigation_model(question)
+    answer = navigation.ask_web_navigation_model(question)
     print(answer)
     assert answer == expected
 

@@ -17,11 +17,13 @@ jsonlines==2.0.0
 kivymd==0.104.2  # Need to install Kivy first
 # pocketsphinx==0.1.15
 openai==0.10.1
+prompt-toolkit==3.0.20
 pvporcupine==1.9.5  # wake word
 PyAudio==0.2.11
 PyAutoGUI==0.9.52  # Requires XCode on Mac
 pydub==0.25.1
-pygame==2.0.1 # Required for Kivy
+pygame==2.0.1  # Required for Kivy
+pyperclip==1.8.2  # copy and paste
 pystray==0.17.3
 selenium==4.0.0.b4
 simpleaudio==1.0.4

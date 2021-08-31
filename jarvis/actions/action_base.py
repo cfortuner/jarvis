@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from jarvis.actions import action_utils
 
@@ -9,6 +9,8 @@ class ActionResult:
     """Stores the status and error of an executed action."""
     status: str = "succeeded"  # succeeded, failed
     error: str = None  # exception message
+    data: Any = None
+    speak: bool = False
 
 
 class ActionBase:

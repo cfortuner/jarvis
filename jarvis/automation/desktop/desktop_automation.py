@@ -1,5 +1,5 @@
-import pyautogui
 
+import pyautogui
 
 class DesktopAutomation():
     """Base class for all functionality related to
@@ -28,7 +28,7 @@ class DesktopAutomation():
 
     def get_all_menuitems_for_window(self, app_name) -> dict:
         """Return all menu items as a dict with the key being the name of the menu
-        
+
         An example would be:
 
         {

@@ -2,10 +2,12 @@
 
 https://developer.apple.com/documentation/accessibility/integrating_accessibility_into_your_app
 """
-
-import atomac
+import time
 
 import AppKit
+import atomac
+import pyautogui
+import pyperclip
 
 from ApplicationServices import *
 from CoreFoundation import *
@@ -76,6 +78,20 @@ class MacAutomation(DesktopAutomation):
         ret_code = 1
         return ret_code
 
+    def capture_highlighted_text(self):
+        # prev_text = pyperclip.paste()
+        # print(f"previous text: {prev_text}")       
+        pyperclip.copy("")
+        # FIXME: Mac only, clears the copy buffer
+        pyautogui.hotkey('command', 'c')
+        time.sleep(.1)  # ctrl-c is usually very fast but your program may execute faster
+        text = pyperclip.paste()
+        print(f"copied text: {text}")
+        # restore prev text
+        # TODO: do this async
+#        pyperclip.copy(prev_text)
+        return text
+
     def _get_all_menu_items(self, ax_item):
         """Using mac accessibility elements, we fetch all the leaf nodes
         of a menu bar"""
@@ -89,7 +105,7 @@ class MacAutomation(DesktopAutomation):
         except:
             # some menu items may have special things like "text edit items"
             # let's ignore such cases
-            pass 
+            pass
         return output
 
     def get_all_menuitems_for_window(self, app_name) -> dict:

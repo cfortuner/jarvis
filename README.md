@@ -304,3 +304,17 @@ Desktop Launcher Tools (Mac Spotlight++)
 
 Headless Browsers
 * https://github.com/dhamaniasad/HeadlessBrowsers
+
+Personal Assistant
+* https://github.com/neuml/txtai (local (no API) semantic search engine, could replace Open.AI for queries)
+* https://github.com/daveshap/NLCA_Question_Generator (question generator, to ask clarifying questions given something the user says)
+    * How to determine user intent? Generate some questions based on the chat thread, then use semantic search to answer the questions.
+
+Semantic Search
+* https://beta.openai.com/docs/guides/search (semantic search)
+* https://beta.openai.com/docs/guides/answers (semantic search --> QA pipeline)
+* https://github.com/neuml/txtai
+* https://github.com/neuml/txtai/blob/master/examples/04_Add_semantic_search_to_Elasticsearch.ipynb
+* https://cloud.google.com/natural-language/docs/samples/language-classify-text-tutorial-query
+* https://aws.amazon.com/kendra/ (semantic search)
+* https://aws.amazon.com/comprehend/ (text analysis, search)
