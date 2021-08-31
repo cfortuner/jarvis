@@ -13,17 +13,15 @@ from pathlib import Path
 import pprint
 import traceback
 import sys
-from typing import List
 
 import click
 from prompt_toolkit import PromptSession
 from prompt_toolkit import print_formatted_text as print
 from prompt_toolkit import HTML
-from prompt_toolkit.shortcuts import radiolist_dialog
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.styles import Style
-from prompt_toolkit.completion import WordCompleter, FuzzyCompleter, FuzzyWordCompleter, NestedCompleter
+from prompt_toolkit.completion import NestedCompleter
 
 from jarvis.actions import ActionBase, ActionResolver, ExecutedAction
 from jarvis.actions import action_registry

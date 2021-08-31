@@ -1,7 +1,7 @@
 # Project specific
 action_chains.json
 chat_history.txt
-promptkit_history.txt
+.prompt_history
 .env.secret
 .vscode/
 kivy_repo/
