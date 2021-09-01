@@ -45,7 +45,7 @@ def save_chat_history(history, chat_history_path):
 
 
 def add_text_to_chat_history(history, text, speaker):
-    text = f"{speaker.upper()}: {text}"
+    text = f"{speaker}: {text}"
     history.append(text)
 
 
@@ -74,6 +74,7 @@ def get_default_completer():
 
 
 def handle_prompt_commands(text, chat_history, chat_history_path=None):
+    is_prompt_cmd = False
     text = nlp_utils.normalize_text(text)
     if text.lower().strip() in ["exit", "quit"]:
         if chat_history_path is not None:
@@ -81,9 +82,11 @@ def handle_prompt_commands(text, chat_history, chat_history_path=None):
         sys.exit(0)
     elif text.lower().strip() == "show history":
         print("\n".join(chat_history[-10:]))
+        is_prompt_cmd = True
     elif text.lower().strip() == "clear history":
         chat_history = []
-    return chat_history
+        is_prompt_cmd = True
+    return chat_history, is_prompt_cmd
 
 
 def init_prompt_session(history_path=".prompt_history", style=None, completer=None):
