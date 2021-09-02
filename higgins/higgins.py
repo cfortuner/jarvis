@@ -1,16 +1,24 @@
 import sys
 import traceback
+from typing import Callable, Dict, List, Type
 
-from higgins.actions import ActionResult, action_registry
+from jarvis.nlp.phrase_matcher import PhraseMatcher
+
+from higgins.actions import Action, ActionResult, action_registry
+from higgins.intents import intent_registry
 from higgins import const
 
 
-def execute_command(cmd_class, cmd_params, automations, class_map, prompt_func=input, print_func=None):
-    intents = cmd_class.parse_intent(cmd_params["text"])
-
-    for intent in intents:
-        action_class = class_map[intent["action"]]
-        action = action_class.from_dict(intent["params"])
+def execute_command(
+    action_chain: List[Dict],
+    automations: Dict,
+    action_class_map: Dict[PhraseMatcher, Type[Action]],
+    prompt_func: Callable = input,
+    print_func: Callable = None
+):
+    for step in action_chain:
+        action_class = action_class_map[step["action"]]
+        action = action_class.from_dict(step["params"])
 
         if const.DEBUG_MODE:
             print(action)
@@ -38,23 +46,40 @@ def execute_command(cmd_class, cmd_params, automations, class_map, prompt_func=i
 
 
 class Higgins:
+    """Primary entrypoint for app.
+
+    commands = prefix used for routing to intent parsers (send-msg, web-nav, etc)
+        eventually these will be replaces by higher-level intent/classification algorithms
+        right now, they're hard-coded to route to the matching intent parser(s)
+    intents = routing functions which parse raw text into a sequence of actions (WebNav). Right
+        now these are equivalent to commands
+    actions = execute user intents (SendMessage, OpenWebsite, LogIn, SignOut) <-- are names globally unique?
+    automations = API integrations for executing actions
+    """
     def __init__(self, prompt_func=input, print_func=print):
         self.prompt_func = prompt_func
         self.print_func = print_func
-        self.phrase_map = action_registry.load_action_phrase_map_from_modules("higgins/actions")
+        self.intent_parser_class_map = intent_registry.load_intent_phrase_map_from_modules("higgins/intents")
         self.action_class_map = action_registry.load_action_classes_from_modules("higgins/actions")
         self.automations = {}
 
     def parse(self, text: str):
         # Regex search for command prefix (e.g. send-msg, web-nav, open-website)
-        commands = action_registry.find_matching_actions(
-            phrase=text, phrase_map=self.phrase_map
+        intent_parsers = intent_registry.find_matching_intents(
+            phrase=text, phrase_map=self.intent_parser_class_map
         )
-        if len(commands) > 0:
-            cmd_class, cmd_params = commands[0]  # We assume 1 matching command
+        if len(intent_parsers) > 0:
+            intent_class, intent_params = intent_parsers[0]  # We assume 1 matching intent parser
+            intent_parser = intent_class()
+            action_chain = intent_parser.parse(intent_params["text"])
+            print("action chain", action_chain)
 
             action_result, self.automations = execute_command(
-                cmd_class, cmd_params, self.automations, self.action_class_map, self.prompt_func, self.print_func
+                action_chain,
+                self.automations,
+                self.action_class_map,
+                self.prompt_func,
+                self.print_func,
             )
         else:
             return None
@@ -63,15 +88,16 @@ class Higgins:
 
 if __name__ == "__main__":
     H = Higgins()
-    print(H.phrase_map)
+    print(H.intent_parser_class_map)
+    print(H.action_class_map)
 
     # Messaging
-    # H.parse("send-msg text Mom with iMessage I'm coming home tonight")
-    # H.parse("send-msg text Mom I'm coming home tonight")
+    H.parse("send-msg text Mom with iMessage I'm coming home tonight")
+    H.parse("send-msg text Mom I'm coming home tonight")
 
     # Opening websites
-    # H.parse("open-website apple.com")
-    # H.parse("open-website open the new yorker website")
+    H.parse("open-website apple.com")
+    H.parse("open-website open the new yorker website")
 
     # Web Navigation
     H.parse("web-nav search for highlighters on google")

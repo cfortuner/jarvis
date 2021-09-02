@@ -9,6 +9,7 @@ AGENT_NAME = "Higgins"
 # To avoid loading them, we only load files that contain actions
 # which are determined by looking for file with this suffix.
 ACTION_FILE_SUFFIX = "_actions.py"
+INTENT_FILE_SUFFIX = "_intents.py"
 
 OPENAI_CACHE_DIR = "openai_cache/"
 

@@ -1,7 +1,6 @@
-from typing import Dict, List
+from typing import Dict
 
 from jarvis.actions import ActionResult
-from jarvis.nlp.openai import completions
 
 from higgins.actions import Action, ActionParamSpec
 
@@ -14,43 +13,13 @@ class BrowserAction(Action):
         return automations
 
 
-class WebNavigation(BrowserAction):
-
-    @classmethod
-    def phrases(cls):
-        return ["web-nav {text}"]
-
-    @classmethod
-    def param_specs(cls):
-        return {}
-
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        answer = completions.web_navigation_completion(text)
-        intent = completions.convert_answer_to_intent(answer)
-        return intent
-
-    def run(self):
-        return ActionResult(data="Running website navigation")
-
-
 class OpenWebsite(BrowserAction):
-
-    @classmethod
-    def phrases(cls):
-        return ["open-website {text}"]
 
     @classmethod
     def param_specs(cls):
         return {
             "website": ActionParamSpec(name="website", question="What is the URL?", required=True),
         }
-
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        answer = completions.open_website_completion(text)
-        intent = completions.convert_answer_to_intent(answer)
-        return intent
 
     def run(self):
         return ActionResult(
@@ -61,20 +30,10 @@ class OpenWebsite(BrowserAction):
 class ClickLink(BrowserAction):
 
     @classmethod
-    def phrases(cls):
-        # This means it's not directly callable
-        return []
-
-    @classmethod
     def param_specs(cls):
         return {
             "link_text": ActionParamSpec(name="link_text", question="Which link should we click on?", required=True),
         }
-
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        # This means it can only be called by others
-        raise NotImplementedError
 
     def run(self):
         return ActionResult(
@@ -85,21 +44,11 @@ class ClickLink(BrowserAction):
 class SearchOnWebsite(BrowserAction):
 
     @classmethod
-    def phrases(cls):
-        # This means it's not directly callable
-        return []
-
-    @classmethod
     def param_specs(cls):
         return {
             "text": ActionParamSpec(name="text", question="What should we search for?", required=True),
             "filter": ActionParamSpec(name="filter", question="Would you like to apply any filters?", required=False),
         }
-
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        # This means it can only be called by others
-        raise NotImplementedError
 
     def run(self):
         text = self.params['text'].value
@@ -109,23 +58,13 @@ class SearchOnWebsite(BrowserAction):
         )
 
 
-class SignOut(BrowserAction):
-
-    @classmethod
-    def phrases(cls):
-        # This means it's not directly callable
-        return []
+class SignOutOfWebsite(BrowserAction):
 
     @classmethod
     def param_specs(cls):
         return {
             "website": ActionParamSpec(name="website", question="Which website should we sign out of?", required=False),
         }
-
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        # This means it can only be called by others
-        raise NotImplementedError
 
     def run(self):
         if self.params['website'].is_missing():
@@ -136,12 +75,7 @@ class SignOut(BrowserAction):
         )
 
 
-class LogIn(BrowserAction):
-
-    @classmethod
-    def phrases(cls):
-        # This means it's not directly callable
-        return []
+class LogInToWebsite(BrowserAction):
 
     @classmethod
     def param_specs(cls):
@@ -151,11 +85,6 @@ class LogIn(BrowserAction):
             "password": ActionParamSpec(name="password", question="What is your password?", required=True),
         }
 
-    @classmethod
-    def parse_intent(cls, text: str) -> List[Dict]:
-        # This means it can only be called by others
-        raise NotImplementedError
-
     def run(self):
         if self.params['website'].is_missing():
             self.params['website'].value = "[CURRENT_URL]"
@@ -164,11 +93,3 @@ class LogIn(BrowserAction):
         return ActionResult(
             data=f"Logging into {self.params['website'].value} with username: {username} and password: {password}"
         )
-
-
-if __name__ == "__main__":
-    print(OpenWebsite.parse_intent("open google"))
-    print(OpenWebsite.parse_intent("go to yahoo.com"))
-    print(OpenWebsite.parse_intent("open the Walmart homepage"))
-    print(OpenWebsite.parse_intent("visit the website"))
-    print(WebNavigation.parse_intent("login to coinbase"))

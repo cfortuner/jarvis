@@ -1,3 +1,5 @@
+from __future__ import annotations  # Required for using current class in a type annotation
+
 from dataclasses import dataclass, asdict
 import json
 from typing import Any, Dict, List
@@ -66,22 +68,12 @@ class Action:
         self.params = params
 
     @classmethod
-    def phrases(cls) -> List[str]:
-        """List of phrases which trigger this Action."""
-        return []
-
-    @classmethod
     def param_specs(cls) -> Dict[str, ActionParamSpec]:
         """Dictionary of parameters needed to instantiate this Action."""
         return {}
 
     @classmethod
-    def parse_intent(cls, text: str) -> Dict:
-        """Given text, parse intent, parameters, and sub-actions."""
-        raise NotImplementedError("Needs to be implemented by derived class")
-
-    @classmethod
-    def from_params(cls, params: Dict[str, ActionParam]):
+    def from_params(cls, params: Dict[str, ActionParam]) -> Action:
         """Initialize Action given dictionary of `ActionParam` objects. 
 
         No text parsing required. Allows other Actions to call this action directly.
@@ -89,7 +81,7 @@ class Action:
         return cls(params=params)
 
     @classmethod
-    def from_dict(cls, dct: Dict[str, Any]):
+    def from_dict(cls, dct: Dict[str, Any]) -> Action:
         """Initialize an Action given a dictionary of parameter values.
 
         Allows us to load serialized actions.

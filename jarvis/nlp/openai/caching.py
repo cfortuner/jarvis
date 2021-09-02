@@ -2,6 +2,8 @@ import json
 import os
 from pathlib import Path
 
+from . import COMPLETION_CACHE_FILE
+
 
 class JSONCache:
     def __init__(self, cache_path: str):
@@ -20,8 +22,9 @@ class JSONCache:
             return self._cache[key]
         return None
 
-    def set(self, key, value):
+    def add(self, key, value):
         self._cache[key] = value
+        self.save()
 
     def save(self):
         json.dump(self._cache, open(self.cache_path, "w"))
@@ -29,5 +32,9 @@ class JSONCache:
     def __contains__(self, key):
         return key in self._cache
 
-    def __get__(self, key):
+    def __getitem__(self, key):
         return self._cache[key]
+
+
+def get_default_cache():
+    return JSONCache(COMPLETION_CACHE_FILE)

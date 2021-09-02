@@ -1,1 +1,1 @@
-from .action_base import Action, ActionParam, ActionParamSpec, ActionResult  # noqa: F401
+from .action import Action, ActionParam, ActionParamSpec, ActionResult  # noqa: F401

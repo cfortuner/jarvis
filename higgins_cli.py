@@ -21,7 +21,7 @@ from jarvis.nlp.text2speech import speak_text
 
 pp = pprint.PrettyPrinter(indent=2)
 
-from higgins import Higgins
+from higgins.higgins import Higgins
 
 
 # CLI commands
