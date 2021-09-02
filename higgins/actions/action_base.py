@@ -33,9 +33,6 @@ class ActionParamSpec:
             valid = type(value) in self.valid_types
         return valid
 
-    def is_missing(self, value: Any) -> bool:
-        return value == "???"
-
 
 @dataclass
 class ActionParam:
@@ -49,13 +46,10 @@ class ActionParam:
 
     def is_valid(self) -> bool:
         """Return True if input is a valid value(s) for this parameter."""
-        valid = True
-        if self.spec.valid_types is not None:
-            valid = type(self.value) in self.spec.valid_types
-        return valid
+        return self.spec.is_valid(self.value)
 
     def is_missing(self) -> bool:
-        return self.value == "???"
+        return self.value is None or self.value == "???"
 
 
 class Action:
@@ -78,7 +72,7 @@ class Action:
 
     @classmethod
     def param_specs(cls) -> Dict[str, ActionParamSpec]:
-        # Returns a dictionary of parameter specs for this Action
+        """Dictionary of parameters needed to instantiate this Action."""
         return {}
 
     @classmethod
@@ -87,13 +81,19 @@ class Action:
         raise NotImplementedError("Needs to be implemented by derived class")
 
     @classmethod
-    def from_params(cls, params: List[ActionParam]):
-        """Validate params and initialize Action instance."""
+    def from_params(cls, params: Dict[str, ActionParam]):
+        """Initialize Action given dictionary of `ActionParam` objects. 
+
+        No text parsing required. Allows other Actions to call this action directly.
+        """
         return cls(params=params)
 
     @classmethod
     def from_dict(cls, dct: Dict[str, Any]):
-        """Validate params and initialize Action instance."""
+        """Initialize an Action given a dictionary of parameter values.
+
+        Allows us to load serialized actions.
+        """
         params = {}
         for param_name, param_value in dct.items():
             params[param_name] = ActionParam(
@@ -101,14 +101,6 @@ class Action:
                 spec=cls.param_specs()[param_name]
             )
         return cls(params=params)
-
-    @classmethod
-    def from_text(cls, text):
-        dct = cls.parse_intent(text)
-        #print(f"Intent: {dct}")
-        action = cls.from_dict(dct["params"])
-        #print(f"Action: {action}")
-        return action
 
     def to_dict(self):
         """Serialize to dictionary. Subclasses can override this
@@ -136,7 +128,11 @@ class Action:
         return automations
 
     def run(self) -> ActionResult:
-        """Execute the behavior."""
+        """Execute the action.
+
+        Currently requires that all required parameters are provided. The caller
+        is responsible for asking clarifying questions to prompt the user for more info.
+        """
         raise NotImplementedError("Needs to be implemented by the derived class")
 
     def __repr__(self):

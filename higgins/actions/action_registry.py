@@ -19,7 +19,7 @@ def load_action_phrase_map_from_modules(dir_name: str) -> dict:
         if os.path.isdir(full_path) and \
             os.path.exists(os.path.join(full_path, "__init__.py")):
             phrase_map.update(load_action_phrase_map_from_modules(rel_path))
-        elif full_path.endswith(const.BEHAVIOR_FILE_SUFFIX) and file_name != "__init__.py":
+        elif full_path.endswith(const.ACTION_FILE_SUFFIX) and file_name != "__init__.py":
             module_name = os.path.splitext(file_name)[0]
             logging.info(module_name)
             module = __import__(
@@ -60,7 +60,7 @@ def load_action_classes_from_modules(dir_name: str) -> dict:
         rel_path = os.path.join(dir_name, file_name)
         if os.path.isdir(full_path) and os.path.exists(os.path.join(full_path, "__init__.py")):
             class_map.update(load_action_classes_from_modules(rel_path))
-        elif full_path.endswith(const.BEHAVIOR_FILE_SUFFIX) and file_name != "__init__.py":
+        elif full_path.endswith(const.ACTION_FILE_SUFFIX) and file_name != "__init__.py":
             module_name = os.path.splitext(file_name)[0]
             module = __import__(
                 f"{dir_name.replace(os.sep, '.')}.{module_name}", fromlist = ["*"])

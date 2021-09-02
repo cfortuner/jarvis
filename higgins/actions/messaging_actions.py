@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from jarvis.actions import ActionResult
 from jarvis.nlp.openai import completions
@@ -28,24 +28,23 @@ class SendMessage(MessagingAction):
         }
 
     @classmethod
-    def parse_intent(cls, text: str) -> Dict:
+    def parse_intent(cls, text: str) -> List[Dict]:
         # text: message mom I'm coming home tonight
         # answer: `SendMessage` PARAMS to=>mom ### body=>I'm coming home tonight ### application=>???
-        # intent: {'behavior': 'SendMessage', 'params': {'to': 'mom', 'body': "I'm coming home tonight", 'application': '???'}}
+        # intent: {'action': 'SendMessage', 'params': {'to': 'mom', 'body': "I'm coming home tonight", 'application': '???'}}
         # TODO: Validate parameters and method names are valid. Perhaps tell GPT about them in the prompt.
         answer = completions.send_message_completion(text)
-        #print(f"answer: {answer}")
         intent = completions.convert_answer_to_intent(answer)
-        #print(f"intent: {intent}")
-        return intent[0]
+        return intent
 
     def run(self):
+        body = self.params["body"].value
         return ActionResult(
-            data=f"Sending message to {self.params['to'].value} using {self.params['application'].value}",
+            data=f"Sending message '{body}' to {self.params['to'].value} using {self.params['application'].value}",
             speak=False
         )
 
 
 if __name__ == "__main__":
-    action = SendMessage.from_text("message mom I'm coming home tonight")
-    print(action)
+    intent = SendMessage.parse_intent("message mom I'm coming home tonight")
+    print(intent)
