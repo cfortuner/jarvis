@@ -5,7 +5,7 @@ from jarvis.nlp.openai import messaging_completions, completion_utils
 from higgins.intents import IntentParser
 
 
-class MessagingIntent(IntentParser):
+class Messaging(IntentParser):
 
     @classmethod
     def phrases(cls):
@@ -22,4 +22,4 @@ class MessagingIntent(IntentParser):
 
 
 if __name__ == "__main__":
-    print(MessagingIntent().parse("message mom I'm coming home tonight"))
+    print(Messaging().parse("message mom I'm coming home tonight"))

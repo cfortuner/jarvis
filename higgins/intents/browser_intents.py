@@ -5,7 +5,7 @@ from jarvis.nlp.openai import browser_completions, completion_utils
 from higgins.intents import IntentParser
 
 
-class NavigateWeb(IntentParser):
+class Website(IntentParser):
 
     @classmethod
     def phrases(cls):
@@ -41,5 +41,5 @@ class SearchOnWebsite(IntentParser):
 
 
 if __name__ == "__main__":
-    print(NavigateWeb().parse("login to coinbase"))
+    print(Website().parse("login to coinbase"))
     print(OpenWebsite().parse("goto amazon.com"))

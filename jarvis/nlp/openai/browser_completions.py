@@ -52,7 +52,7 @@ def open_website_completion(cmd: str, engine="davinci", cache: Any = None):
             stop=["<<END>>"],
         )
         # print(f"Time: {time.time() - start:.2f}")
-        answer = response["choices"][0]["text"]
+        answer = response["choices"][0]["text"].strip("Q:").strip()
         cache.add(
             key=cache_key,
             value={
@@ -65,7 +65,6 @@ def open_website_completion(cmd: str, engine="davinci", cache: Any = None):
         answer = cache[cache_key]["answer"]
         response = cache[cache_key]["response"]
 
-    answer = answer.strip("Q:").strip()
     return answer
 
 
@@ -124,7 +123,7 @@ def web_navigation_completion(cmd: str, engine="davinci", cache: Any = None):
             stop=["<<END>>"],
         )
         # print(f"Time: {time.time() - start:.2f}")
-        answer = response["choices"][0]["text"]
+        answer = response["choices"][0]["text"].strip("Q:").strip()
         cache.add(
             key=cache_key,
             value={
@@ -137,7 +136,6 @@ def web_navigation_completion(cmd: str, engine="davinci", cache: Any = None):
         answer = cache[cache_key]["answer"]
         response = cache[cache_key]["response"]
 
-    answer = answer.strip("Q:").strip()
     return answer
 
 

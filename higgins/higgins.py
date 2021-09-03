@@ -4,8 +4,8 @@ from typing import Callable, Dict, List, Type
 
 from jarvis.nlp.phrase_matcher import PhraseMatcher
 
-from higgins.actions import Action, ActionResult, action_registry
-from higgins.intents import intent_registry
+from higgins.actions import Action, ActionResult
+from higgins.utils import class_registry
 from higgins import const
 
 
@@ -17,25 +17,26 @@ def execute_command(
     print_func: Callable = None
 ):
     for step in action_chain:
-        action_class = action_class_map[step["action"]]
-        action = action_class.from_dict(step["params"])
-
-        if const.DEBUG_MODE:
-            print(action)
-
-        for param in action.params.values():
-            if param.is_missing():
-                if param.spec.required:
-                    param.value = prompt_func(f"{param.spec.question} ")
-                else:
-                    param.value = None
-
-        automations = action.add_automations(automations)
-
         try:
+            action_class = action_class_map[step["action"]]
+            action = action_class.from_dict(step["params"])
+
+            if const.DEBUG_MODE:
+                print(action)
+
+            for param in action.params.values():
+                if param.is_missing():
+                    if param.spec.required:
+                        param.value = prompt_func(f"{param.spec.question} ")
+                    else:
+                        param.value = None
+
+            automations = action.add_automations(automations)
+
             action_result = action.run()
             if action_result.data is not None and print_func is not None:
                 print_func(action_result.data)
+
         except Exception as e:
             msg = "Uh oh! Failed to act on this: {}".format(str(e))
             traceback.print_exc(file=sys.stdout)
@@ -46,34 +47,23 @@ def execute_command(
 
 
 class Higgins:
-    """Primary entrypoint for app.
-
-    commands = prefix used for routing to intent parsers (send-msg, web-nav, etc)
-        eventually these will be replaces by higher-level intent/classification algorithms
-        right now, they're hard-coded to route to the matching intent parser(s)
-    intents = routing functions which parse raw text into a sequence of actions (WebNav). Right
-        now these are equivalent to commands
-    actions = execute user intents (SendMessage, OpenWebsite, LogIn, SignOut) <-- are names globally unique?
-    automations = API integrations for executing actions
-    """
-    def __init__(self, prompt_func=input, print_func=print):
+    """Primary entrypoint for app."""
+    def __init__(self, intent_resolver, prompt_func=input, print_func=print):
+        self.intent_resolver = intent_resolver
         self.prompt_func = prompt_func
         self.print_func = print_func
-        self.intent_parser_class_map = intent_registry.load_intent_phrase_map_from_modules("higgins/intents")
-        self.action_class_map = action_registry.load_action_classes_from_modules("higgins/actions")
+        self.action_class_map = class_registry.load_classes_from_modules(
+            dir_name="higgins/actions",
+            file_suffix=const.ACTION_FILE_SUFFIX,
+            class_type=Action,
+        )
         self.automations = {}
 
     def parse(self, text: str):
-        # Regex search for command prefix (e.g. send-msg, web-nav, open-website)
-        intent_parsers = intent_registry.find_matching_intents(
-            phrase=text, phrase_map=self.intent_parser_class_map
-        )
-        if len(intent_parsers) > 0:
-            intent_class, intent_params = intent_parsers[0]  # We assume 1 matching intent parser
+        intent_class, text = self.intent_resolver.resolve(text)
+        if intent_class is not None:
             intent_parser = intent_class()
-            action_chain = intent_parser.parse(intent_params["text"])
-            print("action chain", action_chain)
-
+            action_chain = intent_parser.parse(text)
             action_result, self.automations = execute_command(
                 action_chain,
                 self.automations,
@@ -81,26 +71,55 @@ class Higgins:
                 self.prompt_func,
                 self.print_func,
             )
-        else:
-            return None
-        return action_result
+            return action_result
+        return None
 
 
 if __name__ == "__main__":
-    H = Higgins()
-    print(H.intent_parser_class_map)
-    print(H.action_class_map)
+    from higgins.intents.intent_resolver import (
+        RegexIntentResolver, OpenAIIntentResolver
+    )
 
-    # Messaging
-    H.parse("send-msg text Mom with iMessage I'm coming home tonight")
-    H.parse("send-msg text Mom I'm coming home tonight")
+    examples = [
+        # Messaging
+        ("send-msg", "ping Liam Fortuner and ask him when his flight lands"),
+        ("send-msg", "email Dad and let him know I'm coming home for the holidays"),
+        ("send-msg", "tell colin to grab me toilet paper at the store"),
+        ("send-msg", "tell Mom I'm coming home for dinner"),
+        ("send-msg", "ping Colin on slack"),
+        # WebNav
+        ("web-nav", "log in to my spotify account username david123"),
+        ("web-nav", "search for apples and oranges on Instacart"),
+        ("web-nav", "open etherscan"),
+        ("web-nav", "search arxiv for resnet50 paper"),
+        ("web-nav", "find airpods on ebay"),
+        ("web-nav", "go to Best Sellers on Amazon.com"),
+        ("web-nav", "go to circle ci and login with the username bfortuner"),
+        ("web-nav", "find Jackie First on facebook"),
+        ("web-nav", "open opensea io"),
+        ("web-nav", "search for rainbows on google"),
+        ("web-nav", "logout"),
+        ("web-nav", "sign out"),
+        ("web-nav", "login to Walmart.com"),
+        ("web-nav", "login to coinbase"),
+        # Other
+        ("", "wondering what the air quality will be"),
+        # ("", "play Stan Getz on Spotify"),
+        ("", "turn on the lights"),
+        ("", "close all applications"),
+        ("", "which app is using the most CPU?)")
+    ]
 
-    # Opening websites
-    H.parse("open-website apple.com")
-    H.parse("open-website open the new yorker website")
+    # H = Higgins(intent_resolver=RegexIntentResolver())
+    # print("Regex intent resolver ------")
+    # for category, text in examples:
+    #     combined = " ".join([category, text])
+    #     result = H.parse(combined)
+    #     print(combined, result)
 
-    # Web Navigation
-    H.parse("web-nav search for highlighters on google")
-    H.parse("web-nav sign out")
-    H.parse("web-nav log out of my amazon account")
-    H.parse("web-nav log in to coinbase")
+    H = Higgins(intent_resolver=OpenAIIntentResolver())
+    print("\nOpenAI intent resolver ------")
+    for category, text in examples:
+        result = H.parse(text)
+        data = result.data if result is not None else None
+        print(text, result)

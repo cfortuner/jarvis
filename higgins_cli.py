@@ -14,14 +14,14 @@ import click
 from prompt_toolkit import print_formatted_text as print
 from prompt_toolkit import HTML
 
-from higgins import const
-from higgins.utils import prompt_utils
-from jarvis.nlp.openai import completions
 from jarvis.nlp.text2speech import speak_text
 
-pp = pprint.PrettyPrinter(indent=2)
-
+from higgins import const
 from higgins.higgins import Higgins
+from higgins.intents.intent_resolver import OpenAIIntentResolver, RegexIntentResolver
+from higgins.utils import prompt_utils
+
+pp = pprint.PrettyPrinter(indent=2)
 
 
 # CLI commands
@@ -74,6 +74,7 @@ def text2intent(chat_history_path, speak):
     style = prompt_utils.get_default_style()
     session = prompt_utils.init_prompt_session(style=style)
     higgins = Higgins(
+        intent_resolver=OpenAIIntentResolver(),  # RegexIntentResolver()
         prompt_func=question_prompt(session, style, chat_history, speak),
         print_func=print_func(style),
     )
