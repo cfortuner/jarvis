@@ -29,6 +29,7 @@ pystray==0.17.3
 selenium==4.0.0.b4
 simpleaudio==1.0.4
 SpeechRecognition==3.6.1
+tinydb==4.5.1
 
 # For MacOS
 # AppKit==0.2.8; sys_platform == "darwin"  # Doesn't install correctly on M1

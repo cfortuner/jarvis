@@ -17,6 +17,7 @@ from prompt_toolkit import HTML
 from jarvis.nlp.text2speech import speak_text
 
 from higgins import const
+from higgins import episode
 from higgins.higgins import Higgins
 from higgins.intents.intent_resolver import OpenAIIntentResolver, RegexIntentResolver
 from higgins.utils import prompt_utils
@@ -34,9 +35,10 @@ def cli(debug):
         click.echo(f"Debug mode is on!")
 
 
-def question_prompt(session, style, chat_history, speak):
+def question_prompt(session, style, chat_history, chat_history_path, speak):
 
     def prompt_func(question):
+        nonlocal chat_history, chat_history_path
         print(
             HTML(
                 f"<bot-prompt>{const.AGENT_NAME}</bot-prompt>: <bot-text>{question}</bot-text>"
@@ -48,6 +50,11 @@ def question_prompt(session, style, chat_history, speak):
         user_text = session.prompt(
             message=HTML(f"<user-prompt>{const.USERNAME}</user-prompt>: ")
         )
+        chat_history, is_prompt_cmd = prompt_utils.handle_prompt_commands(
+            user_text, chat_history, chat_history_path=chat_history_path
+        )
+        if is_prompt_cmd:
+            return
         prompt_utils.add_text_to_chat_history(chat_history, user_text, const.USERNAME)
         return user_text
 
@@ -75,7 +82,7 @@ def text2intent(chat_history_path, speak):
     session = prompt_utils.init_prompt_session(style=style)
     higgins = Higgins(
         intent_resolver=OpenAIIntentResolver(),  # RegexIntentResolver()
-        prompt_func=question_prompt(session, style, chat_history, speak),
+        prompt_func=question_prompt(session, style, chat_history, chat_history_path, speak),
         print_func=print_func(style),
     )
     while True:
@@ -87,10 +94,11 @@ def text2intent(chat_history_path, speak):
         )
         if not user_text or is_prompt_cmd:
             continue
+
+        episode_start = len(chat_history)
         prompt_utils.add_text_to_chat_history(chat_history, user_text, const.USERNAME)
         try:
             action_result = higgins.parse(user_text)
-
             agent_text = None
             if action_result is None:
                 agent_text = "How can I help you?"  # completions.open_ended_chat("\n".join(chat_history[-5:]))
@@ -98,14 +106,15 @@ def text2intent(chat_history_path, speak):
                 agent_text = action_result.data
 
             if agent_text:
-                prompt_utils.add_text_to_chat_history(chat_history, agent_text, const.AGENT_NAME)
+                speak_text(text=agent_text, enable=speak)
                 print(
                     HTML(
                         f"<bot-prompt>{const.AGENT_NAME}</bot-prompt>: <bot-text>{agent_text}</bot-text>"
                     ),
                     style=style,
                 )
-                speak_text(text=agent_text, enable=speak)
+                prompt_utils.add_text_to_chat_history(chat_history, agent_text, const.AGENT_NAME)
+            episode.save_episode(chat_history[episode_start:], db=higgins.db)
         except Exception as e:
             print(e)
             traceback.print_exc(file=sys.stdout)

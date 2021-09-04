@@ -2,7 +2,7 @@ from __future__ import annotations  # Required for using current class in a type
 
 from dataclasses import dataclass, asdict
 import json
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from jarvis.actions import action_utils
 
@@ -64,7 +64,7 @@ class Action:
     - Prompt the user with clarifying questions to finalize parameters.
     """
 
-    def __init__(self, params: Dict):
+    def __init__(self, params: Dict = None):
         self.params = params
 
     @classmethod
@@ -118,6 +118,22 @@ class Action:
         New automations are added to the dictionary and returned.
         """
         return automations
+
+    def clarify(self, prompt_fn: Callable):
+        """Populate missing action parameters.
+
+        Params:
+            prompt_fn: Function which prompts the user (prints question to console)
+
+        Either query using a database or ask the user if some parameters
+        are missing. The database is updated with any new information.
+        """
+        for param in self.params.values():
+            if param.is_missing():
+                if param.spec.required:
+                    param.value = prompt_fn(f"{param.spec.question} ")
+                else:
+                    param.value = None
 
     def run(self) -> ActionResult:
         """Execute the action.

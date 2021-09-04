@@ -14,3 +14,7 @@ INTENT_FILE_SUFFIX = "_intents.py"
 OPENAI_CACHE_DIR = "openai_cache/"
 
 DEBUG_MODE = bool(os.getenv("DEBUG_HIGGINS", False))
+
+# Database
+TINY_DB_PATH = "data/tinydb.json"
+EPISODE_JSONL_PATH = "data/episodes.jsonl"

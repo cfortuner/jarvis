@@ -5,6 +5,7 @@ from typing import Callable, Dict, List, Type
 from jarvis.nlp.phrase_matcher import PhraseMatcher
 
 from higgins.actions import Action, ActionResult
+from higgins.database import tiny
 from higgins.utils import class_registry
 from higgins import const
 
@@ -14,7 +15,7 @@ def execute_command(
     automations: Dict,
     action_class_map: Dict[PhraseMatcher, Type[Action]],
     prompt_func: Callable = input,
-    print_func: Callable = None
+    print_func: Callable = None,
 ):
     for step in action_chain:
         try:
@@ -24,14 +25,10 @@ def execute_command(
             if const.DEBUG_MODE:
                 print(action)
 
-            for param in action.params.values():
-                if param.is_missing():
-                    if param.spec.required:
-                        param.value = prompt_func(f"{param.spec.question} ")
-                    else:
-                        param.value = None
-
             automations = action.add_automations(automations)
+
+            # Ask questions or query db for missing information
+            action.clarify(prompt_func)
 
             action_result = action.run()
             if action_result.data is not None and print_func is not None:
@@ -57,7 +54,10 @@ class Higgins:
             file_suffix=const.ACTION_FILE_SUFFIX,
             class_type=Action,
         )
-        self.automations = {}
+        self.db = tiny.load_database()
+        self.automations = {
+            "db": self.db
+        }
 
     def parse(self, text: str):
         intent_class, text = self.intent_resolver.resolve(text)
