@@ -4,7 +4,7 @@ from jarvis.actions import ActionResult
 
 from higgins.actions import Action, ActionParamSpec
 from higgins.database import tiny
-from higgins.personal import contacts
+from higgins.automation import contacts
 
 
 class MessagingAction(Action):
@@ -40,7 +40,8 @@ class SendMessage(MessagingAction):
         possible_alias = None
         contact_info = None
         while contact_info is None:
-            users = contacts.find_contact(self.db, name)
+            # users = contacts.local.find_contact(self.db, name)
+            users = contacts.google.find_contact_in_database(self.db, name)
             if len(users) == 1:
                 contact_info = contacts.Contact(**users[0])
             elif len(users) > 1:
@@ -55,7 +56,7 @@ class SendMessage(MessagingAction):
             )
             if add_alias.strip().lower() in ["yes", "y"]:
                 contact_info.alias = possible_alias.strip()
-                contacts.update_contact(self.db, contact_info)
+                contacts.local.update_contact(self.db, contact_info)
 
         self.contact_info = contact_info
 

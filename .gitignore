@@ -1,4 +1,11 @@
 # Project specific
+client_secret.json
+google_tokens/
+data/episodes.jsonl
+data/tinydb.json
+# personal data from google
+data/google
+gmail_token.json
 action_chains.json
 chat_history.txt
 .prompt_history

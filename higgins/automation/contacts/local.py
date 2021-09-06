@@ -1,22 +1,14 @@
 import re
 from typing import Dict, List
-import uuid
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict
 
 from tinydb import TinyDB, Query, where
+
 from higgins.database import tiny
+from higgins.automation.contacts import Contact
+
 
 CONTACTS_TABLE_NAME = "contacts"
-
-
-@dataclass
-class Contact:
-    name: str
-    alias: str = None
-    email: str = None
-    phone: str = None
-    default_messaging_app: str = None
-    contact_id: str = field(default_factory=lambda: str(uuid.uuid1()))
 
 
 def add_contact(db: TinyDB, contact: Contact) -> None:
@@ -60,7 +52,7 @@ def find_contact_semantic_search():
     pass
 
 
-def init_contacts_db():
+def init_local_contacts_table():
     db = tiny.load_database()
     tiny.truncate(CONTACTS_TABLE_NAME, db=db)
     contacts = [
@@ -74,7 +66,7 @@ def init_contacts_db():
 
 if __name__ == "__main__":
     db = tiny.load_database()
-    init_contacts_db()
+    init_local_contacts_table()
 
     # print(db.table(CONTACTS_TABLE_NAME).all())
     # print(tiny.query(CONTACTS_TABLE_NAME, "name", "Erin Fortuner", db=db))

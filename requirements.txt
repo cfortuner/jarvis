@@ -11,7 +11,9 @@ black==21.8b0
 click==8.0.1  # CLI
 python-dotenv==0.19.0
 flake8==3.9.2
-google-api-python-client==2.11.0
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==0.4.6
+google-api-python-client==2.19.1
 google-cloud-speech==2.5.0
 google-cloud-texttospeech==2.5.2
 jsonlines==2.0.0
@@ -28,6 +30,7 @@ pyperclip==1.8.2  # copy and paste
 pystray==0.17.3
 selenium==4.0.0.b4
 simpleaudio==1.0.4
+simplegmail==4.0.3
 SpeechRecognition==3.6.1
 tinydb==4.5.1
 
