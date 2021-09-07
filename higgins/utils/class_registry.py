@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Type
 
-from jarvis.nlp.phrase_matcher import PhraseMatcher
+from higgins.nlp.phrase_matcher import PhraseMatcher
 
 
 def load_classes_from_modules(

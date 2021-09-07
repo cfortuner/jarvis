@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from jarvis.nlp.openai import messaging_completions, completion_utils
+from higgins.nlp.openai import messaging_completions, completion_utils
 
 from higgins.intents import IntentParser
 
@@ -17,7 +17,7 @@ class Messaging(IntentParser):
         # intent: {'action': 'SendMessage', 'params': {'to': 'mom', 'body': "I'm coming home tonight", 'application': '???'}}
         # TODO: Validate parameters and method names are valid. Perhaps tell GPT about them in the prompt.
         answer = messaging_completions.send_message_completion(text)
-        actions = completion_utils.convert_answer_to_action_chain(answer)
+        actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
 
 

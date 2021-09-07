@@ -1,7 +1,7 @@
 
 from typing import Dict, Tuple
 
-from jarvis.nlp.openai import intent_classifier
+from higgins.nlp.openai import intent_classifier
 
 from higgins import const
 from higgins.intents import IntentParser

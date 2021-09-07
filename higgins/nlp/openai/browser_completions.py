@@ -4,7 +4,7 @@ from typing import Any
 
 import openai
 
-from jarvis.nlp import nlp_utils
+from higgins.nlp import nlp_utils
 
 from . import caching
 from . import completion_utils

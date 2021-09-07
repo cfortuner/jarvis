@@ -14,7 +14,7 @@ from prompt_toolkit.completion import (
     NestedCompleter,
 )
 
-from jarvis.nlp import nlp_utils
+from higgins.nlp import nlp_utils
 
 pp = pprint.PrettyPrinter(indent=2)
 

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from jarvis.nlp.openai import browser_completions, completion_utils
+from higgins.nlp.openai import browser_completions, completion_utils
 
 from higgins.intents import IntentParser
 
@@ -13,7 +13,7 @@ class Website(IntentParser):
 
     def parse(self, text: str) -> List[Dict]:
         answer = browser_completions.web_navigation_completion(text)
-        actions = completion_utils.convert_answer_to_action_chain(answer)
+        actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
 
 
@@ -26,7 +26,7 @@ class OpenWebsite(IntentParser):
     @classmethod
     def parse(cls, text: str) -> List[Dict]:
         answer = browser_completions.open_website_completion(text)
-        actions = completion_utils.convert_answer_to_action_chain(answer)
+        actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
 
 

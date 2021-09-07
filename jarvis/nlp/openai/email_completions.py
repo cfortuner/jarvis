@@ -13,7 +13,7 @@ from . import completion_utils
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def email_completion(cmd: str, engine="davinci", cache: Any = None):
+def send_message_completion(cmd: str, engine="davinci", cache: Any = None):
     prompt = f"""Convert the following text into commands:
 
     Q: Text mom I love her
@@ -84,6 +84,6 @@ if __name__ == "__main__":
         "text Colin on iMessage and see if he's still going to the store",
     ]
     for text in examples:
-        answer = email_completion(text)
+        answer = send_message_completion(text)
         intent = completion_utils.convert_string_to_action_chain(answer)
         print(f"Q: {text}\nA: {answer}\nI: {intent}")

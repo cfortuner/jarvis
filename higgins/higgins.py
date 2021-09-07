@@ -2,7 +2,7 @@ import sys
 import traceback
 from typing import Callable, Dict, List, Type
 
-from jarvis.nlp.phrase_matcher import PhraseMatcher
+from higgins.nlp.phrase_matcher import PhraseMatcher
 
 from higgins.actions import Action, ActionResult
 from higgins.database import tiny
@@ -82,8 +82,8 @@ if __name__ == "__main__":
 
     examples = [
         # Messaging
-        ("send-msg", "ping Liam Fortuner and ask him when his flight lands"),
-        ("send-msg", "email Dad and let him know I'm coming home for the holidays"),
+        ("send-msg", "ping Liam Fortuner and ask him when his flight lands using WhatsApp"),
+        ("send-msg", "message Dad and let him know I'm coming home for the holidays"),
         ("send-msg", "tell colin to grab me toilet paper at the store"),
         ("send-msg", "tell Mom I'm coming home for dinner"),
         ("send-msg", "ping Colin on slack"),
@@ -116,7 +116,13 @@ if __name__ == "__main__":
     #     combined = " ".join([category, text])
     #     result = H.parse(combined)
     #     print(combined, result)
-
+    from higgins.datasets import email_datasets
+    examples += [
+        ("send-email", action["query"]) for action in email_datasets.SEND_EMAIL_DATASET_TEST
+    ]
+    examples += [
+        ("search-email", action["query"]) for action in email_datasets.SEARCH_EMAIL_DATASET_TEST
+    ]
     H = Higgins(intent_resolver=OpenAIIntentResolver())
     print("\nOpenAI intent resolver ------")
     for category, text in examples:

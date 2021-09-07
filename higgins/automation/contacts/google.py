@@ -174,7 +174,7 @@ def find_contact_in_database(db: TinyDB, name: str) -> List[Dict]:
     'resourceName': 'people/c6056278930532673924'}]
     """
     table = db.table(TABLE_NAME)
-    print(f"Num Contacts: {len(table)}")
+    # print(f"Num Contacts: {len(table)}")
 
     User = Query()
     Name = Query()
@@ -203,7 +203,7 @@ def find_contact_in_database(db: TinyDB, name: str) -> List[Dict]:
                 Name.value.matches(name, flags=re.IGNORECASE)
             )
         )
-    print(f"Found {len(rows)} matching contacts for name `{name}`")
+    # print(f"Found {len(rows)} matching contacts for name `{name}`")
 
     contacts = []
     for row in rows:

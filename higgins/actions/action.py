@@ -26,7 +26,7 @@ class ActionParamSpec:
     name: str
     question: str
     valid_types: List = None
-    required: bool = True
+    required: bool = False
 
     def is_valid(self, value: Any) -> bool:
         """Return True if input is a valid value(s) for this parameter."""
@@ -65,7 +65,7 @@ class Action:
     """
 
     def __init__(self, params: Dict = None):
-        self.params = params
+        self.params = params or {}
 
     @classmethod
     def param_specs(cls) -> Dict[str, ActionParamSpec]:

@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from higgins import const
 
@@ -99,6 +99,25 @@ def convert_string_to_action_chain(string: str) -> List[Dict]:
     if const.DEBUG_MODE:
         print(f"Actions: {actions}")
     return actions
+
+
+def build_completion_prompt(
+    question: str,
+    action_chains: List[Dict],
+    task_description: str = None,
+) -> str:
+    prompt = ""
+    if task_description is not None:
+        prompt += f"{task_description}\n"
+
+    for action in action_chains:
+        completion = convert_action_chain_to_string(action["actions"])
+        prompt += f"\nQ: {action['query']}"
+        prompt += f"\nA: {completion}"
+
+    prompt += "\nQ: {question}".format(question=question)
+    prompt += "\nA:"
+    return prompt
 
 
 if __name__ == "__main__":
