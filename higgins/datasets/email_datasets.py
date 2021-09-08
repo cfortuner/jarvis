@@ -153,7 +153,7 @@ SEARCH_EMAIL_DATASET_TRAIN = [
         ]
     },
     {
-        "query": "Search for emails from Erin Fortuner sent in the last 30 days",
+        "query": "Search for emails Erin Fortuner sent in the last 30 days",
         "actions": [
             {
                 "action": "SearchEmail",
@@ -164,28 +164,28 @@ SEARCH_EMAIL_DATASET_TRAIN = [
                     "unread": "???",
                     "labels": "???",
                     "exact_phrase": "???",
-                    "newer_than": "30 days",
+                    "newer_than": "30 day",
                 }
             },
         ]
     },
-    {
-        "query": "Find emails sent to cfortuner@gmail.com",
-        "actions": [
-            {
-                "action": "SearchEmail",
-                "params": {
-                    "to": "cfortuner@gmail.com",
-                    "from": "???",
-                    "subject": "???",
-                    "unread": "???",
-                    "labels": "???",
-                    "exact_phrase": "???",
-                    "newer_than": "???",
-                }
-            },
-        ]
-    },
+    # {
+    #     "query": "Find emails sent to cfortuner@gmail.com",
+    #     "actions": [
+    #         {
+    #             "action": "SearchEmail",
+    #             "params": {
+    #                 "to": "cfortuner@gmail.com",
+    #                 "from": "???",
+    #                 "subject": "???",
+    #                 "unread": "???",
+    #                 "labels": "???",
+    #                 "exact_phrase": "???",
+    #                 "newer_than": "???",
+    #             }
+    #         },
+    #     ]
+    # },
     {
         "query": "Get all unread emails sent in the last 2 days",
         "actions": [
@@ -378,10 +378,238 @@ SEARCH_EMAIL_DATASET_TEST = [
     },
 ]
 
+# Prompt: https://beta.openai.com/playground/p/MOuS7ocSyR4KEhjtlGb6rbMq?model=davinci-instruct-beta
+COMPOSE_EMAIL_DATASET_TRAIN = [
+    {
+        "query": "Send email to mom and let her know I'm coming home for Christmas",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "mom",
+                    "subject": "Christmas plans",
+                    "body": "I'm coming home for Christmas.",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Send an email to mission@bodyrok.com. Ask to pause membership starting this Thursday and resume in October. Explain my reason is I'm leaving for an RV trip for 1-2 months.",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "mission@bodyrok.com",
+                    "subject": "Pause membership",
+                    "body": "Is it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October. Thanks!",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Compose email. Ask if he has the tennis tickets and whether he'd like me to pay. If so, how much. Which payment method. I'm looking forward to getting together!",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "???",
+                    "subject": "Tennis tickets",
+                    "body": "Did you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Email my manager and let her know I've decided to leave Cruise. Flexible on when I leave. It's up to her. I'd like to stick around at least until October 15 when my vest day is.",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "my manager",
+                    "subject": "Leaving Cruise",
+                    "body": "I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Email Amazon Customer Service. Ask them when my order will arrive. Order number akjgs-1726-j298.",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "Amazon Customer Service",
+                    "subject": "Delivery estimate",
+                    "body": "Do you know when my order will arrive. My order number is akjgs-1726-j298.",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Email David Ling. Hope you're well. Tell him I've accepted the job offer at Cruise. Starting salary: 100k. Is that good?",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "David Ling",
+                    "subject": "Accepted Cruise Job Offer",
+                    "body": "Hope you're well. I accepted the Cruise job offer. Is 100k a good base salary?",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Email Dad and ask if he's coming over for dinner",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "Dad",
+                    "subject": "Dinner?",
+                    "body": "Are you coming over for dinner?",
+                }
+            },
+        ]
+    },
+]
+
+COMPOSE_EMAIL_DATASET_TEST = [
+    {
+        "query": "Email Lumen Support with my fedex tracking number. Number is 175452902. Let them know I filled out the form. Ask when I'll get the refund.",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "Lumen Support",
+                    "subject": "Refund",
+                    "body": "I filled out the form. My Fedex tracking number is 175452902. When will I get the refund?",
+                }
+            },
+        ]
+    },
+    {
+        "query": "Compose an email to Colin and let him know I'm coming to Alaska. I've thought it over and decided it seems fun. Tell him I'll start looking for flights. And ask when he's flying out.",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "Colin",
+                    "subject": "Alaska trip",
+                    "body": "I wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights now. Could you let me know when your flight is?",
+                }
+            },
+        ]
+    },
+]
+
+# https://beta.openai.com/playground/p/bgFErKOAwhe5j9o7w3jI3Ynz?model=davinci-instruct-beta
+EDIT_EMAIL_DATASET_TRAIN = [
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "mission@bodyrok.com",
+                    "subject": "Pause membership",
+                    "user_text": "Send an email to mission@bodyrok.com. Ask to pause membership starting this Thursday and resume in October. Explain my reason is I'm leaving for an RV trip for 1-2 months.",
+                    "first_draft": "Hello Bodyrok Mission,\nIs it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October.\nBrendan",
+                    "feedback": "Replace Bodyrok Mission with team. Change Thursday to Friday the 14th. Remove the line about the RV trip. Change the signature to Thanks, Brendan",
+                }
+            },
+        ],
+        "revised_email": "Hello team,\nIs it possible to pause my membership starting Friday the 14th? And resume the membership in October.\nThanks,\nBrendan",
+    },
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "Colin Fortuner",
+                    "subject": "Alaska trip",
+                    "user_text": "Send an email to Colin and let him know I'm coming to Alaska. I've thought it over and decided it seems fun. Tell him I'll start looking for flights. And ask when he's flying out.",
+                    "first_draft": "Hi Colin Fortuner,\nI wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights know. Could you let me know when your flight is?",
+                    "feedback": "Replace Colin Fortuner with Cols. Add hope you're well at the beginning. Add From, Brendan.",
+                }
+            },
+        ],
+        "revised_email": "Hi Cols,\nHope you're well! I wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights know. Could you let me know when your flight is?\nFrom,\nBrendan",
+    },
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "Amazon Customer Service",
+                    "subject": "Delivery estimate",
+                    "user_text": "Email Amazon Customer Service. Ask them when my order will arrive. Order number akjgs-1726-j298.",
+                    "first_draft": "Do you know when my order will arrive?",
+                    "feedback": "Ask them for a tracking number. Add my order id.",
+                }
+            },
+        ],
+        "revised_email": "Do you know when my order will arrive? My order number is akjgs-1726-j298. And can you provide me a tracking number?",
+    },
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "Ling",
+                    "subject": "Leaving Cruise",
+                    "user_text": "Email my manager Ling and let her know I've decided to leave Cruise. Flexible on when I leave. It's up to her. I'd like to stick around at least until October 15 when my vest day is.",
+                    "first_draft": "Hi Ling, I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
+                    "feedback": "Remove Hi Ling. Change October 15 to November 4",
+                }
+            },
+        ],
+        "revised_email": "I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until November 4 when my vest day is.",
+    },
+]
+
+EDIT_EMAIL_DATASET_TEST = [
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "Lumen Support",
+                    "subject": "Refund",
+                    "user_text": "Reply to Lumen Support and paste my fedex tracking number 175452902. Let them know I filled out the form. Ask when I'll get the refund.",
+                    "first_draft": "Hi Lumen Support,\nI filled out the form. When will I get the refund?\nStew",
+                    "feedback": "Add my fedex tracking number. Change the intro to Hi team. Add Are you open today? to the beginning.",
+                }
+            },
+        ],
+        "revised_email": "Hi team,\nAre you open today? I filled out the form. When will I get the refund? My fedex tracking number is 175452902.\nStew",
+    },
+    {
+        "actions": [
+            {
+                "action": "EditEmail",
+                "params": {
+                    "to": "Bill Fortuner",
+                    "subject": "Tennis tickets payment",
+                    "user_text": "Email Bill Fortuner. Ask if he has the tennis tickets and whether he'd like me to pay. If so, how much. Which payment method. I'm looking forward to getting together!",
+                    "first_draft": "Hey Bill,\nDid you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?\nJackie First",
+                    "feedback": "Replace Hey Bill with Dad. Add Paypal as a payment option.",
+                }
+            },
+        ],
+        "revised_email": "Dad,\nDid you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo or Paypal?\nJackie First",
+
+    },
+]
+
+COMPOSE_EMAIL_DATASET = []
+COMPOSE_EMAIL_DATASET.append(COMPOSE_EMAIL_DATASET_TRAIN)
+COMPOSE_EMAIL_DATASET.append(COMPOSE_EMAIL_DATASET_TEST)
+
 EMAIL_DATASETS_TRAIN = []
 EMAIL_DATASETS_TRAIN += SEND_EMAIL_DATASET_TRAIN
 EMAIL_DATASETS_TRAIN += SEARCH_EMAIL_DATASET_TRAIN
+EMAIL_DATASETS_TRAIN += COMPOSE_EMAIL_DATASET_TRAIN
 
 EMAIL_DATASETS_TEST = []
 EMAIL_DATASETS_TEST += SEND_EMAIL_DATASET_TEST
 EMAIL_DATASETS_TEST += SEARCH_EMAIL_DATASET_TEST
+EMAIL_DATASETS_TRAIN += COMPOSE_EMAIL_DATASET_TEST

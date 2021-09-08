@@ -6,9 +6,10 @@ from typing import Callable, Dict, List
 from higgins.actions import Action, ActionParam, ActionParamSpec, ActionResult
 from higgins.actions import contact_actions
 from higgins.automation.google import gmail
-from higgins.database import tiny
 from higgins.automation.email import email_utils
+from higgins.database import tiny
 from higgins.nlp.openai import data_question_completions
+from higgins.nlp.openai import email_completions
 from higgins.nlp import nlp_utils
 
 pp = PrettyPrinter(indent=2)
@@ -37,23 +38,93 @@ class SendEmail(EmailAction):
     def param_specs(cls):
         return {
             "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
             "body": ActionParamSpec(name="body", question="What should the email body contain?", required=True),
-            "subject": ActionParamSpec(name="subject", question="What is the subject?"),
         }
 
     def clarify(self, prompt_fn: Callable) -> List[str]:
-        super().clarify(prompt_fn)
         name = self.params["to"].value.strip()
-        if not contact_actions.is_valid_email(name):
+        if not email_utils.is_valid_email(name):
+            contact_info = contact_actions.clarify_contact_info(
+                name=name, db=self.db, prompt_fn=prompt_fn
+            )
+            self.params["to"].value = contact_info.email
+        super().clarify(prompt_fn)
+
+    def run(self):
+        body = self.params["body"].value
+        return ActionResult(
+            action_text=f"Emailing message '{body}' to {self.params['to'].value}"
+        )
+
+
+class ComposeEmail(EmailAction):
+
+    def __init__(self, params: Dict = None, db=None, contact_info=None):
+        super().__init__(params, db)
+        self.contact_info = contact_info
+
+    @classmethod
+    def param_specs(cls):
+        return {
+            "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
+            "body": ActionParamSpec(name="body", question="What should the email body contain?", required=True),
+            "user_text": ActionParamSpec(name="user_text", question=""),
+        }
+
+    def clarify(self, prompt_fn: Callable) -> List[str]:
+        name = self.params["to"].value.strip()
+        if not email_utils.is_valid_email(name):
             contact_info = contact_actions.clarify_contact_info(
                 name=name, db=self.db, prompt_fn=prompt_fn
             )
             self.params["to"].value = contact_info.email
 
     def run(self):
-        body = self.params["body"].value
+        email = {k: p.value for k, p in self.params.items()}
         return ActionResult(
-            action_text=f"Emailing message '{body}' to {self.params['to'].value}"
+            reply_text=email_utils.get_email_preview(email),
+            data=email,
+            reply_handler_classname="ComposeEmailReplyHandler",
+        )
+
+
+class EditEmail(EmailAction):
+
+    def __init__(self, params: Dict = None, db=None, contact_info=None):
+        super().__init__(params, db)
+        self.contact_info = contact_info
+
+    @classmethod
+    def param_specs(cls):
+        return {
+            "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
+            "user_text": ActionParamSpec(name="body", question="What was the user's original request?", required=True),
+            "first_draft": ActionParamSpec(name="data", question="What was the first draft?", required=True),
+            "feedback": ActionParamSpec(name="data", question="What would you like to change?", required=True),
+        }
+
+    def clarify(self, prompt_fn: Callable) -> List[str]:
+        super().clarify(prompt_fn)
+
+    def run(self):
+        answer = email_completions.edit_email_completion(
+            user_text=self.params["user_text"].value,
+            first_draft=self.params["first_draft"].value,
+            feedback=self.params["feedback"].value,
+        )
+        data = {
+            "to": self.params["to"].value,
+            "subject": self.params["subject"].value,
+            "body": answer,
+            "user_text": self.params["user_text"].value,
+        }
+        return ActionResult(
+            reply_text=email_utils.get_email_preview(data),
+            data=data,
+            reply_handler_classname="ComposeEmailReplyHandler",
         )
 
 
@@ -74,7 +145,7 @@ class SearchEmail(EmailAction):
     def clarify(self, prompt_fn: Callable) -> List[str]:
         super().clarify(prompt_fn)
         recipient = self.params["to"].value
-        if recipient and not contact_actions.is_valid_email(recipient):
+        if recipient and not email_utils.is_valid_email(recipient):
             recipient_info = contact_actions.clarify_contact_info(
                 name=recipient, db=self.db, prompt_fn=prompt_fn, loop_until_found=False,
             )
@@ -82,7 +153,7 @@ class SearchEmail(EmailAction):
                 self.params["to"].value = recipient_info.email
 
         sender = self.params["from"].value
-        if sender and not contact_actions.is_valid_email(sender):
+        if sender and not email_utils.is_valid_email(sender):
             sender_info = contact_actions.clarify_contact_info(
                 name=sender, db=self.db, prompt_fn=prompt_fn, loop_until_found=False,
             )

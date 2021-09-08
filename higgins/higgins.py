@@ -122,10 +122,13 @@ if __name__ == "__main__":
     #     ("send-email", action["query"]) for action in email_datasets.SEND_EMAIL_DATASET_TEST
     # ]
     examples += [
-        ("search-email", action["query"]) for action in email_datasets.SEARCH_EMAIL_DATASET_TEST
+        ("compose-email", action["query"]) for action in email_datasets.COMPOSE_EMAIL_DATASET_TEST
     ]
+    # examples += [
+    #     ("search-email", action["query"]) for action in email_datasets.SEARCH_EMAIL_DATASET_TEST
+    # ]
     H = Higgins(intent_resolver=OpenAIIntentResolver())
     print("\nOpenAI intent resolver ------")
     for category, text in examples:
         result = H.parse(text, episode=None)
-        print(text, result.message)
+        print(text, result.reply_text, result.action_text)

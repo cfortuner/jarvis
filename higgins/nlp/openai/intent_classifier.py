@@ -36,6 +36,10 @@ web_nav = [
 send_email = [
     (action["query"], "SendEmail") for action in email_datasets.SEND_EMAIL_DATASET_TRAIN
 ]
+send_email = []
+compose_email = [
+    (action["query"], "ComposeEmail") for action in email_datasets.COMPOSE_EMAIL_DATASET_TRAIN
+]
 search_email = [
     (action["query"], "SearchEmail") for action in email_datasets.SEARCH_EMAIL_DATASET_TRAIN
 ]
@@ -53,13 +57,13 @@ other = [
     ("summarize it", "Other"),
     ("Who is it from", "Other"),
 ]
-EXAMPLES = messaging + web_nav + other + send_email + search_email
+EXAMPLES = messaging + web_nav + other + send_email + search_email + compose_email
 random.Random(4).shuffle(EXAMPLES)
 CATEGORIES = list(set([e[1] for e in EXAMPLES]))
 
 
 def classify_intent_completion(
-    text: str, engine: str = "davinci", cache: Any = None
+    text: str, engine: str = "davinci-instruct-beta", cache: Any = None
 ) -> str:
     prompt = """Classify the following commands into categories:\n"""
     for command, category in EXAMPLES:
@@ -73,7 +77,7 @@ def classify_intent_completion(
             engine=engine,
             prompt=prompt,
             temperature=0,
-            max_tokens=2,
+            max_tokens=3,
             top_p=1.0,
             frequency_penalty=0.0,
             presence_penalty=0.0,
@@ -93,7 +97,7 @@ def classify_intent_completion(
         response = cache[cache_key]["response"]
 
     if answer not in CATEGORIES:
-        print("Answer: {answer} not in supported intent categories.")
+        print(f"Answer: {answer} not in supported intent categories: {CATEGORIES}")
         return "Other"
 
     return answer
@@ -147,8 +151,11 @@ if __name__ == "__main__":
         ("close all applications", "Other"),
         ("which app is using the most CPU?", "Other"),
     ]
+    # examples += [
+    #     (action["query"], "SendEmail") for action in email_datasets.SEND_EMAIL_DATASET_TEST
+    # ]
     examples += [
-        (action["query"], "SendEmail") for action in email_datasets.SEND_EMAIL_DATASET_TEST
+        (action["query"], "ComposeEmail") for action in email_datasets.COMPOSE_EMAIL_DATASET_TEST
     ]
     examples += [
         (action["query"], "SearchEmail") for action in email_datasets.SEARCH_EMAIL_DATASET_TEST
@@ -156,12 +163,12 @@ if __name__ == "__main__":
     print("classify_intent_completion -------------")
     for example, category in examples:
         predicted = classify_intent_completion(example)
-        if predicted != category:
+        if predicted.lower() != category.lower():
             print(f"Cmd: {example}, Predicted: {predicted}, Expected: {category}")
 
     # TODO: This requires the category names are one word (only 1 uppercase letter. e.g. not "SendEmail")
     print("classify_intent_classification -------------")
     for example, category in examples:
         predicted = classify_intent_classification(example)
-        if predicted != category:
+        if predicted.lower() != category.lower():
             print(f"Cmd: {example}, Predicted: {predicted}, Expected: {category}")

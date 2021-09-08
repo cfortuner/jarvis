@@ -1,7 +1,8 @@
-import re
 from tinydb import TinyDB
 
 from higgins.automation import contacts
+from higgins.automation.contacts import Contact
+from higgins.automation.email import email_utils
 
 
 def clarify_contact_info(
@@ -10,19 +11,21 @@ def clarify_contact_info(
     prompt_fn: str = input,
     loop_until_found: bool = True,
     prompt_for_alias: bool = False,
-) -> contacts.Contact:
+) -> Contact:
     possible_alias = None
     contact_info = None
     while contact_info is None:
         # users = contacts.local.find_contact(self.db, name)
         users = contacts.google.find_contact_in_database(db, name)
         if len(users) == 1:
-            contact_info = contacts.Contact(**users[0])
+            contact_info = Contact(**users[0])
         elif len(users) > 1:
             name = prompt_fn(f"Found {len(users)} contacts named {name}. Who do you mean by {name}?")
         elif loop_until_found:
             possible_alias = name
             name = prompt_fn(f"No contacts found for {name}. Who do you mean by {name}?")
+            if email_utils.is_valid_email(name):
+                return Contact(name=possible_alias, email=name)
         else:
             return None
 
@@ -36,10 +39,3 @@ def clarify_contact_info(
             contacts.local.update_contact(db, contact_info)
 
     return contact_info
-
-
-def is_valid_email(email):
-    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    if re.fullmatch(regex, email):
-        return True
-    return False

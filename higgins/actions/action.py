@@ -21,8 +21,8 @@ class ActionResult:
     """
     status: str = "succeeded"  # succeeded, failed
     error: str = None  # exception message
-    action_text: str = None
-    reply_text: str = None
+    action_text: str = None  # Can be a List[str] for multi-line chat
+    reply_text: str = None  # Can be a List[str] for multi-line chat
     data: Dict = None
     reply_handler_classname: str = None
 
@@ -35,7 +35,7 @@ class ActionParamSpec:
     is useful for validation and prompt generation.
     """
     name: str
-    question: str
+    question: str = None
     valid_types: List = None
     required: bool = False
 

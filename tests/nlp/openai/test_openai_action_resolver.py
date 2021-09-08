@@ -71,7 +71,7 @@ def test_query_web_navigation_model(question, expected):
         ),
     ]
 )
-def test_parse_answer_to_actions(answer, expected):
+def testparse_answer_to_actions(answer, expected):
     if expected is None:
         with pytest.raises(Exception) as excinfo:
             print(excinfo)
