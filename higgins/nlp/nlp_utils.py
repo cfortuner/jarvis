@@ -5,7 +5,22 @@ can be identified across a number of utility methods. But this is a good startin
 for methods which don't have an obvious home yet.
 """
 import hashlib
+import os
 import sys
+
+from transformers import GPT2TokenizerFast
+
+
+def get_num_tokens(text: str, tokenizer: GPT2TokenizerFast):
+    """Return number of tokens in string."""
+    return len(tokenizer(text)["input_ids"])
+
+
+def get_tokenizer() -> GPT2TokenizerFast:
+    # https://huggingface.co/transformers/main_classes/tokenizer.html#transformers.PreTrainedTokenizerFast
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+    return tokenizer
 
 
 def normalize_text(text, method="naive"):
@@ -20,7 +35,7 @@ def normalize_text_naive(text):
 
 def compute_levenshtein_distance(s1, s2):
     """Measure difference between 2 strings. 
-    
+
     https://en.wikipedia.org/wiki/Levenshtein_distance.
 
     TODO: Replace with open-source implementation
@@ -63,7 +78,7 @@ def match_text(
 
 def display_live_transcription(transcript, overwrite_chars):
     """Print interim results of live transcription to stdout.
-    
+
     We include a carriage return at the end of the line, so subsequent lines will overwrite
     them. If the previous result was longer than this one, we need to print some extra
     spaces to overwrite the previous result    
@@ -77,3 +92,16 @@ def hash_normalized_text(text, normalize=True):
         text = normalize_text(text)
     text = text.encode("utf-8")
     return hashlib.sha256(text).hexdigest()
+
+
+def trim_tokens(text: str, max_tokens: int, tokenizer: GPT2TokenizerFast = None):
+    if tokenizer is None:
+        tokenizer = get_tokenizer()
+    tokens = tokenizer.tokenize(text)[:max_tokens]
+    return tokenizer.convert_tokens_to_string(tokens)
+
+
+if __name__ == "__main__":
+    string = "Hello Brendan What is going on"
+    tokenizer = get_tokenizer()
+    print(trim_tokens(string, 3, tokenizer))

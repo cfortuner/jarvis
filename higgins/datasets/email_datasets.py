@@ -220,6 +220,23 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             },
         ]
     },
+    {
+        "query": "search for emails from nari.kourian@getcruise.ai",
+        "actions": [
+            {
+                "action": "SearchEmail",
+                "params": {
+                    "to": "???",
+                    "from": "nari.kourian@getcruise.ai",
+                    "subject": "???",
+                    "unread": "???",
+                    "labels": "???",
+                    "exact_phrase": "???",
+                    "newer_than": "???",
+                }
+            },
+        ]
+    },
 ]
 
 SEARCH_EMAIL_DATASET_TEST = [

@@ -1,8 +1,6 @@
 from typing import Dict
 
-from jarvis.actions import ActionResult
-
-from higgins.actions import Action, ActionParamSpec
+from higgins.actions import Action, ActionParamSpec, ActionResult
 
 
 class BrowserAction(Action):
@@ -23,7 +21,7 @@ class OpenWebsite(BrowserAction):
 
     def run(self):
         return ActionResult(
-            data=f"Opening website {self.params['website'].value}"
+            action_text=f"Opening website {self.params['website'].value}"
         )
 
 
@@ -37,7 +35,7 @@ class ClickLink(BrowserAction):
 
     def run(self):
         return ActionResult(
-            data=f"Clicking link '{self.params['link_text'].value}'"
+            action_text=f"Clicking link '{self.params['link_text'].value}'"
         )
 
 
@@ -54,7 +52,7 @@ class SearchOnWebsite(BrowserAction):
         text = self.params['text'].value
         filter = self.params['filter'].value
         return ActionResult(
-            data=f"Searching for '{text}' with filter '{filter}'"
+            action_text=f"Searching for '{text}' with filter '{filter}'"
         )
 
 
@@ -71,7 +69,7 @@ class SignOutOfWebsite(BrowserAction):
             self.params['website'].value = "[CURRENT_URL]"
 
         return ActionResult(
-            data=f"Logging out of {self.params['website'].value}"
+            action_text=f"Logging out of {self.params['website'].value}"
         )
 
 
@@ -91,5 +89,5 @@ class LogInToWebsite(BrowserAction):
         username = self.params['username'].value
         password = "*" * len(self.params['password'].value)
         return ActionResult(
-            data=f"Logging into {self.params['website'].value} with username: {username} and password: {password}"
+            action_text=f"Logging into {self.params['website'].value} with username: {username} and password: {password}"
         )

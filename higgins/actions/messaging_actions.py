@@ -1,8 +1,6 @@
 from typing import Callable, Dict, List
 
-from jarvis.actions import ActionResult
-
-from higgins.actions import Action, ActionParamSpec
+from higgins.actions import Action, ActionParamSpec, ActionResult
 from higgins.actions import contact_actions
 from higgins.database import tiny
 
@@ -49,5 +47,5 @@ class SendMessage(MessagingAction):
         body = self.params["body"].value
         application = self.params["application"].value
         return ActionResult(
-            data=f"Sending message '{body}' to {self.contact_info.name} using {application}",
+            reply_text=f"Sending message '{body}' to {self.contact_info.name} using {application}",
         )

@@ -1,8 +1,11 @@
 from typing import Dict, List
 
-from higgins.nlp.openai import email_completions, completion_utils
-
+from higgins.episode import Episode
 from higgins.intents import IntentParser
+from higgins.nlp.openai import (
+    completion_utils,
+    email_completions
+)
 
 
 class SendEmail(IntentParser):
@@ -11,7 +14,7 @@ class SendEmail(IntentParser):
     def phrases(cls):
         return ["send-email {text}"]
 
-    def parse(cls, text: str) -> List[Dict]:
+    def parse(cls, text: str, episode: Episode = None) -> List[Dict]:
         answer = email_completions.send_email_completion(text)
         actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
@@ -23,10 +26,23 @@ class SearchEmail(IntentParser):
     def phrases(cls):
         return ["search-email {text}"]
 
-    def parse(cls, text: str) -> List[Dict]:
+    def parse(cls, text: str, episode: Episode = None) -> List[Dict]:
         answer = email_completions.search_email_completion(text)
         actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
+
+
+class SearchEmailReplyHandler(IntentParser):
+
+    def parse(cls, text: str, episode: Episode) -> List[Dict]:
+        return [
+            {
+                "action": "AnswerEmailQuestion",
+                "params": {
+                    "data": episode.action_result.data, "question": text
+                }
+            }
+        ]
 
 
 if __name__ == "__main__":

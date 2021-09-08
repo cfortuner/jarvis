@@ -9,11 +9,22 @@ from jarvis.actions import action_utils
 
 @dataclass
 class ActionResult:
-    """Stores the status and error of an executed action."""
+    """Stores the status and error of an executed action.
+
+    Args:
+        status: succeeded or failed
+        error: error message if failed
+        action_text: text about actions Higgins is performing (e.g. "opening browser")
+        reply_text: text to respond to the user (e.g. "I don't understand")
+        data: data returned by Action
+        reply_handler_classname: Name of IntentParser to handle follow-up actions
+    """
     status: str = "succeeded"  # succeeded, failed
     error: str = None  # exception message
-    data: Any = None
-    speak: bool = False
+    action_text: str = None
+    reply_text: str = None
+    data: Dict = None
+    reply_handler_classname: str = None
 
 
 @dataclass

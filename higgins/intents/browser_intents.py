@@ -1,8 +1,8 @@
 from typing import Dict, List
 
-from higgins.nlp.openai import browser_completions, completion_utils
-
+from higgins.episode import Episode
 from higgins.intents import IntentParser
+from higgins.nlp.openai import browser_completions, completion_utils
 
 
 class Website(IntentParser):
@@ -11,7 +11,7 @@ class Website(IntentParser):
     def phrases(cls):
         return ["web-nav {text}"]
 
-    def parse(self, text: str) -> List[Dict]:
+    def parse(self, text: str, episode: Episode = None) -> List[Dict]:
         answer = browser_completions.web_navigation_completion(text)
         actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
@@ -24,7 +24,7 @@ class OpenWebsite(IntentParser):
         return ["open-website {text}"]
 
     @classmethod
-    def parse(cls, text: str) -> List[Dict]:
+    def parse(cls, text: str, episode: Episode = None) -> List[Dict]:
         answer = browser_completions.open_website_completion(text)
         actions = completion_utils.convert_string_to_action_chain(answer)
         return actions
@@ -36,7 +36,7 @@ class SearchOnWebsite(IntentParser):
     def phrases(cls):
         return ["search-website {text}"]
 
-    def parse(self, text: str) -> List[Dict]:
+    def parse(self, text: str, episode: Episode = None) -> List[Dict]:
         raise NotImplementedError
 
 

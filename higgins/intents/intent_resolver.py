@@ -4,6 +4,7 @@ from typing import Dict, Tuple
 from higgins.nlp.openai import intent_classifier
 
 from higgins import const
+from higgins.episode import Episode
 from higgins.intents import IntentParser
 from higgins.utils import class_registry
 
@@ -44,8 +45,11 @@ class OpenAIIntentResolver(IntentResolver):
             class_type=IntentParser
         )
 
-    def resolve(self, text: str) -> Tuple[IntentParser, Dict]:
-        category = intent_classifier.classify_intent_completion(text)
+    def resolve(self, text: str, episode: Episode = None) -> Tuple[IntentParser, Dict]:
+        if episode is not None and episode.action_result is not None and episode.action_result.reply_handler_classname is not None:
+            category = episode.action_result.reply_handler_classname
+        else:
+            category = intent_classifier.classify_intent_completion(text)
         if category == "Other":
             intent_class = None
         else:

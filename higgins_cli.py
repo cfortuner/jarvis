@@ -6,9 +6,10 @@ python higgins_cli.py --help
 python higgins_cli.py text2intent
 """
 
+import html
 import pprint
-import traceback
 import sys
+import traceback
 
 import click
 from prompt_toolkit import print_formatted_text as print
@@ -17,7 +18,8 @@ from prompt_toolkit import HTML
 from jarvis.nlp.text2speech import speak_text
 
 from higgins import const
-from higgins import episode
+from higgins.context import Context
+from higgins.episode import Episode, save_episode
 from higgins.higgins import Higgins
 from higgins.intents.intent_resolver import OpenAIIntentResolver, RegexIntentResolver
 from higgins.utils import prompt_utils
@@ -85,6 +87,8 @@ def text2intent(chat_history_path, speak):
         prompt_func=question_prompt(session, style, chat_history, chat_history_path, speak),
         print_func=print_func(style),
     )
+    context = Context()
+    episode = None
     while True:
         user_text = session.prompt(
             message=HTML(f"<user-prompt>{const.USERNAME}</user-prompt>: ")
@@ -93,28 +97,33 @@ def text2intent(chat_history_path, speak):
             user_text, chat_history, chat_history_path=chat_history_path
         )
         if not user_text or is_prompt_cmd:
+            # NOTE: We clear the episode if the user types blank lines
+            print("clearing episode...")
+            episode = None
             continue
 
         episode_start = len(chat_history)
         prompt_utils.add_text_to_chat_history(chat_history, user_text, const.USERNAME)
         try:
-            action_result = higgins.parse(user_text)
-            agent_text = None
-            if action_result is None:
-                agent_text = "How can I help you?"  # completions.open_ended_chat("\n".join(chat_history[-5:]))
-            elif action_result.data is not None:
-                agent_text = action_result.data
-
+            action_result = higgins.parse(user_text, episode)
+            agent_text = action_result.reply_text if action_result.reply_text is not None else None
             if agent_text:
                 speak_text(text=agent_text, enable=speak)
                 print(
                     HTML(
-                        f"<bot-prompt>{const.AGENT_NAME}</bot-prompt>: <bot-text>{agent_text}</bot-text>"
+                        f"<bot-prompt>{const.AGENT_NAME}</bot-prompt>: <bot-text>{html.escape(agent_text)}</bot-text>"
                     ),
                     style=style,
                 )
                 prompt_utils.add_text_to_chat_history(chat_history, agent_text, const.AGENT_NAME)
-            episode.save_episode(chat_history[episode_start:], db=higgins.db)
+
+            episode = Episode(
+                chat_text=" ".join(chat_history[episode_start:]),
+                context=context,
+                action_result=action_result
+            )
+            save_episode(episode, db=higgins.db)
+            context.add_episode(episode.episode_id)
         except Exception as e:
             print(e)
             traceback.print_exc(file=sys.stdout)

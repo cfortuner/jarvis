@@ -47,7 +47,11 @@ other = [
     ("call Dan and ask him if he's coming to Desolation", "Other"),
     ("order takeout from La Tacos to 102 clipper st.", "Other"),
     ("ok that's about right", "Other"),
-    ("Hello Higgins", "Other")
+    ("Hello Higgins", "Other"),
+    ("what time was it sent?", "Other"),
+    ("what does the subject say?", "Other"),
+    ("summarize it", "Other"),
+    ("Who is it from", "Other"),
 ]
 EXAMPLES = messaging + web_nav + other + send_email + search_email
 random.Random(4).shuffle(EXAMPLES)

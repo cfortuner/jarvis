@@ -1,8 +1,8 @@
 from typing import Dict, List
 
-from higgins.nlp.openai import messaging_completions, completion_utils
-
+from higgins.episode import Episode
 from higgins.intents import IntentParser
+from higgins.nlp.openai import messaging_completions, completion_utils
 
 
 class Messaging(IntentParser):
@@ -11,11 +11,7 @@ class Messaging(IntentParser):
     def phrases(cls):
         return ["send-msg {text}"]
 
-    def parse(cls, text: str) -> List[Dict]:
-        # text: message mom I'm coming home tonight
-        # answer: `SendMessage` PARAMS to=>mom ### body=>I'm coming home tonight ### application=>???
-        # intent: {'action': 'SendMessage', 'params': {'to': 'mom', 'body': "I'm coming home tonight", 'application': '???'}}
-        # TODO: Validate parameters and method names are valid. Perhaps tell GPT about them in the prompt.
+    def parse(cls, text: str, episode: Episode = None) -> List[Dict]:
         answer = messaging_completions.send_message_completion(text)
         actions = completion_utils.convert_string_to_action_chain(answer)
         return actions

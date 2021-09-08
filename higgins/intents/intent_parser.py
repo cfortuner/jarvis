@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+from higgins.episode import Episode
+
 
 class IntentParser:
     """Base class for all IntentParsers.
@@ -23,6 +25,6 @@ class IntentParser:
     def name(self):
         return type(self).__name__
 
-    def parse(self, text: str) -> List[Dict]:
+    def parse(self, text: str, episode: Episode = None) -> List[Dict]:
         """Given text, parse intent, parameters, and sub-actions."""
         raise NotImplementedError("Needs to be implemented by derived class")

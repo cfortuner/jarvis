@@ -18,6 +18,8 @@ from simplegmail import Gmail
 from simplegmail.message import Message
 from simplegmail.query import construct_query
 
+from higgins.automation.email import email_utils
+
 
 def send_email(
     to: str,
@@ -98,7 +100,18 @@ def search_emails(query_dicts: List[Dict]) -> List[Message]:
         query=construct_query(*query_dicts)
     )
     # print(f"Query returned {len(messages)} messages")
-    return messages
+    emails = []
+    for message in messages:
+        emails.append({
+            "to": message.recipient,
+            "from": message.sender,
+            "subject": message.subject,
+            "date": message.date,
+            "preview": message.snippet,
+            "body": email_utils.clean_email_body(message.plain or ""),
+            "id": message.id,
+        })
+    return emails
 
 
 if __name__ == "__main__":
