@@ -141,6 +141,55 @@ def edit_email_completion(
     return answer
 
 
+def build_summarize_email_completion_prompt(
+    email_body: str,
+    examples: Dict[str, Any],
+    task_description: str = None,
+) -> str:
+    prompt = ""
+    if task_description is not None:
+        prompt += f"{task_description}"
+
+    for example in examples:
+        params = example["actions"][0]["params"]
+        prompt += f"\n\nEMAIL\n{params['body']}"
+        prompt += f"\n\nSUMMARY\n{example['summary']} <<END>>"
+
+    prompt += f"\n\nEMAIL\n{email_body}"
+    prompt += "\n\nSUMMARY"
+    return prompt
+
+
+def summarize_email_completion(
+    email_body: str,
+    engine="davinci",
+    cache: Any = None,
+    temperature: float = 0.3,
+    max_tokens: int = 30,
+):
+    prompt = build_summarize_email_completion_prompt(
+        email_body,
+        examples=email_datasets.COMPOSE_EMAIL_DATASET_TRAIN,
+        task_description="Summarize the following emails",
+    )
+    # print(f"Prompt: {prompt}")
+    start = time.time()
+    response = openai.Completion.create(
+        engine=engine,
+        model=None,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        top_p=1.0,
+        frequency_penalty=.1,
+        presence_penalty=.1,
+        stop=["<<END>>"],
+    )
+    # print(f"Time: {time.time() - start:.2f}")
+    answer = response["choices"][0]["text"].strip()
+    return answer
+
+
 def search_email_completion(cmd: str, engine="davinci-instruct-beta", cache: Any = None):
     prompt = completion_utils.build_completion_prompt(
         question=cmd,
@@ -216,8 +265,16 @@ def test_edit_email_completion():
         print(answer)
 
 
+def test_summarize_email_completion():
+    for example in email_datasets.COMPOSE_EMAIL_DATASET_TEST:
+        params = example["actions"][0]["params"]
+        answer = summarize_email_completion(params["body"])
+        print(answer)
+
+
 if __name__ == "__main__":
     # test_send_email_completion()
     # test_search_email_completion()
     # test_compose_email_completion()
-    test_edit_email_completion()
+    # test_edit_email_completion()
+    test_summarize_email_completion()

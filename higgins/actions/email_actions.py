@@ -206,18 +206,27 @@ class AnswerEmailQuestion(EmailAction):
         else:
             assert data is None or isinstance(data, dict), "Must be dict or list or None"
 
-    def _ask_model(self, question: str, data: Dict) -> str:
+    def _trim_tokens(self, text: str):
         # OpenAI doesn't support completions with context > 2049 tokens, which includes the completion tokens (100-300)
         MAX_BODY_TOKENS = 1024  # https://beta.openai.com/tokenizer
-        data = deepcopy(data)
-        data["body"] = data["body"].replace("\n", " ")
+        text = text.replace("\n", " ")
         # print("num tokens", nlp_utils.get_num_tokens(data["body"], self.tokenizer))
-        data["body"] = nlp_utils.trim_tokens(
-            text=data["body"], max_tokens=MAX_BODY_TOKENS, tokenizer=self.tokenizer
+        text = nlp_utils.trim_tokens(
+            text=text, max_tokens=MAX_BODY_TOKENS, tokenizer=self.tokenizer
         )
-        # print("num tokens", nlp_utils.get_num_tokens(data["body"], self.tokenizer))
-        answer = data_question_completions.data_question_completion(question=question, data=data)
+        return text
+
+    def _ask_data_question(self, question: str, data: Dict) -> str:
+        data = deepcopy(data)
+        data["body"] = self._trim_tokens(data["body"])
+        answer = data_question_completions.data_question_completion(
+            question=question, data=data
+        )
         return answer
+
+    def _summarize_email(self, data: Dict) -> str:
+        text = self._trim_tokens(data["body"])
+        return email_completions.summarize_email_completion(email_body=text)
 
     def run(self):
         data = self.params["data"].value
@@ -233,10 +242,9 @@ class AnswerEmailQuestion(EmailAction):
         elif question in ["show email", "display email", "show body", "show text"]:
             answer = email_utils.get_email_preview(data)
         elif "summarize" in question:
-            answer = "I don't support summarize yet"
-
+            answer = self._summarize_email(data)
         else:
-            answer = self._ask_model(question, data)
+            answer = self._ask_data_question(question, data)
 
         return ActionResult(
             reply_text=answer,

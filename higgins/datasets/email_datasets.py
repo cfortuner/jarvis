@@ -391,7 +391,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "I'm coming home for Christmas.",
                 }
             },
-        ]
+        ],
+        "summary": "Coming home for Christmas",
     },
     {
         "query": "Send an email to mission@bodyrok.com. Ask to pause membership starting this Thursday and resume in October. Explain my reason is I'm leaving for an RV trip for 1-2 months.",
@@ -404,7 +405,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "Is it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October. Thanks!",
                 }
             },
-        ]
+        ],
+        "summary": "Asking to pause their Bodyrok membership",
     },
     {
         "query": "Compose email. Ask if he has the tennis tickets and whether he'd like me to pay. If so, how much. Which payment method. I'm looking forward to getting together!",
@@ -417,7 +419,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "Did you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?",
                 }
             },
-        ]
+        ],
+        "summary": "They asked about the tennis tickets and how to pay you.",
     },
     {
         "query": "Email my manager and let her know I've decided to leave Cruise. Flexible on when I leave. It's up to her. I'd like to stick around at least until October 15 when my vest day is.",
@@ -430,7 +433,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
                 }
             },
-        ]
+        ],
+        "summary": "They are planning to leave Cruise on October 15."
     },
     {
         "query": "Email Amazon Customer Service. Ask them when my order will arrive. Order number akjgs-1726-j298.",
@@ -443,7 +447,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "Do you know when my order will arrive. My order number is akjgs-1726-j298.",
                 }
             },
-        ]
+        ],
+        "summary": "Wants to know when their order will arrive."
     },
     {
         "query": "Email David Ling. Hope you're well. Tell him I've accepted the job offer at Cruise. Starting salary: 100k. Is that good?",
@@ -456,7 +461,8 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "Hope you're well. I accepted the Cruise job offer. Is 100k a good base salary?",
                 }
             },
-        ]
+        ],
+        "summary": "They accepted the Cruise job offer and have a question about salary."
     },
     {
         "query": "Email Dad and ask if he's coming over for dinner",
@@ -469,7 +475,22 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
                     "body": "Are you coming over for dinner?",
                 }
             },
-        ]
+        ],
+        "summary": "Asked about dinner plans"
+    },
+    {
+        "query": "Inform Ling her order has shipped and will arrive in 2 days. Order status link: <a href='www.amazon.com/order/12786543765'>here</a>",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "to": "Ling",
+                    "subject": "Order status",
+                    "body": "This message is to inform you that your product has shipped! It will arrive in 2 days. Check your order status <a href='www.amazon.com/order/12786543765'>here</a>.",
+                }
+            },
+        ],
+        "summary": "Your Amazon order will arrive in 2 days."
     },
 ]
 
@@ -485,7 +506,8 @@ COMPOSE_EMAIL_DATASET_TEST = [
                     "body": "I filled out the form. My Fedex tracking number is 175452902. When will I get the refund?",
                 }
             },
-        ]
+        ],
+        "summary": "Asking about the status of their refund."
     },
     {
         "query": "Compose an email to Colin and let him know I'm coming to Alaska. I've thought it over and decided it seems fun. Tell him I'll start looking for flights. And ask when he's flying out.",
@@ -498,7 +520,8 @@ COMPOSE_EMAIL_DATASET_TEST = [
                     "body": "I wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights now. Could you let me know when your flight is?",
                 }
             },
-        ]
+        ],
+        "summary": "They're coming to Alaska and asked about your flight schedule."
     },
 ]
 
