@@ -15,7 +15,7 @@ DATA_QUESTION_DATASET_TRAIN = [
         ]
     },
     {
-        "data": {"name": "liam.fortuner@gmail.com", "time": "January 15, 2020", "subject": "Used Car", "body": "I'm interested in buying the car you posted on craigslist. You can reach me at 860-459-8424"},
+        "data": {"name": "liam.fortuner@gmail.com", "time": "January 15, 2020", "subject": "Used Car", "plain": "I'm interested in buying the car you posted on craigslist. You can reach me at 860-459-8424"},
         "questions": [
             ("When was the message sent?", "January 15, 2020"),
             ("Who's it from?", "liam.fortuner@gmail.com"),
@@ -27,7 +27,7 @@ DATA_QUESTION_DATASET_TRAIN = [
         ],
     },
     {
-        "data": {"name": "Colin", "time": "March 1, 2020", "subject": "What's up bro", "body": "Just wanted to see how you're doing"},
+        "data": {"name": "Colin", "time": "March 1, 2020", "subject": "What's up bro", "plain": "Just wanted to see how you're doing"},
         "questions": [
             ("When did he send the message?", "March 1, 2020"),
             ("Who sent it?", "Colin"),
@@ -40,7 +40,7 @@ DATA_QUESTION_DATASET_TRAIN = [
 
 DATA_QUESTION_DATASET_TEST = [
     {
-        "data": {"name": "Bill Fortuner", "time": "February 20, 2021", "subject": "Tennis tickets for Switzerland", "body": "Hey Brendan, Would you like to come to the tennis match in April? If so, can you send me $200 for the tickets? Love, Dad"},
+        "data": {"name": "Bill Fortuner", "time": "February 20, 2021", "subject": "Tennis tickets for Switzerland", "plain": "Hey Brendan, Would you like to come to the tennis match in April? If so, can you send me $200 for the tickets? Love, Dad"},
         "questions": [
             ("Who sent the message?", "Bill Fortuner"),
             ("When did it arrive?", "February 20, 2021"),
@@ -50,7 +50,7 @@ DATA_QUESTION_DATASET_TEST = [
         ]
     },
     # {
-    #     "data": {"name": "Bill Fortuner", "time": "February 20, 2021", "subject": "Tennis tickets for Switzerland", "body": "Hey Brendan, Would you like to come to the tennis match in April? If so, can you send me $200 for the tickets? Love, Dad"},
+    #     "data": {"name": "Bill Fortuner", "time": "February 20, 2021", "subject": "Tennis tickets for Switzerland", "plain": "Hey Brendan, Would you like to come to the tennis match in April? If so, can you send me $200 for the tickets? Love, Dad"},
     #     "questions": [
     #         ("Who sent the message?", "Bill Fortuner"),
     #         ("When did it arrive?", "February 20, 2021"),

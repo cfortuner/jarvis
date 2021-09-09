@@ -5,7 +5,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "mom",
+                    "recipient": "mom",
                     "body": "I love her",
                     "application": "???"
                 }
@@ -18,7 +18,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "steve",
+                    "recipient": "steve",
                     "body": "Are you coming to the meeting?",
                     "application": "???"
                 }
@@ -31,7 +31,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Jackie",
+                    "recipient": "Jackie",
                     "body": "I'll be home by 10pm",
                     "application": "???"
                 }
@@ -44,7 +44,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Colin",
+                    "recipient": "Colin",
                     "body": "Are you free for tennis tomorrow?",
                     "application": "Facebook Messenger"
                 }
@@ -57,7 +57,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "???",
+                    "recipient": "???",
                     "body": "Do you want to hang out tonight?",
                     "application": "???"
                 }
@@ -70,7 +70,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Sam Fortuner",
+                    "recipient": "Sam Fortuner",
                     "body": "???",
                     "application": "WhatsApp"
                 }
@@ -83,7 +83,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Sean Bean",
+                    "recipient": "Sean Bean",
                     "body": "I'm running late to the meeting",
                     "application": "Slack"
                 }
@@ -96,7 +96,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Hari",
+                    "recipient": "Hari",
                     "body": "I pushed my latest changes to the repo",
                     "application": "???"
                 }
@@ -109,7 +109,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "Dad",
+                    "recipient": "Dad",
                     "body": "I'll see you next month",
                     "application": "???"
                 }
@@ -122,7 +122,7 @@ SEND_MESSAGE_DATASET_TRAIN = [
             {
                 "action": "SendMessage",
                 "params": {
-                    "to": "???",
+                    "recipient": "???",
                     "body": "Sounds fun!",
                     "application": "???"
                 }
@@ -134,27 +134,27 @@ SEND_MESSAGE_DATASET_TRAIN = [
 SEND_MESSAGE_DATASET_TEST = [
     {
         "query": "message Liam Briggs and see if he wants to get together",
-        "actions": [{'action': 'SendMessage', 'params': {'to': 'Liam Briggs', 'body': 'Do you want to get together?', 'application': '???'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': 'Liam Briggs', 'body': 'Do you want to get together?', 'application': '???'}}]
     },
     {
         "query": "whatsapp Kabir how are you doing?",
-        "actions": [{'action': 'SendMessage', 'params': {'to': 'Kabir', 'body': 'How are you doing?', 'application': 'WhatsApp'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': 'Kabir', 'body': 'How are you doing?', 'application': 'WhatsApp'}}]
     },
     {
         "query": "Can you ping Joe Boring and say thanks",
-        "actions": [{'action': 'SendMessage', 'params': {'to': 'Joe Boring', 'body': 'Thanks', 'application': '???'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': 'Joe Boring', 'body': 'Thanks', 'application': '???'}}]
     },
     {
         "query": "msg Stew on Slack are you coming to Burning man?",
-        "actions": [{'action': 'SendMessage', 'params': {'to': 'Stew', 'body': 'Are you coming to Burning Man?', 'application': 'Slack'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': 'Stew', 'body': 'Are you coming to Burning Man?', 'application': 'Slack'}}]
     },
     {
         "query": "text Colin on iMessage and see if he's still going to the store",
-        "actions": [{'action': 'SendMessage', 'params': {'to': 'Colin', 'body': 'Are you still going to the store?', 'application': 'iMessage'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': 'Colin', 'body': 'Are you still going to the store?', 'application': 'iMessage'}}]
     },
     {
         "query": "This is something isn't it",
-        "actions": [{'action': 'SendMessage', 'params': {'to': '???', 'body': "This is something isn't it", 'application': '???'}}]
+        "actions": [{'action': 'SendMessage', 'params': {'recipient': '???', 'body': "This is something isn't it", 'application': '???'}}]
     },
 ]
 

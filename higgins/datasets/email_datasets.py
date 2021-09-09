@@ -5,9 +5,9 @@ SEND_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "mom",
+                    "recipient": "mom",
                     "subject": "Christmas plans",
-                    "body": "I'm coming home for Christmas",
+                    "plain": "I'm coming home for Christmas",
                 }
             },
         ]
@@ -18,9 +18,9 @@ SEND_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "Brian jennings",
+                    "recipient": "Brian jennings",
                     "subject": "Apartment visit",
-                    "body": "Can I tour the apartment tomorrow?",
+                    "plain": "Can I tour the apartment tomorrow?",
                 }
             },
         ]
@@ -31,9 +31,9 @@ SEND_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "support@mattressfirm.com",
+                    "recipient": "support@mattressfirm.com",
                     "subject": "Return Order",
-                    "body": "I would like to schedule a return and receive a full refund",
+                    "plain": "I would like to schedule a return and receive a full refund",
                 }
             },
         ]
@@ -44,9 +44,9 @@ SEND_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "Sally",
+                    "recipient": "Sally",
                     "subject": "Raincheck meeting",
-                    "body": "Can we push our meeting to tomorrow at 9am?",
+                    "plain": "Can we push our meeting to tomorrow at 9am?",
                 }
             },
         ]
@@ -57,9 +57,9 @@ SEND_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "support@netflix.com",
+                    "recipient": "support@netflix.com",
                     "subject": "Cancel membership",
-                    "body": "Can you cancel my membership?",
+                    "plain": "Can you cancel my membership?",
                 }
             },
         ]
@@ -73,9 +73,9 @@ SEND_EMAIL_DATASET_TEST = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "Dad",
+                    "recipient": "Dad",
                     "subject": "Tennis rackets",
-                    "body": "Have my tennis rackets arrived?",
+                    "plain": "Have my tennis rackets arrived?",
                 }
             },
         ]
@@ -86,9 +86,9 @@ SEND_EMAIL_DATASET_TEST = [
             {
                 "action": "SendEmail",
                 "params": {
-                    "to": "mission@bodyrok.edu",
+                    "recipient": "mission@bodyrok.edu",
                     "subject": "Cancel membership",
-                    "body": "Can you cancel my membership?",
+                    "plain": "Can you cancel my membership?",
                 }
             },
         ]
@@ -102,8 +102,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "True",
                     "labels": "finance AND Betterment",
@@ -124,8 +124,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "Hello Brendan",
                     "unread": "???",
                     "labels": "???",
@@ -141,8 +141,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "Dad",
+                    "recipient": "???",
+                    "sender": "Dad",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -158,8 +158,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "Erin Fortuner",
+                    "recipient": "???",
+                    "sender": "Erin Fortuner",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -175,8 +175,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
     #         {
     #             "action": "SearchEmail",
     #             "params": {
-    #                 "to": "cfortuner@gmail.com",
-    #                 "from": "???",
+    #                 "recipient": "cfortuner@gmail.com",
+    #                 "sender": "???",
     #                 "subject": "???",
     #                 "unread": "???",
     #                 "labels": "???",
@@ -192,8 +192,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "True",
                     "labels": "???",
@@ -209,8 +209,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -226,8 +226,8 @@ SEARCH_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "nari.kourian@getcruise.ai",
+                    "recipient": "???",
+                    "sender": "nari.kourian@getcruise.ai",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -246,8 +246,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "Jackie First",
+                    "recipient": "???",
+                    "sender": "Jackie First",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -263,8 +263,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "York Mather",
+                    "recipient": "???",
+                    "sender": "York Mather",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -280,8 +280,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "My first email",
                     "unread": "???",
                     "labels": "???",
@@ -297,8 +297,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "Colin",
+                    "recipient": "???",
+                    "sender": "Colin",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -314,8 +314,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "True",
                     "labels": "???",
@@ -331,8 +331,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "True",
                     "labels": "tennis OR Federer",
@@ -348,8 +348,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "???",
+                    "recipient": "???",
+                    "sender": "???",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -365,8 +365,8 @@ SEARCH_EMAIL_DATASET_TEST = [
             {
                 "action": "SearchEmail",
                 "params": {
-                    "to": "???",
-                    "from": "Yoon Manivanh",
+                    "recipient": "???",
+                    "sender": "Yoon Manivanh",
                     "subject": "???",
                     "unread": "???",
                     "labels": "???",
@@ -378,7 +378,8 @@ SEARCH_EMAIL_DATASET_TEST = [
     },
 ]
 
-# Prompt: https://beta.openai.com/playground/p/MOuS7ocSyR4KEhjtlGb6rbMq?model=davinci-instruct-beta
+# Compose prompt: https://beta.openai.com/playground/p/MOuS7ocSyR4KEhjtlGb6rbMq?model=davinci-instruct-beta
+# Summarize prompt: https://beta.openai.com/playground/p/jMjBhqKd9DOvbB6u71ydNRIn?model=davinci
 COMPOSE_EMAIL_DATASET_TRAIN = [
     {
         "query": "Send email to mom and let her know I'm coming home for Christmas",
@@ -386,9 +387,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "mom",
+                    "recipient": "mom",
                     "subject": "Christmas plans",
-                    "body": "I'm coming home for Christmas.",
+                    "plain": "I'm coming home for Christmas.",
                 }
             },
         ],
@@ -400,9 +401,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "mission@bodyrok.com",
+                    "recipient": "mission@bodyrok.com",
                     "subject": "Pause membership",
-                    "body": "Is it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October. Thanks!",
+                    "plain": "Is it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October. Thanks!",
                 }
             },
         ],
@@ -414,9 +415,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "???",
+                    "recipient": "???",
                     "subject": "Tennis tickets",
-                    "body": "Did you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?",
+                    "plain": "Did you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?",
                 }
             },
         ],
@@ -428,9 +429,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "my manager",
+                    "recipient": "my manager",
                     "subject": "Leaving Cruise",
-                    "body": "I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
+                    "plain": "I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
                 }
             },
         ],
@@ -442,9 +443,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "Amazon Customer Service",
+                    "recipient": "Amazon Customer Service",
                     "subject": "Delivery estimate",
-                    "body": "Do you know when my order will arrive. My order number is akjgs-1726-j298.",
+                    "plain": "Do you know when my order will arrive. My order number is akjgs-1726-j298.",
                 }
             },
         ],
@@ -456,9 +457,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "David Ling",
+                    "recipient": "David Ling",
                     "subject": "Accepted Cruise Job Offer",
-                    "body": "Hope you're well. I accepted the Cruise job offer. Is 100k a good base salary?",
+                    "plain": "Hope you're well. I accepted the Cruise job offer. Is 100k a good base salary?",
                 }
             },
         ],
@@ -470,9 +471,9 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "Dad",
+                    "recipient": "Dad",
                     "subject": "Dinner?",
-                    "body": "Are you coming over for dinner?",
+                    "plain": "Are you coming over for dinner?",
                 }
             },
         ],
@@ -484,13 +485,41 @@ COMPOSE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "Ling",
+                    "recipient": "Ling",
                     "subject": "Order status",
-                    "body": "This message is to inform you that your product has shipped! It will arrive in 2 days. Check your order status <a href='www.amazon.com/order/12786543765'>here</a>.",
+                    "plain": "This message is to inform you that your product has shipped! It will arrive in 2 days. Check your order status <a href='www.amazon.com/order/12786543765'>here</a>.",
                 }
             },
         ],
         "summary": "Your Amazon order will arrive in 2 days."
+    },
+    # {
+    #     "query": "Cancel membership support at netflix.com",
+    #     "actions": [
+    #         {
+    #             "action": "SendEmail",
+    #             "params": {
+    #                 "recipient": "support@netflix.com",
+    #                 "subject": "Cancel membership",
+    #                 "plain": "Can you cancel my membership?",
+    #             }
+    #         },
+    #     ],
+    #     "summary": "Asks to cancel netflix membership"
+    # },
+    {
+        "query": "email Sally can we push our meeting to tomorrow at 9am?",
+        "actions": [
+            {
+                "action": "ComposeEmail",
+                "params": {
+                    "recipient": "Sally",
+                    "subject": "Raincheck meeting",
+                    "plain": "Can we push our meeting to tomorrow at 9am?",
+                }
+            },
+        ],
+        "summary": "Wants to push the meeting to 9am tomorrow"
     },
 ]
 
@@ -501,9 +530,9 @@ COMPOSE_EMAIL_DATASET_TEST = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "Lumen Support",
+                    "recipient": "Lumen Support",
                     "subject": "Refund",
-                    "body": "I filled out the form. My Fedex tracking number is 175452902. When will I get the refund?",
+                    "plain": "I filled out the form. My Fedex tracking number is 175452902. When will I get the refund?",
                 }
             },
         ],
@@ -515,9 +544,9 @@ COMPOSE_EMAIL_DATASET_TEST = [
             {
                 "action": "ComposeEmail",
                 "params": {
-                    "to": "Colin",
+                    "recipient": "Colin",
                     "subject": "Alaska trip",
-                    "body": "I wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights now. Could you let me know when your flight is?",
+                    "plain": "I wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights now. Could you let me know when your flight is?",
                 }
             },
         ],
@@ -532,7 +561,7 @@ EDIT_EMAIL_DATASET_TRAIN = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "mission@bodyrok.com",
+                    "recipient": "mission@bodyrok.com",
                     "subject": "Pause membership",
                     "user_text": "Send an email to mission@bodyrok.com. Ask to pause membership starting this Thursday and resume in October. Explain my reason is I'm leaving for an RV trip for 1-2 months.",
                     "first_draft": "Hello Bodyrok Mission,\nIs it possible to pause my membership starting Thursday? And resume the membership in October. I'm leaving for an RV trip for 1-2 months and won't be back until October.\nBrendan",
@@ -547,7 +576,7 @@ EDIT_EMAIL_DATASET_TRAIN = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "Colin Fortuner",
+                    "recipient": "Colin Fortuner",
                     "subject": "Alaska trip",
                     "user_text": "Send an email to Colin and let him know I'm coming to Alaska. I've thought it over and decided it seems fun. Tell him I'll start looking for flights. And ask when he's flying out.",
                     "first_draft": "Hi Colin Fortuner,\nI wanted to let you know I've decided to come to Alaska! It seems fun. I'll start looking for flights know. Could you let me know when your flight is?",
@@ -562,7 +591,7 @@ EDIT_EMAIL_DATASET_TRAIN = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "Amazon Customer Service",
+                    "recipient": "Amazon Customer Service",
                     "subject": "Delivery estimate",
                     "user_text": "Email Amazon Customer Service. Ask them when my order will arrive. Order number akjgs-1726-j298.",
                     "first_draft": "Do you know when my order will arrive?",
@@ -577,7 +606,7 @@ EDIT_EMAIL_DATASET_TRAIN = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "Ling",
+                    "recipient": "Ling",
                     "subject": "Leaving Cruise",
                     "user_text": "Email my manager Ling and let her know I've decided to leave Cruise. Flexible on when I leave. It's up to her. I'd like to stick around at least until October 15 when my vest day is.",
                     "first_draft": "Hi Ling, I've decided to leave Cruise. I'm flexible on when I leave. It's up to you. I would like to stick around until October 15 when my vest day is.",
@@ -595,7 +624,7 @@ EDIT_EMAIL_DATASET_TEST = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "Lumen Support",
+                    "recipient": "Lumen Support",
                     "subject": "Refund",
                     "user_text": "Reply to Lumen Support and paste my fedex tracking number 175452902. Let them know I filled out the form. Ask when I'll get the refund.",
                     "first_draft": "Hi Lumen Support,\nI filled out the form. When will I get the refund?\nStew",
@@ -610,7 +639,7 @@ EDIT_EMAIL_DATASET_TEST = [
             {
                 "action": "EditEmail",
                 "params": {
-                    "to": "Bill Fortuner",
+                    "recipient": "Bill Fortuner",
                     "subject": "Tennis tickets payment",
                     "user_text": "Email Bill Fortuner. Ask if he has the tennis tickets and whether he'd like me to pay. If so, how much. Which payment method. I'm looking forward to getting together!",
                     "first_draft": "Hey Bill,\nDid you get the tennis tickets? Let me know if you want me to pay! If you do, let me know how much and how I can pay you. Venmo?\nJackie First",

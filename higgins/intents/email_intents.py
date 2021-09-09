@@ -52,10 +52,10 @@ class ComposeEmailReplyHandler(IntentParser):
                 {
                     "action": "EditEmail",
                     "params": {
-                        "to": episode.action_result.data["to"],
+                        "recipient": episode.action_result.data["recipient"],
                         "subject": episode.action_result.data["subject"],
                         "user_text": episode.action_result.data["user_text"],
-                        "first_draft": episode.action_result.data["body"],
+                        "first_draft": episode.action_result.data["plain"],
                         "feedback": "???",
                     }
                 }

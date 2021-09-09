@@ -27,14 +27,14 @@ class SendMessage(MessagingAction):
     @classmethod
     def param_specs(cls):
         return {
-            "to": ActionParamSpec(name="to", question="Who would you like to message?", required=True),
+            "recipient": ActionParamSpec(name="recipient", question="Who would you like to message?", required=True),
             "body": ActionParamSpec(name="body", question="What would you like to say?", required=True),
             "application": ActionParamSpec(name="application", question="Which application should we use to send?", required=True),
         }
 
     def clarify(self, prompt_fn: Callable) -> List[str]:
         super().clarify(prompt_fn)
-        name = self.params["to"].value.strip()
+        name = self.params["recipient"].value.strip()
         self.contact_info = contact_actions.clarify_contact_info(
             name=name,
             db=self.db,

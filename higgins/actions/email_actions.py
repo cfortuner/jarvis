@@ -37,24 +37,24 @@ class SendEmail(EmailAction):
     @classmethod
     def param_specs(cls):
         return {
-            "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "recipient": ActionParamSpec(name="recipient", question="Who would you like to email?", required=True),
             "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
-            "body": ActionParamSpec(name="body", question="What should the email body contain?", required=True),
+            "plain": ActionParamSpec(name="plain", question="What should the email body contain?", required=True),
         }
 
     def clarify(self, prompt_fn: Callable) -> List[str]:
-        name = self.params["to"].value.strip()
+        name = self.params["recipient"].value.strip()
         if not email_utils.is_valid_email(name):
             contact_info = contact_actions.clarify_contact_info(
                 name=name, db=self.db, prompt_fn=prompt_fn
             )
-            self.params["to"].value = contact_info.email
+            self.params["recipient"].value = contact_info.email
         super().clarify(prompt_fn)
 
     def run(self):
-        body = self.params["body"].value
+        body = self.params["plain"].value
         return ActionResult(
-            action_text=f"Emailing message '{body}' to {self.params['to'].value}"
+            action_text=f"Emailing message '{body}' to {self.params['recipient'].value}"
         )
 
 
@@ -67,19 +67,19 @@ class ComposeEmail(EmailAction):
     @classmethod
     def param_specs(cls):
         return {
-            "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "recipient": ActionParamSpec(name="recipient", question="Who would you like to email?", required=True),
             "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
-            "body": ActionParamSpec(name="body", question="What should the email body contain?", required=True),
+            "plain": ActionParamSpec(name="plain", question="What should the email body contain?", required=True),
             "user_text": ActionParamSpec(name="user_text", question=""),
         }
 
     def clarify(self, prompt_fn: Callable) -> List[str]:
-        name = self.params["to"].value.strip()
+        name = self.params["recipient"].value.strip()
         if not email_utils.is_valid_email(name):
             contact_info = contact_actions.clarify_contact_info(
                 name=name, db=self.db, prompt_fn=prompt_fn
             )
-            self.params["to"].value = contact_info.email
+            self.params["recipient"].value = contact_info.email
 
     def run(self):
         email = {k: p.value for k, p in self.params.items()}
@@ -99,9 +99,9 @@ class EditEmail(EmailAction):
     @classmethod
     def param_specs(cls):
         return {
-            "to": ActionParamSpec(name="to", question="Who would you like to email?", required=True),
+            "recipient": ActionParamSpec(name="recipient", question="Who would you like to email?", required=True),
             "subject": ActionParamSpec(name="subject", question="What is the subject?", required=True),
-            "user_text": ActionParamSpec(name="body", question="What was the user's original request?", required=True),
+            "user_text": ActionParamSpec(name="plain", question="What was the user's original request?", required=True),
             "first_draft": ActionParamSpec(name="data", question="What was the first draft?", required=True),
             "feedback": ActionParamSpec(name="data", question="What would you like to change?", required=True),
         }
@@ -116,9 +116,9 @@ class EditEmail(EmailAction):
             feedback=self.params["feedback"].value,
         )
         data = {
-            "to": self.params["to"].value,
+            "recipient": self.params["recipient"].value,
             "subject": self.params["subject"].value,
-            "body": answer,
+            "plain": answer,
             "user_text": self.params["user_text"].value,
         }
         return ActionResult(
@@ -133,8 +133,8 @@ class SearchEmail(EmailAction):
     @classmethod
     def param_specs(cls):
         return {
-            "to": ActionParamSpec(name="to", question=""),
-            "from": ActionParamSpec(name="from", question=""),
+            "recipient": ActionParamSpec(name="recipient", question=""),
+            "sender": ActionParamSpec(name="sender", question=""),
             "subject": ActionParamSpec(name="subject", question=""),
             "unread": ActionParamSpec(name="unread", question=""),
             "labels": ActionParamSpec(name="labels", question=""),
@@ -144,21 +144,21 @@ class SearchEmail(EmailAction):
 
     def clarify(self, prompt_fn: Callable) -> List[str]:
         super().clarify(prompt_fn)
-        recipient = self.params["to"].value
+        recipient = self.params["recipient"].value
         if recipient and not email_utils.is_valid_email(recipient):
             recipient_info = contact_actions.clarify_contact_info(
                 name=recipient, db=self.db, prompt_fn=prompt_fn, loop_until_found=False,
             )
             if recipient_info is not None:
-                self.params["to"].value = recipient_info.email
+                self.params["recipient"].value = recipient_info.email
 
-        sender = self.params["from"].value
+        sender = self.params["sender"].value
         if sender and not email_utils.is_valid_email(sender):
             sender_info = contact_actions.clarify_contact_info(
                 name=sender, db=self.db, prompt_fn=prompt_fn, loop_until_found=False,
             )
             if sender_info is not None:
-                self.params["from"].value = sender_info.email
+                self.params["sender"].value = sender_info.email
 
     def run(self):
         query = action_params_to_query(self.params)
@@ -210,7 +210,7 @@ class AnswerEmailQuestion(EmailAction):
         # OpenAI doesn't support completions with context > 2049 tokens, which includes the completion tokens (100-300)
         MAX_BODY_TOKENS = 1024  # https://beta.openai.com/tokenizer
         text = text.replace("\n", " ")
-        # print("num tokens", nlp_utils.get_num_tokens(data["body"], self.tokenizer))
+        # print("num tokens", nlp_utils.get_num_tokens(data["plain"], self.tokenizer))
         text = nlp_utils.trim_tokens(
             text=text, max_tokens=MAX_BODY_TOKENS, tokenizer=self.tokenizer
         )
@@ -218,14 +218,14 @@ class AnswerEmailQuestion(EmailAction):
 
     def _ask_data_question(self, question: str, data: Dict) -> str:
         data = deepcopy(data)
-        data["body"] = self._trim_tokens(data["body"])
+        data["plain"] = self._trim_tokens(data["plain"])
         answer = data_question_completions.data_question_completion(
             question=question, data=data
         )
         return answer
 
     def _summarize_email(self, data: Dict) -> str:
-        text = self._trim_tokens(data["body"])
+        text = self._trim_tokens(data["plain"])
         return email_completions.summarize_email_completion(email_body=text)
 
     def run(self):
@@ -234,7 +234,7 @@ class AnswerEmailQuestion(EmailAction):
         if not data:  # None or empty list:
             return ActionResult(status="failed", reply_text="No emails matched your search.")
 
-        stats = email_utils.get_body_stats(data["body"])
+        stats = email_utils.get_body_stats(data["plain"])
         # print(f"Email stats: {stats}")
 
         if "preview" in question or "snippet" in question:
@@ -255,23 +255,13 @@ class AnswerEmailQuestion(EmailAction):
 
 def action_params_to_query(params: Dict[str, ActionParam]) -> List[Dict]:
     query = {}
-    if params["to"].value is not None:
-        query["recipient"] = params["to"].value
-    if params["from"].value is not None:
-        query["sender"] = params["from"].value
+    if params["recipient"].value is not None:
+        query["recipient"] = params["recipient"].value
+    if params["sender"].value is not None:
+        query["sender"] = params["sender"].value
     if params["newer_than"].value is not None:
-        num, unit = params["newer_than"].value.split()
-        # TODO: Replace these handlers with more training data for GPT
-        if unit[-1] == "s":
-            unit = unit[:-1]
-        if unit == "week":
-            query["newer_than"] = (int(num)*7, "day")
-        elif unit == "hour":
-            query["after"] = int(time.time()) - int(num) * 3600
-        elif unit not in ["day", "month", "year"]:
-            raise Exception(f"`newer_than` unit '{unit}' not supported.")
-        else:
-            query["newer_than"] = (int(num), unit)
+        field_name, field_value = email_utils.format_newer_than_param(params["newer_than"].value)
+        query[field_name] = field_value
     if params["unread"].value is not None:
         query["unread"] = True
     if params["subject"].value is not None:

@@ -1,9 +1,6 @@
 """CLI for testing the Higgins APIs.
 
-Examples
---------
 python higgins_cli.py --help
-python higgins_cli.py text2intent
 """
 
 import html
@@ -17,6 +14,8 @@ from prompt_toolkit import HTML
 
 from jarvis.nlp.text2speech import speak_text
 
+from higgins.automation.email import email_utils
+from higgins.automation.google import gmail
 from higgins import const
 from higgins.context import Context
 from higgins.episode import Episode, save_episode
@@ -37,8 +36,81 @@ def cli(debug):
         click.echo(f"Debug mode is on!")
 
 
-def question_prompt(session, style, chat_history, chat_history_path, speak):
+@cli.command()
+@click.option("--sender", type=str, help="Sender name or email address")
+@click.option("--recipient", type=str, help="Recipient name or email address")
+@click.option("--subject", type=str, help="Subject of the email")
+@click.option("--exact_phrase", type=str, help="Exact phrase found in email body")  # @click.option("--labels")
+@click.option(
+    '--newer-than',
+    type=click.Tuple([int, str]),
+    default=(1, "day"),
+    help="Tuple of number,[day|month|year,week,hour] representing how far back in time to start search"
+)
+@click.option('--unread', is_flag=True, default=False, help="Search unread emails only")
+@click.option('--save', is_flag=True, default=False, help="Search unread emails only")
+@click.option('--categories', help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear")
+@click.option("--email-dir", type=str, default="data/emails", help="Directory where saved emails are stored")
+@click.option('--show-body', is_flag=True, help="Display body of email")
+def search_email(**kwargs):
+    """Search email inbox using Gmail API.
 
+    Searches
+    --sender colin@gather.town
+    --sender brendan@jny.io
+    --sender bob@semi.email --newer-than 10 day
+    --sender brendan.fortuner@getcruise.com --newer-than 2 day
+    --unread --newer-than 2 hour
+    --phrase Bitcoin
+
+    TODO: Support searching local database of emails.
+    """
+    exclude_keys = ["save", "email_dir", "categories", "show_body"]
+    query = {}
+
+    for key, value in kwargs.items():
+        if value is not None and key not in exclude_keys:
+            query[key] = value
+
+    emails = gmail.search_emails(query_dicts=[query], limit=50)
+    print(f"Found {len(emails)} emails.")
+    if len(emails) > 0:
+        print(email_utils.get_email_preview(emails[0], show_body=kwargs.get("show_body", False)))
+
+    for email in emails:
+        if kwargs["save"]:
+            model_labels = {}
+            if kwargs["categories"] is not None:
+                model_labels["categories"] = kwargs["categories"].split(",")
+            email_id = email_utils.save_email(email, dataset_dir=kwargs["email_dir"], labels=model_labels)
+            email = email_utils.load_email(email_id, dataset_dir=kwargs["email_dir"])
+            print(email_utils.get_email_preview(email, show_body=kwargs.get("show_body", False)))
+
+
+@cli.command()
+@click.option("--email-id", help="Higgins email id, used for fetching local copy")
+@click.option("--google-id", help="Gmail email id, used for fetching from Gmail API")
+@click.option('--categories', help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear")
+@click.option('--save', is_flag=True, help="Search unread emails only")
+@click.option('--show-body', is_flag=True, help="Display body of email")
+def get_email(email_id, google_id, categories, save, show_body):
+    """Fetch email by id from Gmail API."""
+    if google_id:
+        email = gmail.get_email(google_id)
+    elif email_id:
+        email = email_utils.load_email(email_id)
+    else:
+        raise Exception("must provide either email-id or google-id")
+
+    if save:
+        model_labels = {"categories": categories.split(",") if categories else None}
+        email_id = email_utils.save_email(email, labels=model_labels)
+        email = email_utils.load_email(email_id)
+
+    print(email_utils.get_email_preview(email, show_body=show_body))
+
+
+def question_prompt(session, style, chat_history, chat_history_path, speak):
     def prompt_func(question):
         nonlocal chat_history, chat_history_path
         print(

@@ -152,7 +152,7 @@ def build_summarize_email_completion_prompt(
 
     for example in examples:
         params = example["actions"][0]["params"]
-        prompt += f"\n\nEMAIL\n{params['body']}"
+        prompt += f"\n\nEMAIL\n{params['plain']}"
         prompt += f"\n\nSUMMARY\n{example['summary']} <<END>>"
 
     prompt += f"\n\nEMAIL\n{email_body}"
@@ -268,7 +268,7 @@ def test_edit_email_completion():
 def test_summarize_email_completion():
     for example in email_datasets.COMPOSE_EMAIL_DATASET_TEST:
         params = example["actions"][0]["params"]
-        answer = summarize_email_completion(params["body"])
+        answer = summarize_email_completion(params["plain"])
         print(answer)
 
 

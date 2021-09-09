@@ -8,7 +8,7 @@ SUMMARIZE_EMAIL_DATASET_TRAIN = [
             {
                 "action": "SummarizeEmail",
                 "params": {
-                    "body": "",
+                    "plain": "",
                 }
             },
         ],

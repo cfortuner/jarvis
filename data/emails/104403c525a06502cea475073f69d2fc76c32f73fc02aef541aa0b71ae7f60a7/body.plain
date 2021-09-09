@@ -1,0 +1,56 @@
+---------- Forwarded message ---------
+From: Slack <notification@slack.com>
+Date: Tue, Sep 7, 2021 at 5:26 PM
+Subject: [Slack] Notifications from the Gather workspace for September 7th,
+2021
+To: <colin@gather.town>
+
+
+*You have new messages in Gather* (gather-town.slack.com)
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/>
+From a thread in #engine
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/archives/C01LWEJLT3Q/p1631060064398700>
+
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/messages/C01LWEJLT3Q/team/U01H1PE6K54>
+Evelyn King
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/messages/C01LWEJLT3Q/team/U01H1PE6K54>
+  September 7th at 5:14 PM
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/archives/C01LWEJLT3Q/p1631060064398700>
+I have been personally concerned about the fact that we send these
+excessive init events, but would the effect of this basically be that the
+events are still sent to GGC, and GGC just doesn't forward anything to
+subscribers until it has a complete player, and then it sends a playerJoins
+event, which is a sort of synthetic event?
+Open in Slack
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/archives/C01LWEJLT3Q/p1631060064398700>
+Reply
+<Slack+%3Ceb-T017NA5LEV9-U0248LWVALA-zgurcjvus7i5ne6anxyx5arz7e@slack-mail.com%3E?subject=Reply+to+thread+in+#engine>
+*Manage your notifications*
+Snooze them for an hour
+<https://gather-town.slack.com/unsub/U0248LWVALA-16a8caf6843d6d65c68f49038650e0ef238b674e976bc9c585e23dbf47b468a3-notify-mute-1h>,
+eight hours
+<https://gather-town.slack.com/unsub/U0248LWVALA-eafc39a003931c53ff3f5bbff2a0dbe4dc58bd6bdc9675ed818b0848c5ae9419-notify-mute-8h>,
+a day
+<https://gather-town.slack.com/unsub/U0248LWVALA-47703d6cdfa367202c5e9989135af2754321904223cc9eb6b25a033fd1b50f14-notify-mute-1d>,
+three days
+<https://gather-town.slack.com/unsub/U0248LWVALA-bd219e4dd7f71fb71eb4a91f605930843c49507c2d36ea1fcb11ea887fb6f8b0-notify-mute-3d>,
+or the next week
+<https://gather-town.slack.com/unsub/U0248LWVALA-e528aef596bd36199ad93371ef1939076f7b311efd077f7dd7fe08131d52867b-notify-mute-7d>.
+Or, turn email notifications off
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/unsub/U0248LWVALA-0017f6f0b34f0ca67598fa7298757b048aa35b1b6a0153fdf67edf1ce3337273-notify>.
+For more detailed preferences, see your account page
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/account/notifications>.
+
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/signin>
+Workspace name: Gather
+*Gather*
+Workspace URL: gather-town.slack.com
+Email: colin@gather.town
+
+Sign In
+<https://gather-town.slack.com/x-p1260345694995-2144710996690-2465717670290/signin>
+
+Made by Slack Technologies, LLC
+500 Howard Street, San Francisco, CA 94105
+slack.com
+  Our Blog <https://slackhq.com>   |   Policies <https://slack.com/legal>

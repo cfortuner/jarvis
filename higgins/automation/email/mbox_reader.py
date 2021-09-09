@@ -149,7 +149,7 @@ def strip_footer(text):
 def get_member_emails(mbox, sender_list, limit=100):
     msgs = []
     for msg in mbox:
-        if (msg["from"] in sender_list and msg["to"] is not None and "friends@example.com" == msg["to"]):
+        if (msg["sender"] in sender_list and msg["recipient"] is not None and "friends@example.com" == msg["recipient"]):
             msgs.append(msg)
         if limit is not None and len(msgs) > limit:
             break

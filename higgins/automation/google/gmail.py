@@ -35,7 +35,7 @@ def send_email(
     client = Gmail()
 
     params = {
-        "to": to,
+        "recipient": to,
         "sender": sender,
         "cc": cc,
         "bcc": bcc,
@@ -71,8 +71,25 @@ def get_emails():
         print("Message Body: " + message.plain)  # or message.html
 
 
-def search_emails(query_dicts: List[Dict]) -> List[Message]:
+def get_email(email_id: str, user_id: str = "me") -> Dict:
+    client = Gmail()
+    message = client._build_message_from_ref(
+        user_id="me", message_ref={"id": email_id}
+    )
+    return convert_message_to_dict(message)
+
+
+def search_emails(
+    query_dicts: List[Dict], limit: int = 100, include_html: bool = False
+) -> List[Dict]:
     """Search emails given queries.
+
+    Args:
+        query_dicts: List of email query parameters
+        limit: Maximum number of emails to return
+
+    Returns:
+        List of dictionaries with email body and metadata
 
     Example: Return messages that are either:
     - newer than 2 days old, unread, labeled "Finance" or both "Homework" and "CS"
@@ -93,25 +110,56 @@ def search_emails(query_dicts: List[Dict]) -> List[Message]:
         }
     ]
     """
+
+    print(f"Searching emails with query {query_dicts}")
+
+    for dct in query_dicts:
+        dct = format_terms(dct)
+
     client = Gmail()
+    # TODO: Add INBOX labels, Sent, etc
     # Get your available labels
+    # User labels: [Label(name='CHAT', id='CHAT'), Label(name='SENT', id='SENT'), Label(name='INBOX', id='INBOX'), Label(name='IMPORTANT', id='IMPORTANT'), Label(name='TRASH', id='TRASH'), Label(name='DRAFT', id='DRAFT'), Label(name='SPAM', id='SPAM'), Label(name='CATEGORY_FORUMS', id='CATEGORY_FORUMS'), Label(name='CATEGORY_UPDATES', id='CATEGORY_UPDATES'), Label(name='CATEGORY_PERSONAL', id='CATEGORY_PERSONAL'), Label(name='CATEGORY_PROMOTIONS', id='CATEGORY_PROMOTIONS'), Label(name='CATEGORY_SOCIAL', id='CATEGORY_SOCIAL'), Label(name='STARRED', id='STARRED'), Label(name='UNREAD', id='UNREAD'), Label(name='[Imap]/Drafts', id='Label_1'), Label(name='Urgent', id='Label_10'), Label(name='[Imap]/Sent', id='Label_2'), Label(name='craigslist', id='Label_2858204817852213362'), Label(name='[Imap]/Trash', id='Label_3'), Label(name='Notes', id='Label_4'), Label(name='Personal', id='Label_5'), Label(name='Receipts', id='Label_6'), Label(name='Work', id='Label_8'), Label(name='TODO', id='Label_8430892267769255145'), Label(name='Sent Messages', id='Label_9')]
     # labels = client.list_labels()
+    # print(f"User labels: {labels}")
     messages = client.get_messages(
         query=construct_query(*query_dicts)
     )
-    # print(f"Query returned {len(messages)} messages")
+    print(f"Query returned {len(messages)} messages")
     emails = []
-    for message in messages:
-        emails.append({
-            "to": message.recipient,
-            "from": message.sender,
-            "subject": message.subject,
-            "date": message.date,
-            "preview": message.snippet,
-            "body": email_utils.clean_email_body(message.plain or ""),
-            "id": message.id,
-        })
+    for message in messages[:limit]:
+        print(message)
+        email = convert_message_to_dict(message, include_html)
+        emails.append(email)
     return emails
+
+
+def convert_message_to_dict(
+    message: Message, include_html: bool = False
+) -> Dict:
+    email = {
+        "recipient": message.recipient,
+        "sender": message.sender,
+        "subject": message.subject,
+        "date": message.date,
+        "preview": message.snippet,
+        "plain": email_utils.clean_email_body(message.plain or ""),
+        "google_id": message.id,
+        "label_ids": [label.name for label in message.label_ids],
+        "html": None,
+    }
+    if include_html:
+        email["html"] = message.html or ""
+    return email
+
+
+def format_terms(terms: Dict) -> Dict:
+    # Bug in library. If unread=False, it behaves as unread=True
+    if "unread" in terms and not terms["unread"]:
+        del terms["unread"]
+    if "read" in terms and not terms["read"]:
+        del terms["read"]
+    return terms
 
 
 if __name__ == "__main__":

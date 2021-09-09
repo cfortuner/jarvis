@@ -15,7 +15,7 @@ def extract_params_from_string(string: str) -> Dict:
 
     Example:
         string: to=>mom ### body=>I Love her ### application=>???
-        out: {"to": "mom", "body":"I love her", "application": None}
+        out: {"recipient": "mom", "body":"I love her", "application": None}
     """
     params = string.strip().split("###")
     out = {}
@@ -36,7 +36,7 @@ def convert_action_chain_to_string(action_chain: List[Dict]) -> str:
 
     Example:
         params: [
-            {'action': 'ActionWithParams', 'params': {'to': 'mom', 'body': 'I love her'}},
+            {'action': 'ActionWithParams', 'params': {'recipient': 'mom', 'body': 'I love her'}},
             {'action': 'ActionMissingParams', 'params': {'application': '???'}},
             {'action': 'ActionNoParams', 'params': {}},
         ]
@@ -103,7 +103,7 @@ def convert_string_to_action_chain(string: str) -> List[Dict]:
 
 if __name__ == "__main__":
     expected_action_chain = [
-        {'action': 'ActionWithParams', 'params': {'to': 'mom', 'body': 'I love her'}},
+        {'action': 'ActionWithParams', 'params': {'recipient': 'mom', 'body': 'I love her'}},
         {'action': 'ActionMissingParams', 'params': {'application': '???'}},
         {'action': 'ActionNoParams', 'params': None},
     ]
