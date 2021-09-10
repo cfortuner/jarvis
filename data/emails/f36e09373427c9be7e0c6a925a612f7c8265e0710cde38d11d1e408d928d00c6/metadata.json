@@ -1,0 +1,14 @@
+{
+  "recipient": "bfortuner@gmail.com",
+  "sender": "Kraken <noreply@kraken.com>",
+  "subject": "Kraken Security - New Device Approval Required",
+  "date": "2021-05-06 10:27:37-07:00",
+  "preview": "A recent sign-in attempt was made to your Kraken account with an unrecognized device. When prompted, enter this code to approve this device: 495234 Note: This code will expire in 20 minutes. Location -",
+  "google_id": "17942b8cf62683dd",
+  "label_ids": [
+    "IMPORTANT",
+    "CATEGORY_UPDATES",
+    "INBOX"
+  ],
+  "email_id": "f36e09373427c9be7e0c6a925a612f7c8265e0710cde38d11d1e408d928d00c6"
+}

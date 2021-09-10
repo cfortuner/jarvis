@@ -44,7 +44,7 @@ def cli(debug):
 @click.option(
     '--newer-than',
     type=click.Tuple([int, str]),
-    default=(1, "day"),
+    default=(2, "year"),
     help="Tuple of number,[day|month|year,week,hour] representing how far back in time to start search"
 )
 @click.option('--unread', is_flag=True, default=False, help="Search unread emails only")
@@ -72,7 +72,7 @@ def search_email(**kwargs):
         if value is not None and key not in exclude_keys:
             query[key] = value
 
-    emails = gmail.search_emails(query_dicts=[query], limit=50)
+    emails = gmail.search_emails(query_dicts=[query], limit=50, include_html=True)
     print(f"Found {len(emails)} emails.")
     if len(emails) > 0:
         print(email_utils.get_email_preview(emails[0], show_body=kwargs.get("show_body", False)))
@@ -96,7 +96,7 @@ def search_email(**kwargs):
 def get_email(email_id, google_id, categories, save, show_body):
     """Fetch email by id from Gmail API."""
     if google_id:
-        email = gmail.get_email(google_id)
+        email = gmail.get_email(google_id, include_html=True)
     elif email_id:
         email = email_utils.load_email(email_id)
     else:

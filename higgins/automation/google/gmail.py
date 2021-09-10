@@ -13,7 +13,6 @@ https://developers.google.com/gmail/api/quickstart/python
 """
 
 from typing import Dict, List
-
 from simplegmail import Gmail
 from simplegmail.message import Message
 from simplegmail.query import construct_query
@@ -71,12 +70,12 @@ def get_emails():
         print("Message Body: " + message.plain)  # or message.html
 
 
-def get_email(email_id: str, user_id: str = "me") -> Dict:
+def get_email(email_id: str, user_id: str = "me", include_html: bool = True) -> Dict:
     client = Gmail()
     message = client._build_message_from_ref(
         user_id="me", message_ref={"id": email_id}
     )
-    return convert_message_to_dict(message)
+    return convert_message_to_dict(message, include_html)
 
 
 def search_emails(
@@ -143,14 +142,24 @@ def convert_message_to_dict(
         "subject": message.subject,
         "date": message.date,
         "preview": message.snippet,
-        "plain": email_utils.clean_email_body(message.plain or ""),
+        "plain": extract_plain_text(message),
         "google_id": message.id,
         "label_ids": [label.name for label in message.label_ids],
         "html": None,
     }
     if include_html:
-        email["html"] = message.html or ""
+        email["html"] = message.html
     return email
+
+
+def extract_plain_text(message: Message) -> str:
+    plain = ""
+    if bool(message.html):
+        plain = email_utils.parse_html_v2(message.html)
+    elif bool(message.plain):
+        plain = message.plain
+    plain = email_utils.clean_email_body(plain)
+    return plain
 
 
 def format_terms(terms: Dict) -> Dict:

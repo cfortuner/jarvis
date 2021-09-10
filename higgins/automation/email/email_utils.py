@@ -6,6 +6,8 @@ import sys
 import time
 from typing import Dict, List, Tuple, Union
 
+from bs4 import BeautifulSoup
+
 
 def is_valid_email(email):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -37,9 +39,15 @@ def get_email_preview(
         lines.append(f"\nDate: {email['date']}")
     lines.append(f"\nSubject: {email['subject']}\n")
 
+    # If the user asks to preview the email, attempt to show the plain version
+    # Otherwise fallback to the HTML (which may not be available...)
     if show_body:
-        body_lines = email["plain"].split("\n")[:max_lines]
-        lines += [f"\n{line}" for line in body_lines]
+        if bool(email['plain']):
+            body_lines = email["plain"].split("\n")[:max_lines]
+            lines += [f"\n{line}" for line in body_lines]
+        else:
+            print("text/plain not found. Falling back to text/html")
+            lines += f"\n{email.get('html', '')}"
     else:
         lines.append(f"Preview: {email.get('preview')}")
 
@@ -53,8 +61,32 @@ def get_email_preview(
 
 
 def clean_email_body(body: str):
+    # https://pypi.org/project/clean-text/ ??
     body = body.replace("\r", "")
+    body = re.sub(r'\n\s*\n', '\n\n', body)
+    body = body.strip("\n")
     return body
+
+
+def parse_html(html):
+    # This one preserves lists and newlines better, but doesn't handle
+    # tags like <string style="margin: 5px">
+    elem = BeautifulSoup(html, features="html.parser")
+    text = ''
+    for e in elem.descendants:
+        if isinstance(e, str):
+            text += e.strip()
+        elif e.name in ['br', 'p', 'h1', 'h2', 'h3', 'h4', 'tr', 'th']:
+            text += '\n'
+        elif e.name == 'li':
+            text += '\n- '
+    return text
+
+
+def parse_html_v2(html):
+    soup = BeautifulSoup(html)
+    plain = soup.get_text("\n")
+    return plain
 
 
 def get_body_stats(body):
