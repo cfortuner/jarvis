@@ -2,5 +2,12 @@
   "categories": [
     "flights_false_positive",
     "alaska"
-  ]
+  ],
+  "questions": [
+    [
+      "flight details",
+      "???"
+    ]
+  ],
+  "split": "train"
 }

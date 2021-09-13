@@ -2,5 +2,52 @@
   "categories": [
     "flights",
     "alaska"
-  ]
+  ],
+  "questions": [
+    [
+      "flight details",
+      {
+        "confirmation_number": "LXBUEJ",
+        "stops": [
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Oakland (OAK)",
+            "arrives": "Seattle (SEA)",
+            "departure_time": "Fri, Aug 13, 6:25pm",
+            "arrival_time": "Fri, Aug 13, 8:30pm",
+            "seats": "6B",
+            "travel_time": "???"
+          },
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Seattle (SEA)",
+            "arrives": "Fairbanks (FAI)",
+            "departure_time": "Fri, Aug 13, 10:44pm",
+            "arrival_time": "Sat, Aug 14, 1:30am",
+            "seats": "30B",
+            "travel_time": "???"
+          },
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Fairbanks (FAI)",
+            "arrives": "Seattle (SEA)",
+            "departure_time": "Sun, Aug 22, 3:55pm",
+            "arrival_time": "Sun, Aug 22, 8:25pm",
+            "seats": "24C",
+            "travel_time": "???"
+          },
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Seattle (SEA)",
+            "arrives": "San Francisco (SFO)",
+            "departure_time": "Sun, Aug 22, 9:35pm",
+            "arrival_time": "Sun, Aug 22, 11:44pm",
+            "seats": "24C",
+            "travel_time": "???"
+          }
+        ]
+      }
+    ]
+  ],
+  "split": "train"
 }

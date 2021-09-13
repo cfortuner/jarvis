@@ -68,8 +68,10 @@ def clean_email_body(body: str):
     return body
 
 
-def remove_tabs(body: str):
-    body = body.replace("\n", "")
+def remove_whitespace(body: str):
+    # body = " ".join(body.split())
+    body = re.sub(r'\s+', ' ', body)
+    body = body.strip().strip("\n")
     return body
 
 

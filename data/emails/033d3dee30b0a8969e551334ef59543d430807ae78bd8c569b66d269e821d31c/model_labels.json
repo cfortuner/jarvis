@@ -2,5 +2,25 @@
   "categories": [
     "flights",
     "southwest"
-  ]
+  ],
+  "questions": [
+    [
+      "flight details",
+      {
+        "confirmation_number": "2DVTDU",
+        "legs": [
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Oakland (OAK)",
+            "arrives": "Seattle (SEA)",
+            "departure_time": "Tues, June 22, 5:15pm",
+            "arrival_time": "Tues, June 22, 7:15pm",
+            "seats": "???",
+            "travel_time": "2 hours"
+          }
+        ]
+      }
+    ]
+  ],
+  "split": "train"
 }

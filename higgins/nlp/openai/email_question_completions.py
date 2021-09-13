@@ -1,6 +1,7 @@
 import copy
 import math
 import os
+import pprint
 import random
 from typing import Any, Dict, List
 
@@ -16,12 +17,14 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 tokenizer = nlp_utils.get_tokenizer()
 
+pp = pprint.PrettyPrinter(indent=2)
+
 
 def build_email_question_completion_prompt(
     user_email: Dict,
     user_question: str,
     prompt_emails: List[Dict],
-    task_description: str = "Answer questions about the following emails",
+    task_description: str = None,
 ) -> str:
     prompt = ""
     if task_description is not None:
@@ -47,6 +50,7 @@ def email_question_completion(
     user_question: str,
     prompt_emails: List[Dict],
     completion_tokens: int = 30,
+    task_description: str = "Answer questions about the following emails",
     engine="davinci",
     cache: Any = None,
 ):
@@ -61,6 +65,7 @@ def email_question_completion(
         num_tokens = nlp_utils.get_num_tokens(prompt, tokenizer)
         i += 1
         print(f"prompt tokens: {num_tokens}")
+    print(prompt)
     cache = cache if cache is not None else caching.get_default_cache()
     cache_key = nlp_utils.hash_normalized_text(prompt)
     if cache_key not in cache:
@@ -155,7 +160,10 @@ def test_email_question_completion():
 
     for email in train_emails + test_emails:
         num_tokens = nlp_utils.get_num_tokens(email['plain'], tokenizer)
-        email["plain"] = email_utils.remove_tabs(email["plain"])
+        print(f"Num tokens before cleaning: {num_tokens}")
+        email['plain'] = email_utils.remove_whitespace(email['plain'])
+        num_tokens = nlp_utils.get_num_tokens(email['plain'], tokenizer)
+        print(f"Num tokens after cleaning: {num_tokens}")
         email["plain"] = nlp_utils.trim_tokens(email["plain"], max_tokens=500, tokenizer=tokenizer)
         print(f"Email_id: {email['email_id']} Subject: {email['subject']} num_tokens: {num_tokens}")
 
@@ -176,5 +184,63 @@ def test_email_question_completion():
     print(f"Failed: {failed}/{len(test_emails)}")
 
 
+def test_email_question_completion_flights():
+    # Assumption is that the 
+    questions = [
+        "Extract flight details",
+        "Get flight details",
+    ]
+    example_emails = email_utils.search_local_emails(
+        categories=["flights", "flights_false_positive"], match_all=False
+    )
+    # train_emails, test_emails = make_train_test_split(
+    #     example_emails, sort_key="email_id"
+    # )
+    train_emails, test_emails = extract_existing_train_test_split(example_emails)
+
+    # false_positives = make_email_false_positive_questions(
+    #     emails=email_utils.search_local_emails(categories=["personal"])[:2],
+    #     questions=questions
+    # )
+    # false_positives += make_email_false_positive_questions(
+    #     emails=email_utils.search_local_emails(categories=["recruiting"])[:2],
+    #     questions=questions
+    # )
+    # random.shuffle(false_positives)
+    # train_emails += false_positives[:1]
+    # test_emails += false_positives[1:2]
+
+    random.shuffle(train_emails)
+    train_emails = random.sample(train_emails, 2)
+    print(f"Train: {len(train_emails)} Test: {len(test_emails)}")
+
+    for email in train_emails + test_emails:
+        num_tokens = nlp_utils.get_num_tokens(email['plain'], tokenizer)
+        print(f"Num tokens before cleaning: {num_tokens}")
+        email['plain'] = email_utils.remove_whitespace(email['plain'])
+        num_tokens = nlp_utils.get_num_tokens(email['plain'], tokenizer)
+        print(f"Num tokens after cleaning: {num_tokens}")
+        email["plain"] = nlp_utils.trim_tokens(email["plain"], max_tokens=500, tokenizer=tokenizer)
+        print(f"Email_id: {email['email_id']} Subject: {email['subject']} num_tokens: {num_tokens}")
+
+    failed = 0
+    for example in test_emails:
+        for _, expected_answer in example["model_labels"].get("questions", [(None, {})]):
+            answer = email_question_completion(
+                user_email=example,
+                user_question="flight details",
+                prompt_emails=train_emails,
+                completion_tokens=200,
+                task_description="Extract flight details from the following emails. Input '???' to indicate missing or unknown fields."
+            )
+            # if answer != expected_answer:
+            #     print("Answers below do not match ----")
+            print(example["email_id"], example["model_labels"]["categories"])
+            pp.pprint(answer)
+            failed += 1
+    print(f"Failed: {failed}/{len(test_emails)}")
+
+
 if __name__ == "__main__":
     test_email_question_completion()
+    # test_email_question_completion_flights()

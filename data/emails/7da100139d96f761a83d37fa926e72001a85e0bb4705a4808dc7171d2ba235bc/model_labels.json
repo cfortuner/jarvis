@@ -2,5 +2,25 @@
   "categories": [
     "flights",
     "alaska"
-  ]
+  ],
+  "questions": [
+    [
+      "flight details",
+      {
+        "confirmation_number": "LXBUEJ",
+        "legs": [
+          {
+            "travelers": "Brendan Fortuner",
+            "departs": "Fairbanks (FAI)",
+            "arrives": "San Francisco (SFO)",
+            "departure_time": "Aug 22, 3:55pm",
+            "arrival_time": "Aug 22, 11:44pm",
+            "seats": "24C",
+            "travel_time": "2 hours"
+          }
+        ]
+      }
+    ]
+  ],
+  "split": "train"
 }

@@ -2,5 +2,34 @@
   "categories": [
     "flights",
     "delta"
-  ]
+  ],
+  "questions": [
+    [
+      "flight details",
+      {
+        "confirmation_number": "GQV7QC",
+        "legs": [
+          {
+            "travelers": "Brendan David",
+            "departs": "Seattle",
+            "arrives": "Los Angeles, CA",
+            "departure_time": "Sat July 2, 9:34am",
+            "arrival_time": "Sat July 2, 12:20pm",
+            "seats": "27E",
+            "travel_time": "???"
+          },
+          {
+            "travelers": "Brendan David",
+            "departs": "Los Angeles, CA",
+            "arrives": "Seattle",
+            "departure_time": "Sat July 5, 8:37pm",
+            "arrival_time": "Sat July 5, 11:23pm",
+            "seats": "13B",
+            "travel_time": "???"
+          }
+        ]
+      }
+    ]
+  ],
+  "split": "train"
 }
