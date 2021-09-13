@@ -40,7 +40,7 @@ def cli(debug):
 @click.option("--sender", type=str, help="Sender name or email address")
 @click.option("--recipient", type=str, help="Recipient name or email address")
 @click.option("--subject", type=str, help="Subject of the email")
-@click.option("--exact_phrase", type=str, help="Exact phrase found in email body")  # @click.option("--labels")
+@click.option("--exact-phrase", type=str, help="Exact phrase found in email body")  # @click.option("--labels")
 @click.option(
     '--newer-than',
     type=click.Tuple([int, str]),
@@ -52,6 +52,7 @@ def cli(debug):
 @click.option('--categories', help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear")
 @click.option("--email-dir", type=str, default="data/emails", help="Directory where saved emails are stored")
 @click.option('--show-body', is_flag=True, help="Display body of email")
+@click.option('--local', is_flag=True, help="Search local database of emails")
 def search_email(**kwargs):
     """Search email inbox using Gmail API.
 
@@ -65,17 +66,23 @@ def search_email(**kwargs):
 
     TODO: Support searching local database of emails.
     """
-    exclude_keys = ["save", "email_dir", "categories", "show_body"]
+    exclude_keys = ["save", "email_dir", "categories", "show_body", "local"]
     query = {}
 
     for key, value in kwargs.items():
         if value is not None and key not in exclude_keys:
             query[key] = value
 
-    emails = gmail.search_emails(query_dicts=[query], limit=50, include_html=True)
-    print(f"Found {len(emails)} emails.")
-    if len(emails) > 0:
-        print(email_utils.get_email_preview(emails[0], show_body=kwargs.get("show_body", False)))
+    if kwargs["local"]:
+        emails = email_utils.search_local_emails(kwargs.get("categories", "").split(","))
+        kwargs["save"] = False
+    else:
+        emails = gmail.search_emails(query_dicts=[query], limit=50, include_html=True)
+    for email in emails[:10]:
+        print(email_utils.get_email_preview(
+                email, show_body=kwargs.get("show_body", False)
+            )
+        )
 
     for email in emails:
         if kwargs["save"]:
@@ -85,6 +92,7 @@ def search_email(**kwargs):
             email_id = email_utils.save_email(email, dataset_dir=kwargs["email_dir"], labels=model_labels)
             email = email_utils.load_email(email_id, dataset_dir=kwargs["email_dir"])
             print(email_utils.get_email_preview(email, show_body=kwargs.get("show_body", False)))
+    print(f"Found {len(emails)} emails.")
 
 
 @cli.command()

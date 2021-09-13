@@ -193,5 +193,3 @@ if __name__ == "__main__":
             # subject=None,
         )
     ])
-    print(len(messages))
-    print(messages[0])

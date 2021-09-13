@@ -106,8 +106,10 @@ def save_email(email: Dict, dataset_dir: str = "data/emails", labels: Dict = Non
     return email_id
 
 
-def load_email(email_id: str, dataset_dir: str = "data/emails") -> Dict:
-    email_dir = Path(dataset_dir, email_id)
+def load_email(email_id: str = None, email_dir: str = None, dataset_dir: str = "data/emails") -> Dict:
+    if email_dir is None:
+        assert email_id is not None, "must provide email_id or email_dir"
+        email_dir = Path(dataset_dir, email_id)
     email = json.load(open(Path(email_dir, "metadata.json")))
     email.update({"plain": None, "html": None, "model_labels": None})
     plain_path = Path(email_dir, "body.plain")
@@ -125,6 +127,30 @@ def load_email(email_id: str, dataset_dir: str = "data/emails") -> Dict:
         email["model_labels"] = json.load(open(labels_path))
 
     return email
+
+
+def search_local_emails(
+    categories: List[str], match_all: bool = True, dataset_dir: str = "data/emails"
+) -> List[Dict]:
+    """Search local database of emails.
+
+    Args:
+        categories: List of categories to include in query (e.g. flights, personal)
+        match_all: If true, all categories in `categories` must be present in emails.
+            If false, a match will occur if any category is present.
+    """
+    email_dirs = [f for f in Path(dataset_dir).iterdir() if f.is_dir()]
+    emails = []
+    for email_dir in email_dirs:
+        email = load_email(email_dir=email_dir, dataset_dir=dataset_dir)
+        matches = set(categories) & set(email["model_labels"]["categories"])
+        if match_all:
+            if len(matches) == len(categories):  # match all
+                emails.append(email)
+        elif len(matches) > 0:  # match any
+            emails.append(email)
+    print(f"search returned {len(emails)}")
+    return emails
 
 
 def save_email_to_dir(email_id: str, email: Dict, dataset_dir: str, labels: Dict = None) -> str:
