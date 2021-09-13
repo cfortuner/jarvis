@@ -1,5 +1,12 @@
 {
   "categories": [
     "verification_code"
-  ]
+  ],
+  "questions": [
+    [
+      "What is the verification code?",
+      "735867"
+    ]
+  ],
+  "split": "train"
 }

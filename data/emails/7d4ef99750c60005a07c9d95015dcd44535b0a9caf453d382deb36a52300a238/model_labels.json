@@ -1,5 +1,12 @@
 {
   "categories": [
     "verification_code"
-  ]
+  ],
+  "questions": [
+    [
+      "Get the verification code",
+      "G8HJFW"
+    ]
+  ],
+  "split": "train"
 }

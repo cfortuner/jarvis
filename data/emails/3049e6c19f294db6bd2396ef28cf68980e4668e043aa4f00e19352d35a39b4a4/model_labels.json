@@ -1,5 +1,11 @@
 {
   "categories": [
     "verification_code"
+  ],
+  "questions": [
+    [
+      "Get me the verification code",
+      "5257297"
+    ]
   ]
 }

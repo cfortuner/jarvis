@@ -115,7 +115,8 @@ def get_email(email_id, google_id, categories, save, show_body):
         email_id = email_utils.save_email(email, labels=model_labels)
         email = email_utils.load_email(email_id)
 
-    print(email_utils.get_email_preview(email, show_body=show_body))
+    preview = email_utils.get_email_preview(email, show_body=show_body)
+    print(email_utils.remove_tabs(preview))
 
 
 def question_prompt(session, style, chat_history, chat_history_path, speak):

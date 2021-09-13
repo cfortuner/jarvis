@@ -68,6 +68,11 @@ def clean_email_body(body: str):
     return body
 
 
+def remove_tabs(body: str):
+    body = body.replace("\n", "")
+    return body
+
+
 def parse_html(html):
     # This one preserves lists and newlines better, but doesn't handle
     # tags like <string style="margin: 5px">

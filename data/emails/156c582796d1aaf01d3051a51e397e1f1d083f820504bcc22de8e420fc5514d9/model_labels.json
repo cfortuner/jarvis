@@ -2,5 +2,12 @@
   "categories": [
     "verification_code",
     "amazon"
-  ]
+  ],
+  "questions": [
+    [
+      "What's the verification code?",
+      "771049"
+    ]
+  ],
+  "split": "train"
 }

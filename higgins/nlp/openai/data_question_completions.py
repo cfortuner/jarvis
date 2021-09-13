@@ -50,6 +50,7 @@ def data_question_completion(
         examples=data_question_datasets.DATA_QUESTION_DATASET_TRAIN,
         task_description="Please answer questions about the data structures below",
     )
+    print(prompt)
     # print(f"Prompt: {prompt}")
     cache = cache if cache is not None else caching.get_default_cache()
     cache_key = nlp_utils.hash_normalized_text(prompt)

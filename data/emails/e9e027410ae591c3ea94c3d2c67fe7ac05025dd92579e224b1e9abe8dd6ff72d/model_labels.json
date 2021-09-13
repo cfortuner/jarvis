@@ -3,5 +3,12 @@
     "crypto",
     "verification_code",
     "binance"
-  ]
+  ],
+  "questions": [
+    [
+      "Get me the verification code",
+      "3804c672f0db402daac7167fea369257"
+    ]
+  ],
+  "split": "train"
 }
