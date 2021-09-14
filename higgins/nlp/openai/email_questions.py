@@ -251,18 +251,18 @@ def test_email_question_answers():
         "What is the destination city?",
         "Who is the passenger?",
     ]
-    for question in questions:
-        import time
-        time.sleep(1)
-        answer = email_question_answers(
-            question=question,
-            documents=documents,
-            example_email=example_document,
-            example_questions=example_questions,
-        )
-        print("-------------------------")
-        print(question, answer["answers"][0])
-        print(answer["selected_documents"][0]["text"])
+    # for question in questions:
+    #     import time
+    #     time.sleep(1)
+    #     answer = email_question_answers(
+    #         question=question,
+    #         documents=documents,
+    #         example_email=example_document,
+    #         example_questions=example_questions,
+    #     )
+    #     print("-------------------------")
+    #     print(question, answer["answers"][0])
+    #     print(answer["selected_documents"][0]["text"])
 
 
 def create_email_chunks(

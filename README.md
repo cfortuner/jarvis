@@ -339,6 +339,8 @@ Semantic Search
 
 ### Ideas to process large documents
 
+Website for GPT-based projects http://gptcrush.com/
+
 * NOTE: You pay money for every document searched
 * Pre-search the data with a cheap model (Ada) or non-model-based search engine (Gmail API, ElasticSearch, txt AI)
 * Break large documents into snippets

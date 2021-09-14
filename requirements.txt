@@ -33,6 +33,7 @@ simpleaudio==1.0.4
 simplegmail==4.0.3
 SpeechRecognition==3.6.1
 tinydb==4.5.1
+transformers==4.10.0
 
 # For MacOS
 # AppKit==0.2.8; sys_platform == "darwin"  # Doesn't install correctly on M1
