@@ -60,6 +60,27 @@ def get_email_preview(
     return preview
 
 
+def get_email_body_extended(email: Dict, max_lines=sys.maxsize) -> str:
+    """Return body with subject, from and date fields prepended."""
+    lines = []
+    # if email.get("recipient"):
+    #     lines.append(f"\nTo: {email['recipient']}")
+    if email.get("sender"):
+        lines.append(f"\nFrom: {email['sender']}")
+    if email.get("date"):
+        lines.append(f"\nDate: {email['date']}")
+    lines.append(f"\nSubject: {email['subject']}\n")
+
+    if bool(email['plain']):
+        body_lines = email["plain"].split("\n")[:max_lines]
+        lines += [f"\n{line}" for line in body_lines]
+    else:
+        print("text/plain not found. Falling back to text/html")
+        lines += f"\n{email.get('html', '')}"
+
+    return "".join(lines)
+
+
 def clean_email_body(body: str):
     # https://pypi.org/project/clean-text/ ??
     body = body.replace("\r", "")

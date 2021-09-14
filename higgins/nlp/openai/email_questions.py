@@ -3,6 +3,7 @@ import math
 import os
 import pprint
 import random
+from re import U
 from typing import Any, Dict, List
 
 import openai
@@ -128,6 +129,165 @@ def extract_existing_train_test_split(examples: List[Dict]):
     return train, test
 
 
+EXAMPLE_EMAIL_DOCUMENT = """<body>From: Brendan Fortuner <brendan.fortuner@getcruise.com>
+Date: 2021-09-08 16:11:36-07:00
+Subject: Coffee
+
+Hey Joe,
+Would you like to grab coffee next week? I'm free Thursday and Friday.
+Looking forward to connecting soon!
+Brendan
+
+--
+Brendan Fortuner
+Software Engineer, ML Platform
+GM Cruise LLC 
+brendan.fortuner@getcruise.com
+</body>
+"""
+
+EXAMPLE_EMAIL_QUESTIONS = [
+    # ["Who wrote the email?", "Brendan Fortuner <brendan.fortuner@getcruise.com>"],
+    # ["When was the email sent?", "2021-09-08 16:11:36-07:00"],
+    ["What is Brendan's job?", "Software Engineer"],
+    ["What company does he work at?", "Software Engineer"],
+    # ["What is the subject?", "Coffee"],
+    ["When is Brendan free?", "Thursday and Friday"]
+]
+
+
+def email_question_answers(
+    question: str,
+    example_email: str = EXAMPLE_EMAIL_DOCUMENT,
+    example_questions: List[List[str]] = EXAMPLE_EMAIL_QUESTIONS,
+    documents: List[str] = None,
+    file_id: str = None,
+):
+    """Answer question over multiple emails or emails snippets using answers/ API.
+
+    Performs a 2-stage semantic search -> answer. If documents and file_id are None,
+    the model will answer the question based on the content of the example_email.
+
+    Args:
+        question: User question
+        file_id: id of the uploaded document
+        documents: List of emails or snippets
+    """
+    resp = openai.Answer.create(
+        search_model="ada",
+        model="davinci",
+        question=question,
+        file=file_id,
+        documents=documents,
+        examples_context=example_email,
+        examples=example_questions,
+        temperature=.1,
+        max_rerank=3,
+        max_tokens=30,
+        stop=["\n", "<|endoftext|>"]
+    )
+    return resp
+
+
+def generate_email_question_context(email: Dict):
+    document = email_utils.get_email_body_extended(email)
+    document = email_utils.remove_whitespace(document)
+    questions = [
+        ["Who sent the email?", email["sender"]],
+        ["What is the subject?", email["subject"]],
+        ["When was it sent?", email["date"]]
+    ]
+    return document, questions
+
+
+def generate_email_question_context_from_labeled_email(email: Dict, plain_body: bool = True):
+    if plain_body:
+        document = email_utils.get_email_body_extended(email)
+    else:
+        document = email["html"]
+    document = email_utils.remove_whitespace(document)
+    questions = email["model_labels"]["questions"]
+    return document, questions
+
+
+def get_email_chunks(email, tokens_per_chunk, plain_body = True):
+    if plain_body:
+        document = email_utils.get_email_body_extended(email)
+    else:
+        document = email["html"]
+    chunks = create_email_chunks(document, tokens_per_chunk)
+    return chunks
+
+
+def test_email_question_answers():
+    use_plain_body = True
+    # Generate an example 
+    example_email_id = "365b47046e7027df274d0a26de33461f99c4cb054e47a6aaa4a6bc791e263585"  # Amazon payment 
+    example_email = email_utils.load_email(example_email_id)
+    example_document, example_questions = generate_email_question_context_from_labeled_email(example_email, plain_body=use_plain_body)
+    print(example_questions)
+    example_num_tokens = nlp_utils.get_num_tokens(example_document, tokenizer)
+    print(f"num tokens in example {example_num_tokens}")
+    # Load the email
+    email_id = "0f84cbaf27e24d6d3eb96b734e8f8c776a8fc7250ed479ba252d47a9fc56fcc2"
+
+    # Southwest email, forwarded from jackie, 1 flight -- Works well!
+    email_id = "033d3dee30b0a8969e551334ef59543d430807ae78bd8c569b66d269e821d31c"
+    email = email_utils.load_email(email_id)
+    documents = get_email_chunks(email, 300, use_plain_body)
+    for doc in documents:
+        print(f"----------------- {nlp_utils.get_num_tokens(doc, tokenizer)}")
+        print(doc)
+    # document, _ = generate_email_question_context_from_labeled_email(email, plain_body=use_plain_body)
+    # documents = [documents]
+    questions = [
+        "Who sent the email?",
+        "What is the subject of the email?",
+        "When was the email sent?",
+        "What is the arrival time?",
+        "What is the departure time?",
+        "What is the confirmation code?",
+        "Where is the flight departing from?",
+        "What is the destination city?",
+        "Who is the passenger?",
+    ]
+    for question in questions:
+        import time
+        time.sleep(1)
+        answer = email_question_answers(
+            question=question,
+            documents=documents,
+            example_email=example_document,
+            example_questions=example_questions,
+        )
+        print("-------------------------")
+        print(question, answer["answers"][0])
+        print(answer["selected_documents"][0]["text"])
+
+
+def create_email_chunks(
+    text: str, max_tokens_per_chunk: int = 500
+) -> List[str]:
+    num_tokens = nlp_utils.get_num_tokens(text, tokenizer)
+    print(f"Num tokens before cleaning: {num_tokens}")
+    chunks = []
+    lines = text.split("\n")
+    chunk_tokens = 0
+    current_chunk = []
+    for line in lines:
+        line = email_utils.remove_whitespace(line)
+        if chunk_tokens >= max_tokens_per_chunk:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = []
+            chunk_tokens = 0
+        else:
+            current_chunk.append(line)
+            chunk_tokens += nlp_utils.get_num_tokens(line, tokenizer)
+    chunks.append(" ".join(current_chunk))
+    print(f"Num chunks {len(chunks)}")
+    return chunks
+
+
 def test_email_question_completion():
     # Assumption is that the 
     questions = [
@@ -242,5 +402,6 @@ def test_email_question_completion_flights():
 
 
 if __name__ == "__main__":
-    test_email_question_completion()
+    # test_email_question_completion()
     # test_email_question_completion_flights()
+    test_email_question_answers()

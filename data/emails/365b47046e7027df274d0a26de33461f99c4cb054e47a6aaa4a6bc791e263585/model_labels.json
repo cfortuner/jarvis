@@ -2,5 +2,24 @@
   "categories": [
     "order_confirmation",
     "amazon"
-  ]
+  ],
+  "questions": [
+    [
+      "what is the order number?",
+      "113-9042362-9156231"
+    ],
+    [
+      "What is the remaining balance?",
+      "$25.99"
+    ],
+    [
+      "When is the payment due?",
+      "09/14/2021"
+    ],
+    [
+      "What is the area of the square?",
+      "???"
+    ]
+  ],
+  "split": "train"
 }

@@ -318,3 +318,34 @@ Semantic Search
 * https://cloud.google.com/natural-language/docs/samples/language-classify-text-tutorial-query
 * https://aws.amazon.com/kendra/ (semantic search)
 * https://aws.amazon.com/comprehend/ (text analysis, search)
+
+
+## GPT3 Notes
+
+* [How to avoid making up facts (and large document parsing)](https://community.openai.com/t/how-do-i-upload-a-book-to-gpt3/1499/9)
+* [Fine-tune a model to improve truthfulness](https://docs.google.com/document/d/1Cx25TplZ3tL_cTFlFEChLJ2z1l1sa2WKivAVCpqYPnE/edit#heading=h.qnufq9wqvxvd)
+    * Sample 10+ generations and pass them through a discriminator / classifier to determine truthfulness
+* [Preventing Hallucination Facebook](https://www.unite.ai/preventing-hallucination-in-gpt-3-and-other-complex-language-models/)
+* [Longformer - Larger texts](https://arxiv.org/abs/2004.05150)
+* [Improving reasoning skills](https://blog.andrewcantino.com/blog/2021/05/28/how-to-dramatically-improve-the-reasoning-ability-of-GPT-3/)
+
+### Ideas to improve truthfulness
+
+* Generator samples 10 answers, discriminator evaluates the answers and selects the best
+* Fine-tune the model on your facts
+* Lower the temperature
+* Include "I don't know" as a valid response, with examples (false positives)
+* Incorporate the model's confidence (log probs?) to evaluate the reply (and determine how many times to sample?)
+
+### Ideas to process large documents
+
+* NOTE: You pay money for every document searched
+* Pre-search the data with a cheap model (Ada) or non-model-based search engine (Gmail API, ElasticSearch, txt AI)
+* Break large documents into snippets
+* Pre-process the document into summarizations or salient facts
+* Run semantic search, then completion (like answers/ endpoint)
+* [I have 6M documents and fast search with SOLR (ElasticSearch)](https://community.openai.com/t/summarizing-or-question-answering-from-long-wikipedia-articles/4137/6)
+* Steps
+  * Search relevant documents with cheap local engine (elasticsearch, SOLR)
+  * Upload chunks of these articles dynamically based on the most relevant chunk from that article
+  * Pass results to semantic search or answers endpoint
