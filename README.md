@@ -144,6 +144,9 @@ sudo apt install libgirepository1.0-dev
 
 # Taskbar icon support requires this
 sudo apt install gir1.2-appindicator3-0.1
+
+# If running without a GUI and pyautogui gives you KEYERROR :DISPLAY. Add this to ~/.bashrc, etc.
+export DISPLAY=:0
 ```
 
 ### Python Setup
@@ -207,6 +210,16 @@ python electron.py
 # And in prophet...
 npm install
 npm run start
+```
+
+6. App steps
+
+```bash
+# Load contacts from google
+python -m higgins.automation.contacts.google
+
+# Install pytorch
+pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ## Testing
@@ -340,6 +353,7 @@ Semantic Search
 ### Ideas to process large documents
 
 Website for GPT-based projects http://gptcrush.com/
+Email-related product from GPT https://www.hypertype.co/
 
 * NOTE: You pay money for every document searched
 * Pre-search the data with a cheap model (Ada) or non-model-based search engine (Gmail API, ElasticSearch, txt AI)

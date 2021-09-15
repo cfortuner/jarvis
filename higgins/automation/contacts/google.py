@@ -230,6 +230,7 @@ def convert_google_contact_to_contact(row: Dict) -> Contact:
 
 
 if __name__ == "__main__":
+    # python -m higgins.automation.contacts.google
     # csv_contacts = load_contacts_from_csv()
     # print(f"Num csv contacts: {len(csv_contacts)}")
     init_google_contacts_table()
