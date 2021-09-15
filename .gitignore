@@ -1,6 +1,8 @@
 # Project specific
 client_secret.json
 google_tokens/
+# txtai embeddings index
+index/
 data/episodes.jsonl
 data/tinydb.json
 # personal data from google
