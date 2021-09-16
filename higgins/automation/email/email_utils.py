@@ -1,3 +1,4 @@
+from datetime import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -8,9 +9,11 @@ from typing import Dict, List, Tuple, Union
 
 from bs4 import BeautifulSoup
 
+from higgins.automation.email import email_model
+
 
 def is_valid_email(email):
-    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
     if re.fullmatch(regex, email):
         return True
     return False
@@ -42,7 +45,7 @@ def get_email_preview(
     # If the user asks to preview the email, attempt to show the plain version
     # Otherwise fallback to the HTML (which may not be available...)
     if show_body:
-        if bool(email['plain']):
+        if bool(email["plain"]):
             body_lines = email["plain"].split("\n")[:max_lines]
             lines += [f"\n{line}" for line in body_lines]
         else:
@@ -71,7 +74,7 @@ def get_email_body_extended(email: Dict, max_lines=sys.maxsize) -> str:
         lines.append(f"\nDate: {email['date']}")
     lines.append(f"\nSubject: {email['subject']}\n")
 
-    if bool(email['plain']):
+    if bool(email["plain"]):
         body_lines = email["plain"].split("\n")[:max_lines]
         lines += [f"\n{line}" for line in body_lines]
     else:
@@ -84,14 +87,14 @@ def get_email_body_extended(email: Dict, max_lines=sys.maxsize) -> str:
 def clean_email_body(body: str):
     # https://pypi.org/project/clean-text/ ??
     body = body.replace("\r", "")
-    body = re.sub(r'\n\s*\n', '\n\n', body)
+    body = re.sub(r"\n\s*\n", "\n\n", body)
     body = body.strip("\n")
     return body
 
 
 def remove_whitespace(body: str):
     # body = " ".join(body.split())
-    body = re.sub(r'\s+', ' ', body)
+    body = re.sub(r"\s+", " ", body)
     body = body.strip().strip("\n")
     return body
 
@@ -100,14 +103,14 @@ def parse_html(html):
     # This one preserves lists and newlines better, but doesn't handle
     # tags like <string style="margin: 5px">
     elem = BeautifulSoup(html, features="html.parser")
-    text = ''
+    text = ""
     for e in elem.descendants:
         if isinstance(e, str):
             text += e.strip()
-        elif e.name in ['br', 'p', 'h1', 'h2', 'h3', 'h4', 'tr', 'th']:
-            text += '\n'
-        elif e.name == 'li':
-            text += '\n- '
+        elif e.name in ["br", "p", "h1", "h2", "h3", "h4", "tr", "th"]:
+            text += "\n"
+        elif e.name == "li":
+            text += "\n- "
     return text
 
 
@@ -127,14 +130,37 @@ def get_body_stats(body):
     }
 
 
-def save_email(email: Dict, dataset_dir: str = "data/emails", labels: Dict = None) -> str:
+def save_email(
+    email: Dict,
+    dataset_dir: str = "data/emails",
+    labels: Dict = None,
+    include_elastic: bool = True,
+) -> str:
     # Google has a unique identifier, but for now..
     email_id = hash_email(email)
     _ = save_email_to_dir(email_id, email, dataset_dir, labels)
+    if include_elastic:
+        _ = save_email_to_elastic(email)
     return email_id
 
 
-def load_email(email_id: str = None, email_dir: str = None, dataset_dir: str = "data/emails") -> Dict:
+def save_email_to_elastic(email: Dict):
+    email = email_model.from_gmail_dict(email)
+    email.save()
+    email = email.get(id=email["google_id"])
+    return email
+
+
+def normalize_email_address(email_in):
+    import email
+
+    parsed = email.utils.parseaddr(email_in)
+    return parsed[1]
+
+
+def load_email(
+    email_id: str = None, email_dir: str = None, dataset_dir: str = "data/emails"
+) -> Dict:
     if email_dir is None:
         assert email_id is not None, "must provide email_id or email_dir"
         email_dir = Path(dataset_dir, email_id)
@@ -181,7 +207,9 @@ def search_local_emails(
     return emails
 
 
-def save_email_to_dir(email_id: str, email: Dict, dataset_dir: str, labels: Dict = None) -> str:
+def save_email_to_dir(
+    email_id: str, email: Dict, dataset_dir: str, labels: Dict = None
+) -> str:
     """Save email body and metadata to email dataset directory.
 
     Args:
@@ -221,9 +249,7 @@ def save_email_to_dir(email_id: str, email: Dict, dataset_dir: str, labels: Dict
     print(f"Saving email to: {email_dir}")
 
     exclude_fields = ["plain", "html", "attachments"]
-    metadata = {
-        k: v for k, v in email.items() if k not in exclude_fields
-    }
+    metadata = {k: v for k, v in email.items() if k not in exclude_fields}
     metadata["email_id"] = email_id
 
     json.dump(metadata, open(Path(email_dir, "metadata.json"), "w"), indent=2)
@@ -284,3 +310,15 @@ def hash_email(email: Dict) -> str:
     hash_input += f"{email['plain']}"
     hash_input = hash_input.encode("utf-8")
     return hashlib.sha256(hash_input).hexdigest()
+
+
+if __name__ == "__main__":
+    email_dict = load_email(
+        email_dir="data/emails/3f50ce2a8e1fd4a1120dd5b67dbe2799ec2c838d09d32b8ec1c15ab74755cd70"
+    )
+    email_model.Email.init()
+    es_email = save_email_to_elastic(email_dict)
+    print(es_email)
+    import pdb
+
+    pdb.set_trace()

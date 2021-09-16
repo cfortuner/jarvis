@@ -13,11 +13,15 @@ https://developers.google.com/gmail/api/quickstart/python
 """
 
 from typing import Dict, List
+
+from datetime import datetime
+import elasticsearch
+import elasticsearch_dsl
 from simplegmail import Gmail
 from simplegmail.message import Message
 from simplegmail.query import construct_query
 
-from higgins.automation.email import email_utils
+from higgins.automation.email import email_model, email_utils
 
 
 def send_email(
@@ -42,9 +46,11 @@ def send_email(
         "msg_html": body_html,  # "<h1>Woah, my first email!</h1><br />This is an HTML email.",
         "msg_plain": body_plain,
         "attachments": attachments,  # ["path/to/something/cool.pdf", "path/to/image.jpg", "path/to/script.py"],
-        "signature": True  # use my account signature
+        "signature": True,  # use my account signature
     }
-    message = client.send_message(**params)  # equivalent to send_message(to="you@youremail.com", sender=...)
+    message = client.send_message(
+        **params
+    )  # equivalent to send_message(to="you@youremail.com", sender=...)
     return message
 
 
@@ -72,9 +78,7 @@ def get_emails():
 
 def get_email(email_id: str, user_id: str = "me", include_html: bool = True) -> Dict:
     client = Gmail()
-    message = client._build_message_from_ref(
-        user_id="me", message_ref={"id": email_id}
-    )
+    message = client._build_message_from_ref(user_id="me", message_ref={"id": email_id})
     return convert_message_to_dict(message, include_html)
 
 
@@ -121,21 +125,16 @@ def search_emails(
     # User labels: [Label(name='CHAT', id='CHAT'), Label(name='SENT', id='SENT'), Label(name='INBOX', id='INBOX'), Label(name='IMPORTANT', id='IMPORTANT'), Label(name='TRASH', id='TRASH'), Label(name='DRAFT', id='DRAFT'), Label(name='SPAM', id='SPAM'), Label(name='CATEGORY_FORUMS', id='CATEGORY_FORUMS'), Label(name='CATEGORY_UPDATES', id='CATEGORY_UPDATES'), Label(name='CATEGORY_PERSONAL', id='CATEGORY_PERSONAL'), Label(name='CATEGORY_PROMOTIONS', id='CATEGORY_PROMOTIONS'), Label(name='CATEGORY_SOCIAL', id='CATEGORY_SOCIAL'), Label(name='STARRED', id='STARRED'), Label(name='UNREAD', id='UNREAD'), Label(name='[Imap]/Drafts', id='Label_1'), Label(name='Urgent', id='Label_10'), Label(name='[Imap]/Sent', id='Label_2'), Label(name='craigslist', id='Label_2858204817852213362'), Label(name='[Imap]/Trash', id='Label_3'), Label(name='Notes', id='Label_4'), Label(name='Personal', id='Label_5'), Label(name='Receipts', id='Label_6'), Label(name='Work', id='Label_8'), Label(name='TODO', id='Label_8430892267769255145'), Label(name='Sent Messages', id='Label_9')]
     # labels = client.list_labels()
     # print(f"User labels: {labels}")
-    messages = client.get_messages(
-        query=construct_query(*query_dicts)
-    )
+    messages = client.get_messages(query=construct_query(*query_dicts))
     print(f"Query returned {len(messages)} messages")
     emails = []
     for message in messages[:limit]:
-        print(message)
         email = convert_message_to_dict(message, include_html)
         emails.append(email)
     return emails
 
 
-def convert_message_to_dict(
-    message: Message, include_html: bool = False
-) -> Dict:
+def convert_message_to_dict(message: Message, include_html: bool = False) -> Dict:
     email = {
         "recipient": message.recipient,
         "sender": message.sender,
@@ -171,6 +170,30 @@ def format_terms(terms: Dict) -> Dict:
     return terms
 
 
+def gmail_to_elastic(query: Dict, limit: int = 100):
+    """Load emails from Gmail API query into Elasticsearch."""
+    messages = search_emails(query_dicts=[query], limit=limit)
+    for dct in messages:
+        dct["email_id"] = email_utils.hash_email(dct)
+        email = email_model.from_gmail_dict(dct)
+        email.save()
+
+    # TODO: Add Bulk support
+    # conn = elasticsearch_dsl.connections.get_connection()
+    # elasticsearch.helpers.bulk(conn, (d.to_dict(True) for d in docs))
+
+
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+
+
+def search_elastic_emails(query: Dict):
+    client = Elasticsearch()
+    s = Search(using=client, index="email")
+    resp = s.execute()
+    print(f"Hits: {resp.hits.total.value}")
+
+
 if __name__ == "__main__":
     # msg = send_email(
     #     to="bfortuner@gmail.com",
@@ -182,14 +205,27 @@ if __name__ == "__main__":
 
     # get_emails()
 
-    messages = search_emails([
-        dict(
-            sender="bfortuner@gmail.com",
-            recipient="cfortuner@gmail.com",
-            newer_than=(7, "day"),
-            # unread=None,
-            # labels=None,
-            # exact_phrase=None,
-            # subject=None,
-        )
-    ])
+    # messages = search_emails(
+    #     [
+    #         dict(
+    #             sender="bfortuner@gmail.com",
+    #             recipient="cfortuner@gmail.com",
+    #             newer_than=(7, "day"),
+    #             # unread=None,
+    #             # labels=None,
+    #             # exact_phrase=None,
+    #             # subject=None,
+    #         )
+    #     ]
+    # )
+
+    messages = gmail_to_elastic(
+        query=dict(
+            recipient="bfortuner@gmail.com",
+            newer_than=(120, "day"),
+            labels=["INBOX"],
+        ),
+        limit=100000,
+    )
+
+    search_elastic_emails({})

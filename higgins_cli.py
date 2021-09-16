@@ -40,19 +40,29 @@ def cli(debug):
 @click.option("--sender", type=str, help="Sender name or email address")
 @click.option("--recipient", type=str, help="Recipient name or email address")
 @click.option("--subject", type=str, help="Subject of the email")
-@click.option("--exact-phrase", type=str, help="Exact phrase found in email body")  # @click.option("--labels")
 @click.option(
-    '--newer-than',
+    "--exact-phrase", type=str, help="Exact phrase found in email body"
+)  # @click.option("--labels")
+@click.option(
+    "--newer-than",
     type=click.Tuple([int, str]),
     default=(2, "year"),
-    help="Tuple of number,[day|month|year,week,hour] representing how far back in time to start search"
+    help="Tuple of number,[day|month|year,week,hour] representing how far back in time to start search",
 )
-@click.option('--unread', is_flag=True, default=False, help="Search unread emails only")
-@click.option('--save', is_flag=True, default=False, help="Search unread emails only")
-@click.option('--categories', help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear")
-@click.option("--email-dir", type=str, default="data/emails", help="Directory where saved emails are stored")
-@click.option('--show-body', is_flag=True, help="Display body of email")
-@click.option('--local', is_flag=True, help="Search local database of emails")
+@click.option("--unread", is_flag=True, default=False, help="Search unread emails only")
+@click.option("--save", is_flag=True, default=False, help="Search unread emails only")
+@click.option(
+    "--categories",
+    help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear",
+)
+@click.option(
+    "--email-dir",
+    type=str,
+    default="data/emails",
+    help="Directory where saved emails are stored",
+)
+@click.option("--show-body", is_flag=True, help="Display body of email")
+@click.option("--source", default="gmail", help="elastic, local, or gmail")
 def search_email(**kwargs):
     """Search email inbox using Gmail API.
 
@@ -73,13 +83,19 @@ def search_email(**kwargs):
         if value is not None and key not in exclude_keys:
             query[key] = value
 
-    if kwargs["local"]:
-        emails = email_utils.search_local_emails(kwargs.get("categories", "").split(","))
+    if kwargs["source"] == "local":
+        emails = email_utils.search_local_emails(
+            kwargs.get("categories", "").split(",")
+        )
+        kwargs["save"] = False
+    elif kwargs["source"] == "elastic":
+        # emails = email_utils.search_elastic_emails()
         kwargs["save"] = False
     else:
         emails = gmail.search_emails(query_dicts=[query], limit=50, include_html=True)
     for email in emails[:10]:
-        print(email_utils.get_email_preview(
+        print(
+            email_utils.get_email_preview(
                 email, show_body=kwargs.get("show_body", False)
             )
         )
@@ -89,18 +105,27 @@ def search_email(**kwargs):
             model_labels = {}
             if kwargs["categories"] is not None:
                 model_labels["categories"] = kwargs["categories"].split(",")
-            email_id = email_utils.save_email(email, dataset_dir=kwargs["email_dir"], labels=model_labels)
+            email_id = email_utils.save_email(
+                email, dataset_dir=kwargs["email_dir"], labels=model_labels
+            )
             email = email_utils.load_email(email_id, dataset_dir=kwargs["email_dir"])
-            print(email_utils.get_email_preview(email, show_body=kwargs.get("show_body", False)))
+            print(
+                email_utils.get_email_preview(
+                    email, show_body=kwargs.get("show_body", False)
+                )
+            )
     print(f"Found {len(emails)} emails.")
 
 
 @cli.command()
 @click.option("--email-id", help="Higgins email id, used for fetching local copy")
 @click.option("--google-id", help="Gmail email id, used for fetching from Gmail API")
-@click.option('--categories', help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear")
-@click.option('--save', is_flag=True, help="Search unread emails only")
-@click.option('--show-body', is_flag=True, help="Display body of email")
+@click.option(
+    "--categories",
+    help="List of categories to add to model labels for training/organizing. e.g. dog,cat,bear",
+)
+@click.option("--save", is_flag=True, help="Search unread emails only")
+@click.option("--show-body", is_flag=True, help="Display body of email")
 def get_email(email_id, google_id, categories, save, show_body):
     """Fetch email by id from Gmail API."""
     if google_id:
@@ -152,12 +177,13 @@ def print_func(style):
             ),
             style=style,
         )
+
     return func
 
 
 @cli.command()
 @click.option("--chat-history-path", default=None, help="Path to chat history file.")
-@click.option('--speak', is_flag=True, help="Speak the answers and actions.")
+@click.option("--speak", is_flag=True, help="Speak the answers and actions.")
 def text2intent(chat_history_path, speak):
     """Parse user text 2 intent."""
     chat_history = []
@@ -165,7 +191,9 @@ def text2intent(chat_history_path, speak):
     session = prompt_utils.init_prompt_session(style=style)
     higgins = Higgins(
         intent_resolver=OpenAIIntentResolver(),  # RegexIntentResolver()
-        prompt_func=question_prompt(session, style, chat_history, chat_history_path, speak),
+        prompt_func=question_prompt(
+            session, style, chat_history, chat_history_path, speak
+        ),
         print_func=print_func(style),
     )
     context = Context()
@@ -187,7 +215,11 @@ def text2intent(chat_history_path, speak):
         prompt_utils.add_text_to_chat_history(chat_history, user_text, const.USERNAME)
         try:
             action_result = higgins.parse(user_text, episode)
-            agent_text = action_result.reply_text if action_result.reply_text is not None else None
+            agent_text = (
+                action_result.reply_text
+                if action_result.reply_text is not None
+                else None
+            )
             if agent_text:
                 speak_text(text=agent_text, enable=speak)
                 print(
@@ -196,12 +228,14 @@ def text2intent(chat_history_path, speak):
                     ),
                     style=style,
                 )
-                prompt_utils.add_text_to_chat_history(chat_history, agent_text, const.AGENT_NAME)
+                prompt_utils.add_text_to_chat_history(
+                    chat_history, agent_text, const.AGENT_NAME
+                )
 
             episode = Episode(
                 chat_text=" ".join(chat_history[episode_start:]),
                 context=context,
-                action_result=action_result
+                action_result=action_result,
             )
             save_episode(episode, db=higgins.db)
             context.add_episode(episode.episode_id)
