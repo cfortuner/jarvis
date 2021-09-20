@@ -212,26 +212,26 @@ if __name__ == "__main__":
 
     # get_emails()
 
-    messages = search_emails(
-        [
-            dict(
-                sender="colin@gather.town",
-                newer_than=(10, "day"),
-                # unread=None,
-                labels=["INBOX"],
-                # exact_phrase=None,
-                # subject=None,
-            )
-        ]
-    )
+    # messages = search_emails(
+    #     [
+    #         dict(
+    #             sender="colin@gather.town",
+    #             newer_than=(10, "day"),
+    #             # unread=None,
+    #             labels=["INBOX"],
+    #             # exact_phrase=None,
+    #             # subject=None,
+    #         )
+    #     ]
+    # )
 
-    messages = gmail_to_elastic(
-        query=dict(
-            recipient="bfortuner@gmail.com",
-            newer_than=(120, "day"),
-            labels=["INBOX"],
-        ),
-        limit=100000,
-    )
+    # messages = gmail_to_elastic(
+    #     query=dict(
+    #         recipient="bfortuner@gmail.com",
+    #         newer_than=(120, "day"),
+    #         labels=["INBOX"],
+    #     ),
+    #     limit=100000,
+    # )
 
-    # search_elastic_emails({})
+    search_elastic_emails({})
