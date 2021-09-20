@@ -6,9 +6,12 @@ import elasticsearch_dsl
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import MultiMatch
 import pandas as pd
+from txtai.pipeline import Similarity
 
 
 EMAIL_INDEX = "email"
+QUERY_LIMIT = 1000
+SIMILARITY_BATCH_SIZE = 100
 
 
 def bulk_load_docs():
@@ -57,10 +60,15 @@ def get_by_id(id_: str, client: Elasticsearch):
 
 
 def search_query_string(
-    query_str: str, fields: List, client: Elasticsearch, start: int = 0, stop: int = 100
+    query_str: str,
+    fields: List,
+    client: Elasticsearch,
+    start: int = 0,
+    stop: int = QUERY_LIMIT,
 ) -> List[elasticsearch_dsl.response.hit.Hit]:
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
-    query = MultiMatch(query=query_str, fields=fields)
+    # https://www.elastic.co/guide/en/elasticsearch//reference/current/query-dsl-multi-match-query.html
+    query = MultiMatch(query=query_str, fields=fields, type="best_fields")
     s = Search(using=client, index=EMAIL_INDEX)
     s = s.query(query)
     s = s[start:stop]  # pagination/limit
@@ -98,7 +106,7 @@ def results_to_df(results: List[Dict], fields: List[str] = None):
     return df
 
 
-def search_subjects(query: str, client: Elasticsearch, limit: int = 10):
+def search_subjects(query: str, client: Elasticsearch, limit: int = QUERY_LIMIT):
     query = {"size": limit, "query": {"query_string": {"query": query}}}
 
     results = []
@@ -114,6 +122,10 @@ def dict_to_table(dct, columns=None):
     return df
 
 
+def semantic_search(query: str, strings: List[str], engine: Similarity):
+    return [(score, strings[x]) for x, score in engine(query, strings)]
+
+
 if __name__ == "__main__":
     # search_elastic_emails({})
     es = Elasticsearch(
@@ -123,12 +135,30 @@ if __name__ == "__main__":
     # query = "+Slack"
     # results = search_subjects(query, client=es, limit=10)
     # print(results)
+    similarity = Similarity("valhalla/distilbart-mnli-12-3")
 
-    query = "+Slack"
-    hits = search_query_string(query, fields=["subject"], client=es)
-    print(f"Found {len(hits)} results.")
-    results = [dsl_hit_to_dict(hit) for hit in hits]
-    print(results[0])
-    df = results_to_df(results, fields=["subject", "sender_address", "date"])
-    email = get_by_id(id_=df.iloc[0]["_id"], client=es)
-    print(email)
+    # email = get_by_id(id_=df.iloc[0]["_id"], client=es)
+    # print(email)
+    query_field = "subject"
+    # queries = ["+job opportunity"]  # + means include/contains? - means exclude
+    queries = ["+recruiter email"]  # + means include/contains? - means exclude
+    for query in queries:
+        hits = search_query_string(query, fields=[query_field], client=es)
+        print(f"Found {len(hits)} results.")
+        results = [dsl_hit_to_dict(hit) for hit in hits]
+        df = results_to_df(results, fields=["subject", "sender_address", "date"])
+        with pd.option_context("display.max_colwidth", -1):
+            print(df.head(20))
+        # Create similarity instance for re-ranking
+        rankings = []
+        for i in range(0, len(results), SIMILARITY_BATCH_SIZE):
+            strings = [
+                r["_source"][query_field]
+                for r in results[i : i + SIMILARITY_BATCH_SIZE]
+            ]
+            rankings += semantic_search(query, strings, similarity)
+            print(f"Processed {len(rankings)} rows")
+        df = pd.DataFrame(data=rankings, columns=["score", query_field])
+        df = df.sort_values(by="score", ascending=False, inplace=False)
+        # with pd.option_context("display.max_colwidth", -1):
+        print(df.head(20))
