@@ -1,4 +1,5 @@
 from datetime import datetime
+import email
 import hashlib
 import json
 from pathlib import Path
@@ -152,10 +153,8 @@ def save_email_to_elastic(email: Dict):
 
 
 def normalize_email_address(email_in):
-    import email
-
     parsed = email.utils.parseaddr(email_in)
-    return parsed[1]
+    return parsed
 
 
 def load_email(
@@ -313,12 +312,13 @@ def hash_email(email: Dict) -> str:
 
 
 if __name__ == "__main__":
-    email_dict = load_email(
-        email_dir="data/emails/3f50ce2a8e1fd4a1120dd5b67dbe2799ec2c838d09d32b8ec1c15ab74755cd70"
-    )
-    email_model.Email.init()
-    es_email = save_email_to_elastic(email_dict)
-    print(es_email)
-    import pdb
+    # email_dict = load_email(
+    #     email_dir="data/emails/3f50ce2a8e1fd4a1120dd5b67dbe2799ec2c838d09d32b8ec1c15ab74755cd70"
+    # )
+    # email_model.Email.init()
+    # es_email = save_email_to_elastic(email_dict)
+    # print(es_email)
+    # import pdb
 
-    pdb.set_trace()
+    # pdb.set_trace()
+    normalize_email_address("Colin Fortuner <colin@gather.town>")

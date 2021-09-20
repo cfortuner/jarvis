@@ -13,6 +13,8 @@ class Email(Document):
     email_id = Keyword(required=True)
     google_id = Keyword(required=True)
     sender = Keyword(required=True)
+    sender_name = Keyword(required=True)
+    sender_address = Keyword(required=True)
     recipient = Keyword(required=True)
     date = Date(required=True)
     subject = Text(analyzer="snowball", required=True)
@@ -41,8 +43,10 @@ def from_gmail_dict(email: Dict):
         email_id=email["email_id"],
         google_id=email["google_id"],
         sender=email["sender"],
+        sender_name=email["sender_name"],
+        sender_address=email["sender_address"],
         recipient=email["recipient"],
-        date=datetime.now(),
+        date=email["date"],
         subject=email["subject"],
         plain=email["plain"],
         label_ids=["INBOX"],

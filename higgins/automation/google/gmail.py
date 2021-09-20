@@ -14,9 +14,10 @@ https://developers.google.com/gmail/api/quickstart/python
 
 from typing import Dict, List
 
-from datetime import datetime
+import dateutil
 import elasticsearch
 import elasticsearch_dsl
+import pytz
 from simplegmail import Gmail
 from simplegmail.message import Message
 from simplegmail.query import construct_query
@@ -135,11 +136,17 @@ def search_emails(
 
 
 def convert_message_to_dict(message: Message, include_html: bool = False) -> Dict:
+    sender_name, sender_address = email_utils.normalize_email_address(message.sender)
+    # For now, set everything to pacific time
+    date = dateutil.parser.parse(message.date, ignoretz=True)
+    date = pytz.timezone("US/Pacific").localize(date)
     email = {
         "recipient": message.recipient,
         "sender": message.sender,
+        "sender_name": sender_name,
+        "sender_address": sender_address,
         "subject": message.subject,
-        "date": message.date,
+        "date": date,
         "preview": message.snippet,
         "plain": extract_plain_text(message),
         "google_id": message.id,
@@ -205,19 +212,18 @@ if __name__ == "__main__":
 
     # get_emails()
 
-    # messages = search_emails(
-    #     [
-    #         dict(
-    #             sender="bfortuner@gmail.com",
-    #             recipient="cfortuner@gmail.com",
-    #             newer_than=(7, "day"),
-    #             # unread=None,
-    #             # labels=None,
-    #             # exact_phrase=None,
-    #             # subject=None,
-    #         )
-    #     ]
-    # )
+    messages = search_emails(
+        [
+            dict(
+                sender="colin@gather.town",
+                newer_than=(10, "day"),
+                # unread=None,
+                labels=["INBOX"],
+                # exact_phrase=None,
+                # subject=None,
+            )
+        ]
+    )
 
     messages = gmail_to_elastic(
         query=dict(
@@ -228,4 +234,4 @@ if __name__ == "__main__":
         limit=100000,
     )
 
-    search_elastic_emails({})
+    # search_elastic_emails({})
