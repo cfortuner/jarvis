@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
@@ -6,10 +6,12 @@ import elasticsearch_dsl
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import MultiMatch
 import pandas as pd
+from txtai.embeddings import Embeddings
+from txtai.pipeline.extractor import Extractor
 from txtai.pipeline import Similarity
 
-
 from higgins.nlp.openai.email_questions import rank_strings
+from . import email_utils
 
 
 EMAIL_INDEX = "email"
@@ -126,15 +128,11 @@ def dict_to_table(dct, columns=None):
 
 
 def semantic_search(query: str, strings: List[str], engine: Similarity):
+    # https://github.com/neuml/txtai/blob/master/examples/04_Add_semantic_search_to_Elasticsearch.ipynb
     return [(score, strings[x]) for x, score in engine(query, strings)]
 
 
-if __name__ == "__main__":
-    # search_elastic_emails({})
-    es = Elasticsearch(
-        hosts=["http://localhost:9200"], timeout=60, retry_on_timeout=True
-    )
-
+def test_semantic_search(es):
     # query = "+Slack"
     # results = search_subjects(query, client=es, limit=10)
     # print(results)
@@ -183,3 +181,100 @@ if __name__ == "__main__":
         docs = rank_strings(query, strings)
         for doc in docs[:20]:
             print(doc["score"], strings[doc["document"]])
+
+
+def extractive_qa(
+    email: Dict, questions: List[Tuple], embeddings: Embeddings, extractor: Extractor
+):
+    # questions: [ (Name, query, question, is_snippet), ... ]
+    # They preprocess their articles to extract and label sentences
+    # as "informative" or not. Only the salient sentences are fed to model.
+    # https://github.com/UKPLab/sentence-transformers
+    # https://github.com/neuml/txtai/blob/master/examples/06_Extractive_QA_with_Elasticsearch.ipynb
+
+    # Use QA extractor to derive additional columns
+    from higgins.nlp.openai import email_questions
+
+    chunks = email_questions.create_email_chunks(email["plain"], 100)
+    answers = extractor(questions, chunks)
+    return answers, chunks
+
+
+def test_extractive_qa_verification_codes():
+    # Create embeddings model, backed by sentence-transformers & transformers
+    embeddings = Embeddings({"path": "sentence-transformers/nli-mpnet-base-v2"})
+    # https://huggingface.co/deepset/roberta-large-squad2
+    extractor = Extractor(embeddings, "deepset/roberta-large-squad2")
+    # extractor = Extractor(
+    #     embeddings, "deepset/bert-large-uncased-whole-word-masking-squad2"
+    # )
+    questions = [
+        ("Sender", "from", "Who is the email from?", False),
+        ("Code", "verification code", "What is the code?", False),
+        ("Expires", "code expires", "When does the code expire?", False),
+    ]
+    emails = email_utils.search_local_emails(["verification_code"])
+    print(f"Found {len(emails)}")
+    for email in emails:
+        preview = email_utils.get_email_preview(email, show_body=True)
+        email["plain"] = preview
+        answers, chunks = extractive_qa(email, questions, embeddings, extractor)
+        print("--->   ", answers)
+
+
+def test_extractive_qa_flights():
+    # Create embeddings model, backed by sentence-transformers & transformers
+    embeddings = Embeddings({"path": "sentence-transformers/nli-mpnet-base-v2"})
+    # https://huggingface.co/deepset/roberta-large-squad2
+    extractor = Extractor(embeddings, "deepset/roberta-large-squad2")
+    questions = [
+        ("Traveler", "traveler passenger name", "Who is the traveler?", False),
+        (
+            "Confirmation number",
+            "confirmation number",
+            "What is the confirmation number?",
+            False,
+        ),
+        (
+            "Airline",
+            "airline",
+            "What is the airline?",
+            False,
+        ),
+        (
+            "Departure time",
+            "departure time departs",
+            "When does the flight depart?",
+            False,
+        ),
+        (
+            "Arrival time",
+            "arrival time arrives",
+            "When does the flight arrive?",
+            False,
+        ),
+    ]
+    emails = email_utils.search_local_emails(["flights"])
+    print(f"Found {len(emails)}")
+    for email in emails:
+        preview = email_utils.get_email_preview(email, show_body=True)
+        email["plain"] = preview
+        answers, chunks = extractive_qa(email, questions, embeddings, extractor)
+        print("--->   ", answers)
+        print(email.get("model_labels"))
+
+
+def elasticsearch_dense_vectors():
+    # https://www.sbert.net/examples/applications/semantic-search/README.html
+    # https://github.com/UKPLab/sentence-transformers/blob/master/examples/applications/semantic-search/semantic_search_quora_elasticsearch.py
+    pass
+
+
+if __name__ == "__main__":
+    # search_elastic_emails({})
+    es = Elasticsearch(
+        hosts=["http://localhost:9200"], timeout=60, retry_on_timeout=True
+    )
+    # test_semantic_search(es)
+    # test_extractive_qa_verification_codes()
+    test_extractive_qa_flights()
