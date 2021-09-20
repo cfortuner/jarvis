@@ -9,9 +9,12 @@ import pandas as pd
 from txtai.pipeline import Similarity
 
 
+from higgins.nlp.openai.email_questions import rank_strings
+
+
 EMAIL_INDEX = "email"
 QUERY_LIMIT = 1000
-SIMILARITY_BATCH_SIZE = 100
+SIMILARITY_BATCH_SIZE = 10
 
 
 def bulk_load_docs():
@@ -135,15 +138,27 @@ if __name__ == "__main__":
     # query = "+Slack"
     # results = search_subjects(query, client=es, limit=10)
     # print(results)
-    similarity = Similarity("valhalla/distilbart-mnli-12-3")
+    # engine = "typeform/distilbert-base-uncased-mnli"  # best?
+    engine = "valhalla/distilbart-mnli-12-3"  # tutorial
+    # engine = "facebook/bart-large-mnli"
+    # engine = "vicgalle/xlm-roberta-large-xnli-anli"  # slow, can't use the fast tokenizer
+    similarity = Similarity(engine)
 
     # email = get_by_id(id_=df.iloc[0]["_id"], client=es)
     # print(email)
     query_field = "subject"
+    secondary_fields = ["plain"]
     # queries = ["+job opportunity"]  # + means include/contains? - means exclude
-    queries = ["+recruiter email"]  # + means include/contains? - means exclude
+    queries = [
+        "+recruiter email"
+    ]  # Elasticsearch doesn't understand, but txtai does well
+    # queries = [
+    #     "+when does my flight arrive?"   # Davinci handles this well
+    # ]  # + means include/contains? - means exclude
     for query in queries:
-        hits = search_query_string(query, fields=[query_field], client=es)
+        hits = search_query_string(
+            query, fields=[query_field] + secondary_fields, client=es
+        )
         print(f"Found {len(hits)} results.")
         results = [dsl_hit_to_dict(hit) for hit in hits]
         df = results_to_df(results, fields=["subject", "sender_address", "date"])
@@ -162,3 +177,9 @@ if __name__ == "__main__":
         df = df.sort_values(by="score", ascending=False, inplace=False)
         # with pd.option_context("display.max_colwidth", -1):
         print(df.head(20))
+
+        # OpenAI - Davinci == Way better
+        strings = [r["_source"][query_field] for r in results[:200]]
+        docs = rank_strings(query, strings)
+        for doc in docs[:20]:
+            print(doc["score"], strings[doc["document"]])
