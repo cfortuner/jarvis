@@ -161,7 +161,8 @@ def convert_message_to_dict(message: Message, include_html: bool = False) -> Dic
 def extract_plain_text(message: Message) -> str:
     plain = ""
     if bool(message.html):
-        plain = email_utils.parse_html_v2(message.html)
+        # plain = email_utils.parse_html_v2(message.html)
+        plain = email_utils.parse_html_v3(message.html)
     elif bool(message.plain):
         plain = message.plain
     plain = email_utils.clean_email_body(plain)

@@ -382,3 +382,7 @@ Email-related product from GPT https://www.hypertype.co/
 * https://prodi.gy/features (Scriptable annotation tool for NLP tasks -- and some CV)
 * 
 
+### Large Document IR and Summarization
+
+* https://yjernite.github.io/lfqa.html
+* https://docs.google.com/presentation/d/1A5wJEzFYGdNem7egJ-BTm6EMI3jGNe1lalyChYL54gw/edit#slide=id.p

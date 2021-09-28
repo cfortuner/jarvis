@@ -19,7 +19,9 @@ def get_num_tokens(text: str, tokenizer: GPT2TokenizerFast):
 def get_tokenizer() -> GPT2TokenizerFast:
     # https://huggingface.co/transformers/main_classes/tokenizer.html#transformers.PreTrainedTokenizerFast
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+    tokenizer = GPT2TokenizerFast.from_pretrained(
+        "gpt2", cache_dir="transformers_cache/", local_files_only=True
+    )
     return tokenizer
 
 
@@ -34,7 +36,7 @@ def normalize_text_naive(text):
 
 
 def compute_levenshtein_distance(s1, s2):
-    """Measure difference between 2 strings. 
+    """Measure difference between 2 strings.
 
     https://en.wikipedia.org/wiki/Levenshtein_distance.
 
@@ -45,12 +47,14 @@ def compute_levenshtein_distance(s1, s2):
 
     distances = range(len(s1) + 1)
     for i2, c2 in enumerate(s2):
-        distances_ = [i2+1]
+        distances_ = [i2 + 1]
         for i1, c1 in enumerate(s1):
             if c1 == c2:
                 distances_.append(distances[i1])
             else:
-                distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
+                distances_.append(
+                    1 + min((distances[i1], distances[i1 + 1], distances_[-1]))
+                )
         distances = distances_
     return distances[-1]
 
@@ -60,7 +64,7 @@ def match_text(
     text: str,
     fuzzy: bool = True,
     contains: bool = False,
-    threshold: float = 2
+    threshold: float = 2,
 ):
     target = normalize_text(target)
     text = normalize_text(text)
@@ -81,7 +85,7 @@ def display_live_transcription(transcript, overwrite_chars):
 
     We include a carriage return at the end of the line, so subsequent lines will overwrite
     them. If the previous result was longer than this one, we need to print some extra
-    spaces to overwrite the previous result    
+    spaces to overwrite the previous result
     """
     sys.stdout.write(transcript + overwrite_chars + "\r")
     sys.stdout.flush()

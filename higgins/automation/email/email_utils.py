@@ -1,7 +1,9 @@
 from datetime import datetime
 import email
 import hashlib
+from html2text import HTML2Text
 import json
+import mistletoe
 from pathlib import Path
 import re
 import sys
@@ -119,6 +121,48 @@ def parse_html_v2(html):
     soup = BeautifulSoup(html)
     plain = soup.get_text("\n")
     return plain
+
+
+def parse_html_v3(html):
+    soup = BeautifulSoup(html)
+    plain = [text for text in soup.stripped_strings]
+    return "\n".join(plain)
+
+
+def html2md(html):
+    parser = HTML2Text()
+    parser.ignore_images = True
+    parser.ignore_anchors = True
+    parser.body_width = 0
+    md = parser.handle(html)
+    return md
+
+
+def html2plain(html):
+    # HTML to Markdown
+    md = html2md(html)
+    # Normalise custom lists
+    md = re.sub(r"(^|\n) ? ? ?\\?[•·–-—-*]( \w)", r"\1  *\2", md)
+    # Convert back into HTML
+    html_simple = mistletoe.markdown(md)
+    # Convert to plain text
+    soup = BeautifulSoup(html_simple)
+    text = soup.getText()
+    # Strip off table formatting
+    text = re.sub(r"(^|\n)\|\s*", r"\1", text)
+    # Strip off extra emphasis
+    text = re.sub(r"\*\*", "", text)
+    # Remove trailing whitespace and leading newlines
+    text = re.sub(r" *$", "", text)
+    text = re.sub(r"\n\n+", r"\n\n", text)
+    text = re.sub(r"^\n+", "", text)
+    return text
+
+
+def parse_html_v4(html):
+    # Preserves some structure by using markdown as intermediary representation
+    # https://skeptric.com/html-to-text/
+    return html2plain(html)
 
 
 def get_body_stats(body):

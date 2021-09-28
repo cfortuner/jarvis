@@ -211,11 +211,19 @@ def test_extractive_qa_verification_codes():
     questions = [
         ("Sender", "from", "Who is the email from?", False),
         ("Code", "verification code", "What is the code?", False),
+        (
+            "Verification Code",
+            "verification code",
+            "What is the verification code?",
+            False,
+        ),
         ("Expires", "code expires", "When does the code expire?", False),
     ]
     emails = email_utils.search_local_emails(["verification_code"])
     print(f"Found {len(emails)}")
     for email in emails:
+        # if bool(email["html"]):
+        #     email["plain"] = email_utils.parse_html_v4(email["html"])
         preview = email_utils.get_email_preview(email, show_body=True)
         email["plain"] = preview
         answers, chunks = extractive_qa(email, questions, embeddings, extractor)
@@ -257,6 +265,8 @@ def test_extractive_qa_flights():
     emails = email_utils.search_local_emails(["flights"])
     print(f"Found {len(emails)}")
     for email in emails:
+        if bool(email["html"]):
+            email["plain"] = email_utils.parse_html_v4(email["html"])
         preview = email_utils.get_email_preview(email, show_body=True)
         email["plain"] = preview
         answers, chunks = extractive_qa(email, questions, embeddings, extractor)
@@ -272,9 +282,57 @@ def elasticsearch_dense_vectors():
 
 if __name__ == "__main__":
     # search_elastic_emails({})
-    es = Elasticsearch(
-        hosts=["http://localhost:9200"], timeout=60, retry_on_timeout=True
-    )
+    # es = Elasticsearch(
+    #     hosts=["http://localhost:9200"], timeout=60, retry_on_timeout=True
+    # )
     # test_semantic_search(es)
     # test_extractive_qa_verification_codes()
-    test_extractive_qa_flights()
+    # test_extractive_qa_flights()
+    # emails = email_utils.search_local_emails(["flights"])
+    # print(email_utils.get_email_list_preview(emails))
+
+    # for email in emails[:3]:
+    #     print(email_utils.get_email_preview(email))
+
+    from higgins.nlp import html_utils
+
+    #     email = emails[0]
+
+    # email = email_utils.load_email(
+    #     "cfefa0094fe59fb957197da94d4681e0070c74f8313e8f45637a61c5ba2bc83e"  # "e2230f4e0ac8396781c9f1002c3e759850d57d21c664a919e0d8d994eebfb993"
+    # )
+    # print(email_utils.get_email_preview(email))
+    # from bs4 import BeautifulSoup
+
+    # # print(email["email_id"])
+    # # soup = BeautifulSoup(email["html"])
+    # # for child in soup.find_all("table"):
+    # #     print(child)
+
+    # # for child in soup.find_all("table")[4].children:
+    # #     for td in child:
+    # #         print(td.text)
+
+    # # tables = html_utils.extract_tables_from_html(email["html"])
+    # # print(tables)
+
+    # # tables = html_utils.extract_tables_from_html_pandas(email["html"])
+    # plain = email_utils.parse_html_v3(email["html"])
+    # print(plain)
+
+    # # tables = soup.find_all("table")
+    # # import pdb
+
+    # # pdb.set_trace()
+
+    # test_extractive_qa_verification_codes()
+    # test_extractive_qa_flights()
+
+    emails = email_utils.search_local_emails(["flights"])
+    print(f"Found {len(emails)}")
+    for email in emails:
+        print("BEFORE -------------------------")
+        print(email["plain"])
+        if bool(email["html"]):
+            print("AFTER -------------------------")
+            print(email_utils.parse_html_v4(email["html"]))
