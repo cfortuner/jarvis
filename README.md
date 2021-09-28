@@ -365,3 +365,20 @@ Email-related product from GPT https://www.hypertype.co/
   * Search relevant documents with cheap local engine (elasticsearch, SOLR)
   * Upload chunks of these articles dynamically based on the most relevant chunk from that article
   * Pass results to semantic search or answers endpoint
+
+### Semantic Search / Email Processing
+
+* [Info Retreival with ReRank](https://github.com/UKPLab/sentence-transformers/blob/master/examples/applications/semantic-search/semantic_search_wikipedia_qa.py)
+* [Info Retreival with ReRank](https://github.com/UKPLab/sentence-transformers/tree/master/examples/applications/retrieve_rerank) (Could be used for email search. Can operate on paragraphs.)
+* [Topic Modeling](https://maartengr.github.io/BERTopic/tutorial/algorithm/algorithm.html) - topic modeling / clustering. Guided (manually seed topics), semi, or unsupervised. Could be used to categorize emails by their semantic meaning (recruiter emails, family/personal, flights, verification codes, orders/receipts, promotions, etc.)
+* [TextRank] https://towardsdatascience.com/textrank-for-keyword-extraction-by-python-c0bae21bcec0 - extract most important keywords from emails and discard the rest
+* [Extractive Summarization Overview](https://www.machinelearningplus.com/nlp/text-summarization-approaches-nlp-example) - Gensim
+* Extracting data from HTML tables and websites [1](https://arxiv.org/abs/1903.08305) [2](https://arxiv.org/abs/1403.1939)
+* [TextPipe](https://github.com/textpipe/textpipe) Extracting text from HTML pages
+
+
+### Data Labeling
+
+* https://prodi.gy/features (Scriptable annotation tool for NLP tasks -- and some CV)
+* 
+

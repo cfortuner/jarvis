@@ -19,9 +19,11 @@ google-auth-oauthlib==0.4.6
 google-api-python-client==2.19.1
 google-cloud-speech==2.5.0
 google-cloud-texttospeech==2.5.2
+hnswlib==0.5.2  # ANN similarity search for sentence transfomers
 jsonlines==2.0.0
 kivymd==0.104.2  # Need to install Kivy first
 # pocketsphinx==0.1.15
+mistletoe==0.7.2  # parsing html
 openai==0.10.1
 prompt-toolkit==3.0.20
 pvporcupine==1.9.5  # wake word
@@ -32,8 +34,10 @@ pygame==2.0.1  # Required for Kivy
 pyperclip==1.8.2  # copy and paste
 pystray==0.17.3
 selenium==4.0.0.b4
+sentence-transformers==2.0.0
 simpleaudio==1.0.4
 simplegmail==4.0.3
+# spacy==3.1.3
 SpeechRecognition==3.6.1
 tinydb==4.5.1
 transformers==4.10.0

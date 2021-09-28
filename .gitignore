@@ -1,6 +1,7 @@
 # Project specific
 client_secret.json
 google_tokens/
+transformers_cache/
 # txtai embeddings index
 index/
 data/episodes.jsonl
