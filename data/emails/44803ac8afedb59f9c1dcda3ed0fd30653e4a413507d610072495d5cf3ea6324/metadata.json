@@ -1,0 +1,17 @@
+{
+  "recipient": "bfortuner@gmail.com",
+  "sender": "Colin Fortuner <colin@gather.town>",
+  "sender_name": "Colin Fortuner",
+  "sender_address": "colin@gather.town",
+  "subject": "Fwd: [Slack] Notifications from the Gather workspace for September 7th, 2021",
+  "date": "2021-09-07 17:51:24-07:00",
+  "preview": "---------- Forwarded message --------- From: Slack <notification@slack.com> Date: Tue, Sep 7, 2021 at 5:26 PM Subject: [Slack] Notifications from the Gather workspace for September 7th, 2021 To:",
+  "google_id": "17bc2e3846c6fc8c",
+  "thread_id": "17bc2e3846c6fc8c",
+  "label_ids": [
+    "CATEGORY_PERSONAL",
+    "INBOX"
+  ],
+  "markdown": "\\---------- Forwarded message --------- From: Slack<notification@slack.com> Date: Tue, Sep 7, 2021 at 5:26 PM Subject: [Slack] Notifications from the Gather workspace for September 7th, 2021 To: <colin@gather.town>\n\n| \n\n| \n\n## You have new messages in Gather (gather-town.slack.com)\n\n### From a thread in #engine\n\nEvelyn King September 7th at 5:14 PM\n\nI have been personally concerned about the fact that we send these excessive init events, but would the effect of this basically be that the events are still sent to GGC, and GGC just doesn't forward anything to subscribers until it has a complete player, and then it sends a playerJoins event, which is a sort of synthetic event?\n\n| Open in Slack  \n---  \nReply  \n---  \n  \nManage your notifications\n\nSnooze them for an hour, eight hours, a day, three days, or the next week. Or, turn email notifications off. For more detailed preferences, see your account page.  \n  \n---  \n  \n| | \n\nWorkspace name: Gather\n\n| Gather Workspace URL: gather-town.slack.com Email: colin@gather.town  \n---|---  \n  \nSign In  \n  \n---  \n  \n| Made by Slack Technologies, LLC 500 Howard Street, San Francisco, CA 94105 slack.com  \n---  \nOur Blog | Policies\n",
+  "email_id": "44803ac8afedb59f9c1dcda3ed0fd30653e4a413507d610072495d5cf3ea6324"
+}

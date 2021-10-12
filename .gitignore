@@ -1,5 +1,6 @@
 # Project specific
 client_secret.json
+data/emails_old/
 google_tokens/
 transformers_cache/
 # txtai embeddings index

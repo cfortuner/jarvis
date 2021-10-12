@@ -23,6 +23,7 @@ from simplegmail.message import Message
 from simplegmail.query import construct_query
 
 from higgins.automation.email import email_model, email_utils
+from higgins.nlp import html2plain
 
 
 def send_email(
@@ -123,10 +124,38 @@ def search_emails(
     client = Gmail()
     # TODO: Add INBOX labels, Sent, etc
     # Get your available labels
-    # User labels: [Label(name='CHAT', id='CHAT'), Label(name='SENT', id='SENT'), Label(name='INBOX', id='INBOX'), Label(name='IMPORTANT', id='IMPORTANT'), Label(name='TRASH', id='TRASH'), Label(name='DRAFT', id='DRAFT'), Label(name='SPAM', id='SPAM'), Label(name='CATEGORY_FORUMS', id='CATEGORY_FORUMS'), Label(name='CATEGORY_UPDATES', id='CATEGORY_UPDATES'), Label(name='CATEGORY_PERSONAL', id='CATEGORY_PERSONAL'), Label(name='CATEGORY_PROMOTIONS', id='CATEGORY_PROMOTIONS'), Label(name='CATEGORY_SOCIAL', id='CATEGORY_SOCIAL'), Label(name='STARRED', id='STARRED'), Label(name='UNREAD', id='UNREAD'), Label(name='[Imap]/Drafts', id='Label_1'), Label(name='Urgent', id='Label_10'), Label(name='[Imap]/Sent', id='Label_2'), Label(name='craigslist', id='Label_2858204817852213362'), Label(name='[Imap]/Trash', id='Label_3'), Label(name='Notes', id='Label_4'), Label(name='Personal', id='Label_5'), Label(name='Receipts', id='Label_6'), Label(name='Work', id='Label_8'), Label(name='TODO', id='Label_8430892267769255145'), Label(name='Sent Messages', id='Label_9')]
-    # labels = client.list_labels()
+    # User labels:
+    # Label(name='CHAT', id='CHAT'),
+    # Label(name='SENT', id='SENT'),
+    # Label(name='INBOX', id='INBOX'),
+    # Label(name='IMPORTANT', id='IMPORTANT'),
+    # Label(name='TRASH', id='TRASH'),
+    # Label(name='DRAFT', id='DRAFT'),
+    # Label(name='SPAM', id='SPAM'),
+    # Label(name='CATEGORY_FORUMS', id='CATEGORY_FORUMS'),
+    # Label(name='CATEGORY_UPDATES', id='CATEGORY_UPDATES'),
+    # Label(name='CATEGORY_PERSONAL', id='CATEGORY_PERSONAL'),
+    # Label(name='CATEGORY_PROMOTIONS', id='CATEGORY_PROMOTIONS'),
+    # Label(name='CATEGORY_SOCIAL', id='CATEGORY_SOCIAL'),
+    # Label(name='STARRED', id='STARRED'),
+    # Label(name='UNREAD', id='UNREAD'),
+    # Label(name='[Imap]/Drafts', id='Label_1'),
+    # Label(name='Urgent', id='Label_10'),
+    # Label(name='[Imap]/Sent', id='Label_2'),
+    # Label(name='craigslist', id='Label_2858204817852213362'),
+    # Label(name='[Imap]/Trash', id='Label_3'),
+    # Label(name='Notes', id='Label_4'),
+    # Label(name='Personal', id='Label_5'),
+    # Label(name='Receipts', id='Label_6'),
+    # Label(name='Work', id='Label_8'),
+    # Label(name='TODO', id='Label_8430892267769255145'),
+    # Label(name='Sent Messages', id='Label_9')]
+    labels = client.list_labels()
+    print("USR LABELS", labels)
     # print(f"User labels: {labels}")
-    messages = client.get_messages(query=construct_query(*query_dicts))
+    query = construct_query(*query_dicts)
+    print(query)
+    messages = client.get_messages(query=query)
     print(f"Query returned {len(messages)} messages")
     emails = []
     for message in messages[:limit]:
@@ -138,7 +167,7 @@ def search_emails(
 def convert_message_to_dict(message: Message, include_html: bool = False) -> Dict:
     sender_name, sender_address = email_utils.normalize_email_address(message.sender)
     # For now, set everything to pacific time
-    date = dateutil.parser.parse(message.date, ignoretz=True)
+    date = dateutil.parser.parse(message.date, ignoretz=True, fuzzy=True)
     date = pytz.timezone("US/Pacific").localize(date)
     email = {
         "recipient": message.recipient,
@@ -148,13 +177,20 @@ def convert_message_to_dict(message: Message, include_html: bool = False) -> Dic
         "subject": message.subject,
         "date": date,
         "preview": message.snippet,
-        "plain": extract_plain_text(message),
         "google_id": message.id,
+        "thread_id": message.thread_id,
         "label_ids": [label.name for label in message.label_ids],
+        "plain": extract_plain_text(message),
         "html": None,
+        "markdown": None,
     }
-    if include_html:
-        email["html"] = message.html
+    if bool(message.html):
+        html_extracts = html2plain.parse_html(message.html)
+        email["html"] = html_extracts["simplified"]
+        email["plain"] = html_extracts["text"]
+        email["markdown"] = html_extracts["markdown"]
+    if not include_html:
+        email["html"] = None
     return email
 
 
@@ -181,7 +217,9 @@ def format_terms(terms: Dict) -> Dict:
 def gmail_to_elastic(query: Dict, limit: int = 100):
     """Load emails from Gmail API query into Elasticsearch."""
     messages = search_emails(query_dicts=[query], limit=limit)
-    for dct in messages:
+    from tqdm import tqdm
+
+    for dct in tqdm(messages):
         dct["email_id"] = email_utils.hash_email(dct)
         email = email_model.from_gmail_dict(dct)
         email.save()
@@ -200,6 +238,14 @@ def search_elastic_emails(query: Dict):
     s = Search(using=client, index="email")
     resp = s.execute()
     print(f"Hits: {resp.hits.total.value}")
+
+
+def update_local_emails():
+    # Update local emails to have new HTML preprocessing
+    emails = email_utils.search_local_emails([], dataset_dir="data/emails_old")
+    for email in emails:
+        google_email = get_email(email["google_id"])
+        email_utils.save_email(google_email, labels=email.get("model_labels"))
 
 
 if __name__ == "__main__":
@@ -229,10 +275,14 @@ if __name__ == "__main__":
     # messages = gmail_to_elastic(
     #     query=dict(
     #         recipient="bfortuner@gmail.com",
-    #         newer_than=(120, "day"),
-    #         labels=["INBOX"],
+    #         newer_than=(365, "day"),
+    #         exclude_labels=[["promotions"], ["social"], ["forums"]],
+    #         # google supports these labels in queries:
+    #         # finance, purchases, updates, travel, social, promotions, inbox
     #     ),
     #     limit=100000,
     # )
 
-    search_elastic_emails({})
+    # search_elastic_emails({})
+
+    update_local_emails()

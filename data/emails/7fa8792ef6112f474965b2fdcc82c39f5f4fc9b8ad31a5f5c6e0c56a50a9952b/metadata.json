@@ -1,0 +1,18 @@
+{
+  "recipient": "\"bfortuner@gmail.com\" <bfortuner@gmail.com>",
+  "sender": "Eli Mernit <eli@slai.io>",
+  "sender_name": "Eli Mernit",
+  "sender_address": "eli@slai.io",
+  "subject": "Founding Engineer at Slai",
+  "date": "2021-08-13 12:02:43-07:00",
+  "preview": "Hi Brendan, I'm one of the founders here at Slai. Do you have time for a quick call/coffee next week? Slai is a tool to quickly build machine learning-powered applications. We make it easy for",
+  "google_id": "17b40e524cda1271",
+  "thread_id": "17b40e524cda1271",
+  "label_ids": [
+    "IMPORTANT",
+    "CATEGORY_PERSONAL",
+    "INBOX"
+  ],
+  "markdown": "Hi Brendan,\n\nI'm one of the founders here at Slai. Do you have time for a quick call/coffee next week?\n\nSlai is a tool to quickly build machine learning-powered applications. We make it easy for developers to build useful ML models without managing infrastructure.\n\nWe're currently a team of two, and we're looking to hire our first engineer (apart from our CTO) who will be heavily involved in leading product development at the company.\n\nA few highlights:\n\n\u2022 Launched our private beta in June, and starting to onboard customers\n\n\u2022 Raised pre-seed funding from some of the best founders and VCs in Silicon Valley\n\n\u2022 We are solving some of the most interesting problems at the intersection of distributed systems and machine learning (think multithreading on GPUs and creating interactive coding sessions in the browser)\n\nLet me know if you're interested in chatting!\n\n-Eli\n",
+  "email_id": "7fa8792ef6112f474965b2fdcc82c39f5f4fc9b8ad31a5f5c6e0c56a50a9952b"
+}

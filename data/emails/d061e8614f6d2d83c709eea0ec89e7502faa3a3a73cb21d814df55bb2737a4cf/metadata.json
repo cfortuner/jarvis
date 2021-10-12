@@ -1,0 +1,18 @@
+{
+  "recipient": "bfortuner@gmail.com",
+  "sender": "\"Amazon.com\" <account-update@amazon.com>",
+  "sender_name": "Amazon.com",
+  "sender_address": "account-update@amazon.com",
+  "subject": "Your Amazon verification code",
+  "date": "2018-09-04 14:41:14-07:00",
+  "preview": "Hello, We noticed that there was an attempt to sign in to your Amazon account. If you were prompted for a verification code, please enter the following to complete your sign-in. 771049 This code will",
+  "google_id": "165a6884d83258fd",
+  "thread_id": "165a6884d83258fd",
+  "label_ids": [
+    "IMPORTANT",
+    "CATEGORY_UPDATES",
+    "INBOX"
+  ],
+  "markdown": "| \n\nHello, We noticed that there was an attempt to sign in to your Amazon account. If you were prompted for a verification code, please enter the following to complete your sign-in.\n\n771049  \n  \n---  \n  \nThis code will expire in 10 minutes.\n\nIf you did not try to sign in to your account, please change your password immediately by visiting your account settings on Amazon. We also recommend changing password on other non-Amazon websites if you use the same password.\n\nIf you have additional questions about account security, please visit amazon.com/security.  \n  \nThanks for visiting Amazon!\n",
+  "email_id": "d061e8614f6d2d83c709eea0ec89e7502faa3a3a73cb21d814df55bb2737a4cf"
+}

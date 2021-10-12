@@ -1,0 +1,18 @@
+{
+  "recipient": "bfortuner@gmail.com",
+  "sender": "Binance US <do-not-reply@post.binance.us>",
+  "sender_name": "Binance US",
+  "sender_address": "do-not-reply@post.binance.us",
+  "subject": "Binance US | Confirm Your Withdraw Request From 76.14.117.217 - 2021-08-10 01:55:59(UTC)",
+  "date": "2021-08-09 18:55:59-07:00",
+  "preview": "Binance US Confirm Your Withdraw Request Anti-phishing 3797 You've made an application to withdraw 24.01000000 BNB from your account to addressbnb1jlqt44syc54l8dsd3958tc0w7acxevrlkjsymf .Please",
+  "google_id": "17b2dc614bd4546e",
+  "thread_id": "17b2dc614bd4546e",
+  "label_ids": [
+    "IMPORTANT",
+    "CATEGORY_UPDATES",
+    "INBOX"
+  ],
+  "markdown": "| \n\n| | Confirm Your Withdraw Request| | Anti-phishing| 3797  \n---|---  \n  \nYou\u2019ve made an application to withdraw 24.01000000 BNB from your account to addressbnb1jlqt44syc54l8dsd3958tc0w7acxevrlkjsymf .Please check the withdrawal address letter by letter.\n\nPlease click the button below to confirm the withdrawal:  \n  \nConfirm withdrawal  \nIf the above button doesn't work, copy and paste the following URL into your browser's address bar: https://www.binance.us/gateway-api/v1/public/capital/withdraw/confirm?id=3804c672f0db402daac7167fea369257  \n  \nVerification code:3804c672f0db402daac7167fea369257\n\nThis link will expire after 30 minutes for security reasons.\n\nDownload the Binance.US Mobile App  \n  \nBinance US Team This is an automated message. Please do not reply.  \n  \n\u00a9 2021 Binance.US All Rights Reserved www.binance.us\n",
+  "email_id": "a9354c1befbb6a5c0cb595a628f2fdbacadd04937ef60300d08253843e3f8056"
+}

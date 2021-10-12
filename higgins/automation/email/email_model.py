@@ -12,6 +12,7 @@ class Email(Document):
 
     email_id = Keyword(required=True)
     google_id = Keyword(required=True)
+    thread_id = Keyword(required=True)
     sender = Keyword(required=True)
     sender_name = Keyword(required=True)
     sender_address = Keyword(required=True)
@@ -42,6 +43,7 @@ def from_gmail_dict(email: Dict):
         meta={"id": email["google_id"]},
         email_id=email["email_id"],
         google_id=email["google_id"],
+        thread_id=email["thread_id"],
         sender=email["sender"],
         sender_name=email["sender_name"],
         sender_address=email["sender_address"],
@@ -49,7 +51,8 @@ def from_gmail_dict(email: Dict):
         date=email["date"],
         subject=email["subject"],
         plain=email["plain"],
-        label_ids=["INBOX"],
+        html=email["html"],
+        label_ids=email["label_ids"],
     )
 
 

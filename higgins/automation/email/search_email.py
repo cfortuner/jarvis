@@ -195,7 +195,7 @@ def extractive_qa(
     # Use QA extractor to derive additional columns
     from higgins.nlp.openai import email_questions
 
-    chunks = email_questions.create_email_chunks(email["plain"], 100)
+    chunks = email_questions.create_email_chunks(email["plain"], 200)
     answers = extractor(questions, chunks)
     return answers, chunks
 
@@ -222,8 +222,6 @@ def test_extractive_qa_verification_codes():
     emails = email_utils.search_local_emails(["verification_code"])
     print(f"Found {len(emails)}")
     for email in emails:
-        # if bool(email["html"]):
-        #     email["plain"] = email_utils.parse_html_v4(email["html"])
         preview = email_utils.get_email_preview(email, show_body=True)
         email["plain"] = preview
         answers, chunks = extractive_qa(email, questions, embeddings, extractor)
@@ -265,8 +263,6 @@ def test_extractive_qa_flights():
     emails = email_utils.search_local_emails(["flights"])
     print(f"Found {len(emails)}")
     for email in emails:
-        if bool(email["html"]):
-            email["plain"] = email_utils.parse_html_v4(email["html"])
         preview = email_utils.get_email_preview(email, show_body=True)
         email["plain"] = preview
         answers, chunks = extractive_qa(email, questions, embeddings, extractor)
@@ -326,13 +322,4 @@ if __name__ == "__main__":
     # # pdb.set_trace()
 
     # test_extractive_qa_verification_codes()
-    # test_extractive_qa_flights()
-
-    emails = email_utils.search_local_emails(["flights"])
-    print(f"Found {len(emails)}")
-    for email in emails:
-        print("BEFORE -------------------------")
-        print(email["plain"])
-        if bool(email["html"]):
-            print("AFTER -------------------------")
-            print(email_utils.parse_html_v4(email["html"]))
+    test_extractive_qa_flights()

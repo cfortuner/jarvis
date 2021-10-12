@@ -13,6 +13,12 @@ from typing import Dict, List, Tuple, Union
 from bs4 import BeautifulSoup
 
 from higgins.automation.email import email_model
+from higgins.nlp import html2plain
+
+
+def dateconverter(o):
+    if isinstance(o, datetime):
+        return o.__str__()
 
 
 def is_valid_email(email):
@@ -138,7 +144,7 @@ def html2md(html):
     return md
 
 
-def html2plain(html):
+def html2plain_fn(html):
     # HTML to Markdown
     md = html2md(html)
     # Normalise custom lists
@@ -162,7 +168,12 @@ def html2plain(html):
 def parse_html_v4(html):
     # Preserves some structure by using markdown as intermediary representation
     # https://skeptric.com/html-to-text/
-    return html2plain(html)
+    return html2plain_fn(html)
+
+
+def parse_email_html(html: str) -> dict:
+    # Minify HTML, Simplify HTML, Convert To Text
+    return html2plain.parse_html(html)
 
 
 def get_body_stats(body):
@@ -179,7 +190,7 @@ def save_email(
     email: Dict,
     dataset_dir: str = "data/emails",
     labels: Dict = None,
-    include_elastic: bool = True,
+    include_elastic: bool = False,
 ) -> str:
     # Google has a unique identifier, but for now..
     email_id = hash_email(email)
@@ -294,8 +305,14 @@ def save_email_to_dir(
     exclude_fields = ["plain", "html", "attachments"]
     metadata = {k: v for k, v in email.items() if k not in exclude_fields}
     metadata["email_id"] = email_id
+    # metadata["date"] = metadata["date"].isoformat()
 
-    json.dump(metadata, open(Path(email_dir, "metadata.json"), "w"), indent=2)
+    json.dump(
+        metadata,
+        open(Path(email_dir, "metadata.json"), "w"),
+        indent=2,
+        default=dateconverter,
+    )
 
     if bool(email.get("plain")):
         with open(Path(email_dir, "body.plain"), "w") as f:
@@ -304,6 +321,10 @@ def save_email_to_dir(
     if bool(email.get("html")):
         with open(Path(email_dir, "body.html"), "w") as f:
             f.write(email["html"])
+
+    if bool(email.get("markdown")):
+        with open(Path(email_dir, "body.md"), "w") as f:
+            f.write(email["markdown"])
 
     if labels is not None:
         json.dump(labels, open(Path(email_dir, "model_labels.json"), "w"), indent=2)
@@ -366,3 +387,6 @@ if __name__ == "__main__":
 
     # pdb.set_trace()
     normalize_email_address("Colin Fortuner <colin@gather.town>")
+
+    emails = search_local_emails([])
+    print(len(emails))

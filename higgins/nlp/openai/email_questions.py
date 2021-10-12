@@ -283,15 +283,18 @@ def create_email_chunks(text: str, max_tokens_per_chunk: int = 500) -> List[str]
     lines = text.split("\n")
     chunk_tokens = 0
     current_chunk = []
-    for line in lines:
-        line = email_utils.remove_whitespace(line)
+    i = 0
+    while i < len(lines):
+        line = email_utils.remove_whitespace(lines[i])
         if chunk_tokens >= max_tokens_per_chunk:
             chunks.append(" ".join(current_chunk))
             current_chunk = []
             chunk_tokens = 0
+            i -= 1  # Overlapping chunks
         else:
             current_chunk.append(line)
             chunk_tokens += nlp_utils.get_num_tokens(line, tokenizer)
+        i += 1
     chunks.append(" ".join(current_chunk))
     print(f"Num chunks {len(chunks)}")
     return chunks

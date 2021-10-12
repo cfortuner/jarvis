@@ -1,0 +1,18 @@
+{
+  "recipient": "bfortuner@gmail.com",
+  "sender": "Microsoft account team <account-security-noreply@accountprotection.microsoft.com>",
+  "sender_name": "Microsoft account team",
+  "sender_address": "account-security-noreply@accountprotection.microsoft.com",
+  "subject": "Microsoft account password reset",
+  "date": "2021-05-16 13:09:44-07:00",
+  "preview": "Microsoft account Password reset code Please use this code to reset the password for the Microsoft account bf*****@gmail.com. Here is your code: 5257297 If you don't recognize the Microsoft account",
+  "google_id": "17976cc84cad17a2",
+  "thread_id": "17976cc84cad17a2",
+  "label_ids": [
+    "IMPORTANT",
+    "CATEGORY_UPDATES",
+    "INBOX"
+  ],
+  "markdown": "Microsoft account  \n---  \nPassword reset code  \nPlease use this code to reset the password for the Microsoft account bf*****@gmail.com.  \nHere is your code: 5257297  \nIf you don't recognize the Microsoft account bf*****@gmail.com, you can click here to remove your email address from that account.  \nThanks,  \nThe Microsoft account team\n",
+  "email_id": "96f542cb73cf785fe84998a41a37e792c47355a53362d4b6b6f79deb898cad26"
+}
