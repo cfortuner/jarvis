@@ -141,10 +141,9 @@ def parse_html(html: str, include_tables: bool = False) -> dict:
 if __name__ == "__main__":
     from higgins.automation.email import email_utils
 
-    # email_id = "e9e027410ae591c3ea94c3d2c67fe7ac05025dd92579e224b1e9abe8dd6ff72d"
-    email_id = "365b47046e7027df274d0a26de33461f99c4cb054e47a6aaa4a6bc791e263585"
-    email_id = "0f84cbaf27e24d6d3eb96b734e8f8c776a8fc7250ed479ba252d47a9fc56fcc2"
-    email = email_utils.load_email(email_id)
+    emails = email_utils.search_local_emails([], dataset_dir="data/emails")
+    # email = email_utils.load_email(email_id)
+    email = emails[0]
     html = email["html"]
 
     # Save minified html
@@ -191,3 +190,26 @@ if __name__ == "__main__":
 
             # dfs = pd.read_html(table.prettify())
             # print(dfs[0].head())
+
+    import pprint
+    import extruct
+
+    # https://github.com/scrapinghub/extruct
+    pp = pprint.PrettyPrinter(indent=2)
+    for email in emails:
+        if bool(email["html"]):
+            minified_html = minify_html_lib(email["html"])
+            data = extruct.extract(
+                email["html"],
+                uniform=True,  # syntaxes=["microdata", "opengraph", "rdfa"], uniform=True
+            )
+            if (
+                data["json-ld"]
+                or data["microdata"]
+                or data["microformat"]
+                or data["opengraph"]
+                or data["rdfa"]
+            ):
+                print(email["subject"])
+                pp.pprint(data)
+                print("-" * 20)

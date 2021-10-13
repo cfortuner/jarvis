@@ -21,6 +21,7 @@ import pytz
 from simplegmail import Gmail
 from simplegmail.message import Message
 from simplegmail.query import construct_query
+import traceback
 
 from higgins.automation.email import email_model, email_utils
 from higgins.nlp import html2plain
@@ -159,8 +160,12 @@ def search_emails(
     print(f"Query returned {len(messages)} messages")
     emails = []
     for message in messages[:limit]:
-        email = convert_message_to_dict(message, include_html)
-        emails.append(email)
+        try:
+            email = convert_message_to_dict(message, include_html)
+            emails.append(email)
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
     return emails
 
 
@@ -242,7 +247,7 @@ def search_elastic_emails(query: Dict):
 
 def update_local_emails():
     # Update local emails to have new HTML preprocessing
-    emails = email_utils.search_local_emails([], dataset_dir="data/emails_old")
+    emails = email_utils.search_local_emails([], dataset_dir="data/emails")
     for email in emails:
         google_email = get_email(email["google_id"])
         email_utils.save_email(google_email, labels=email.get("model_labels"))
@@ -272,17 +277,17 @@ if __name__ == "__main__":
     #     ]
     # )
 
-    # messages = gmail_to_elastic(
-    #     query=dict(
-    #         recipient="bfortuner@gmail.com",
-    #         newer_than=(365, "day"),
-    #         exclude_labels=[["promotions"], ["social"], ["forums"]],
-    #         # google supports these labels in queries:
-    #         # finance, purchases, updates, travel, social, promotions, inbox
-    #     ),
-    #     limit=100000,
-    # )
+    messages = gmail_to_elastic(
+        query=dict(
+            recipient="bfortuner@gmail.com",
+            newer_than=(365, "day"),
+            exclude_labels=[["promotions"], ["social"], ["forums"]],
+            # google supports these labels in queries:
+            # finance, purchases, updates, travel, social, promotions, inbox
+        ),
+        limit=100000,
+    )
 
     # search_elastic_emails({})
 
-    update_local_emails()
+    # update_local_emails()
