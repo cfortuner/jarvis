@@ -69,6 +69,7 @@ def get_email_preview(
         lines.append(f"\nGoogle_id: {email['google_id']}")
 
     preview = "".join(lines)
+    preview += "\n\nThanks,\nBrendan"
     return preview
 
 

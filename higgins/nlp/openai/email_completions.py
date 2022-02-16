@@ -275,6 +275,6 @@ def test_summarize_email_completion():
 if __name__ == "__main__":
     # test_send_email_completion()
     # test_search_email_completion()
-    # test_compose_email_completion()
-    # test_edit_email_completion()
+    test_compose_email_completion()
+    test_edit_email_completion()
     test_summarize_email_completion()

@@ -63,7 +63,7 @@ CATEGORIES = list(set([e[1] for e in EXAMPLES]))
 
 
 def classify_intent_completion(
-    text: str, engine: str = "davinci-instruct-beta", cache: Any = None
+    text: str, engine: str = "text-davinci-001", cache: Any = None
 ) -> str:
     prompt = """Classify the following commands into categories:\n"""
     for command, category in EXAMPLES:
@@ -96,6 +96,13 @@ def classify_intent_completion(
         answer = cache[cache_key]["answer"]
         response = cache[cache_key]["response"]
 
+    # 2/10/2022: Openai added some normalization to outputs, which results in ComposeEmail --> Composeemail
+    # HACK: Map normalized names back to our class names
+    if answer.lower() == "composeemail":
+        answer = "ComposeEmail"
+    if answer.lower() == "searchemail":
+        answer = "SearchEmail"
+
     if answer not in CATEGORIES:
         print(f"Answer: {answer} not in supported intent categories: {CATEGORIES}")
         return "Other"
@@ -108,8 +115,8 @@ def classify_intent_classification(text: str, cache: Any = None) -> str:
     cache_key = nlp_utils.hash_normalized_text(text)
     if cache_key not in cache:
         response = openai.Classification.create(
-            search_model="ada",
-            model="curie",
+            search_model="text-curie-001",
+            model="text-davinci-001",
             examples=EXAMPLES,
             query=text,
             labels=CATEGORIES,
@@ -126,6 +133,17 @@ def classify_intent_classification(text: str, cache: Any = None) -> str:
     else:
         answer = cache[cache_key]["answer"]
         response = cache[cache_key]["response"]
+
+    # 2/10/2022: Openai added some normalization to outputs, which results in ComposeEmail --> Composeemail
+    # HACK: Map normalized names back to our class names
+    if answer.lower() == "composeemail":
+        answer = "ComposeEmail"
+    if answer.lower() == "searchemail":
+        answer = "SearchEmail"
+
+    if answer not in CATEGORIES:
+        print(f"Answer: {answer} not in supported intent categories: {CATEGORIES}")
+        return "Other"
 
     return answer
 
